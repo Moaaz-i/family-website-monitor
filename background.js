@@ -208,7 +208,69 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 
 chrome.alarms.create("trackTime", { periodInMinutes: 1 });
 
+// ── Auto-Update System ──────────────────────────────────────────────────────
+const VERSION_URL =
+  "https://raw.githubusercontent.com/Moaaz-i/family-website-monitor/main/version.json";
+
+function getCurrentVersion() {
+  return chrome.runtime.getManifest().version;
+}
+
+function compareVersions(v1, v2) {
+  // Returns true if v2 is newer than v1
+  const parts1 = v1.split(".").map(Number);
+  const parts2 = v2.split(".").map(Number);
+  for (let i = 0; i < Math.max(parts1.length, parts2.length); i++) {
+    const a = parts1[i] || 0;
+    const b = parts2[i] || 0;
+    if (b > a) return true;
+    if (b < a) return false;
+  }
+  return false;
+}
+
+function setUpdateBadge(hasUpdate) {
+  if (hasUpdate) {
+    chrome.action.setBadgeText({ text: "!" });
+    chrome.action.setBadgeBackgroundColor({ color: "#f97316" });
+  } else {
+    chrome.action.setBadgeText({ text: "" });
+  }
+}
+
+async function fetchAndCheckUpdates() {
+  try {
+    const response = await fetch(VERSION_URL + "?t=" + Date.now());
+    if (!response.ok) return;
+    const data = await response.json();
+    const latestVersion = data.version;
+    const releaseNotes = data.releaseNotes || "";
+    const currentVersion = getCurrentVersion();
+    const updateAvailable = compareVersions(currentVersion, latestVersion);
+    chrome.storage.local.set({
+      updateAvailable,
+      latestVersion,
+      currentVersion,
+      releaseNotes,
+      lastUpdateCheck: Date.now(),
+    });
+    setUpdateBadge(updateAvailable);
+  } catch (e) {
+    // Network error — silently ignore
+  }
+}
+
+// Check on startup
+fetchAndCheckUpdates();
+
+// Check every 6 hours
+chrome.alarms.create("checkForUpdates", { periodInMinutes: 360 });
+
 chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "checkForUpdates") {
+    fetchAndCheckUpdates();
+    return;
+  }
   if (alarm.name !== "trackTime") return;
   chrome.storage.local.get(["dailyLimit", "tempAllowed"], (data) => {
     const nowTime = new Date().getTime();
@@ -250,6 +312,21 @@ chrome.alarms.onAlarm.addListener((alarm) => {
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "checkForUpdatesNow") {
+    fetchAndCheckUpdates().then(() => {
+      chrome.storage.local.get(
+        ["updateAvailable", "latestVersion", "currentVersion", "releaseNotes"],
+        (data) => sendResponse(data),
+      );
+    });
+    return true;
+  }
+  if (message.type === "dismissUpdate") {
+    chrome.storage.local.set({ updateAvailable: false });
+    setUpdateBadge(false);
+    sendResponse({ ok: true });
+    return false;
+  }
   if (message.type === "checkTimeStatus") {
     chrome.storage.local.get(["dailyLimit", "tempAllowed"], (data) => {
       const tabUrl = sender.tab ? sender.tab.url : "";

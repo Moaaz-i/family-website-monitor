@@ -29,6 +29,80 @@ function isMatchingSite(urlString, targetSite) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ── Update UI ──────────────────────────────────────────────────────────────
+  const updateBanner      = document.getElementById("updateBanner");
+  const updateBannerVer   = document.getElementById("updateBannerVersion");
+  const updateHowBtn      = document.getElementById("updateHowBtn");
+  const updateDismissBtn  = document.getElementById("updateDismissBtn");
+  const updateModal       = document.getElementById("updateModal");
+  const modalVersionText  = document.getElementById("modalVersionText");
+  const modalReleaseNotes = document.getElementById("modalReleaseNotes");
+  const modalCloseBtn     = document.getElementById("modalCloseBtn");
+  const checkForUpdatesBtn = document.getElementById("checkForUpdatesBtn");
+
+  function showUpdateBanner(latestVersion, currentVersion) {
+    updateBannerVer.textContent = `v${currentVersion} → v${latestVersion}`;
+    updateBanner.classList.remove("hidden");
+  }
+
+  function showUpdateModal(latestVersion, currentVersion, releaseNotes) {
+    modalVersionText.textContent =
+      `Current: v${currentVersion}  →  Latest: v${latestVersion}`;
+    modalReleaseNotes.textContent = releaseNotes || "";
+    modalReleaseNotes.style.display = releaseNotes ? "block" : "none";
+    updateModal.classList.remove("hidden");
+  }
+
+  // Check storage on popup open
+  chrome.storage.local.get(
+    ["updateAvailable", "latestVersion", "currentVersion", "releaseNotes"],
+    (data) => {
+      if (data.updateAvailable) {
+        showUpdateBanner(data.latestVersion, data.currentVersion);
+      }
+    }
+  );
+
+  updateHowBtn && updateHowBtn.addEventListener("click", () => {
+    chrome.storage.local.get(
+      ["latestVersion", "currentVersion", "releaseNotes"],
+      (data) => showUpdateModal(data.latestVersion, data.currentVersion, data.releaseNotes)
+    );
+  });
+
+  updateDismissBtn && updateDismissBtn.addEventListener("click", () => {
+    updateBanner.classList.add("hidden");
+    chrome.runtime.sendMessage({ type: "dismissUpdate" });
+  });
+
+  modalCloseBtn && modalCloseBtn.addEventListener("click", () => {
+    updateModal.classList.add("hidden");
+  });
+
+  updateModal && updateModal.addEventListener("click", (e) => {
+    if (e.target === updateModal) updateModal.classList.add("hidden");
+  });
+
+  checkForUpdatesBtn && checkForUpdatesBtn.addEventListener("click", () => {
+    checkForUpdatesBtn.innerHTML = '<span class="checking-spinner">⟳</span> Checking...';
+    checkForUpdatesBtn.disabled = true;
+    chrome.runtime.sendMessage({ type: "checkForUpdatesNow" }, (data) => {
+      checkForUpdatesBtn.disabled = false;
+      if (data && data.updateAvailable) {
+        checkForUpdatesBtn.textContent = "🔔 Update available!";
+        showUpdateBanner(data.latestVersion, data.currentVersion);
+        showUpdateModal(data.latestVersion, data.currentVersion, data.releaseNotes);
+      } else {
+        checkForUpdatesBtn.textContent = "✅ Up to date";
+        setTimeout(() => {
+          checkForUpdatesBtn.textContent = "🔄 Check for Updates";
+        }, 3000);
+      }
+    });
+  });
+  // ──────────────────────────────────────────────────────────────────────────
+
+
   let activeTabUrl = "";
 
   chrome.storage.local.get("language", (data) => {

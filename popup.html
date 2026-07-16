@@ -74,9 +74,169 @@
         display: flex;
         gap: 8px;
       }
+
+      /* ── Update Banner ── */
+      .update-banner {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 14px;
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: #fff;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: default;
+        animation: slideDown 0.3s ease;
+      }
+      @keyframes slideDown {
+        from { transform: translateY(-100%); opacity: 0; }
+        to   { transform: translateY(0);    opacity: 1; }
+      }
+      .update-banner .update-icon { font-size: 16px; flex-shrink: 0; }
+      .update-banner .update-text { flex: 1; }
+      .update-banner .update-version {
+        font-size: 10px;
+        opacity: 0.85;
+        display: block;
+        margin-top: 1px;
+      }
+      .update-banner-btn {
+        background: rgba(255,255,255,0.25);
+        border: 1px solid rgba(255,255,255,0.5);
+        color: #fff;
+        border-radius: 5px;
+        padding: 3px 9px;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.2s;
+      }
+      .update-banner-btn:hover { background: rgba(255,255,255,0.4); }
+      .update-dismiss {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.7);
+        font-size: 16px;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      .update-dismiss:hover { color: #fff; }
+
+      /* ── Update Modal ── */
+      .update-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.55);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        animation: fadeIn 0.2s ease;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; } to { opacity: 1; }
+      }
+      .update-modal {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 20px;
+        width: 300px;
+        max-width: 90%;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      }
+      .update-modal h4 {
+        margin: 0 0 4px 0;
+        font-size: 15px;
+        color: var(--primary);
+      }
+      .update-modal .modal-version {
+        font-size: 11px;
+        color: var(--text-muted, #888);
+        margin-bottom: 12px;
+      }
+      .update-modal .steps {
+        background: var(--bg-hover);
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 14px;
+        font-size: 12px;
+        line-height: 1.8;
+      }
+      .update-modal .steps code {
+        background: var(--border);
+        padding: 1px 5px;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 11px;
+      }
+      .update-modal .modal-notes {
+        font-size: 11px;
+        color: var(--text-muted, #888);
+        margin-bottom: 14px;
+        padding: 8px;
+        border-left: 3px solid var(--primary);
+        background: var(--bg-hover);
+        border-radius: 0 6px 6px 0;
+      }
+      .update-modal .modal-footer {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+
+      /* ── Check for Updates button ── */
+      .btn-check-update {
+        font-size: 11px;
+        padding: 6px 10px;
+        opacity: 0.85;
+      }
+      .btn-check-update:hover { opacity: 1; }
+      .checking-spinner {
+        display: inline-block;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(360deg); }
+      }
     </style>
   </head>
   <body class="popup-body">
+
+    <!-- Update Banner (hidden by default) -->
+    <div id="updateBanner" class="update-banner hidden">
+      <span class="update-icon">🔔</span>
+      <div class="update-text">
+        Update available!
+        <span class="update-version" id="updateBannerVersion"></span>
+      </div>
+      <button class="update-banner-btn" id="updateHowBtn">How to update</button>
+      <button class="update-dismiss" id="updateDismissBtn" title="Dismiss">&times;</button>
+    </div>
+
+    <!-- Update Modal (hidden by default) -->
+    <div id="updateModal" class="update-modal-overlay hidden">
+      <div class="update-modal">
+        <h4>🚀 Update Available</h4>
+        <div class="modal-version" id="modalVersionText"></div>
+        <div class="steps">
+          <strong>Steps to update:</strong><br>
+          1️⃣ Open Terminal in the extension folder<br>
+          2️⃣ Run: <code>./update.sh</code><br>
+          3️⃣ Go to <code>chrome://extensions</code><br>
+          4️⃣ Click 🔄 <strong>Reload</strong> on this extension
+        </div>
+        <div class="modal-notes" id="modalReleaseNotes"></div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="modalCloseBtn">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Lock Screen Section -->
     <div id="lockScreen" class="card">
       <h3
@@ -193,7 +353,7 @@
       </div>
 
       <!-- Footer Buttons -->
-      <div class="footer-actions">
+      <div class="footer-actions" style="flex-wrap: wrap;">
         <button
           id="savePopupSettingsBtn"
           class="btn btn-primary"
@@ -209,6 +369,13 @@
           data-i18n="openDashboard"
         >
           Open Control Panel
+        </button>
+        <button
+          id="checkForUpdatesBtn"
+          class="btn btn-secondary btn-check-update"
+          style="width: 100%; margin-top: 0;"
+        >
+          🔄 Check for Updates
         </button>
       </div>
     </div>
