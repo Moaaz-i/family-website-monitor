@@ -1,0 +1,469 @@
+/* Import Google Fonts (Inter for English, Cairo for Arabic) */
+@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap");
+
+/* ─── CSS Variables & Base Styles ────────── */
+:root {
+  --font-family: "Cairo", "Inter", "Segoe UI", sans-serif;
+
+  /* Light Mode (Sophisticated Glass) */
+  --bg-light: rgba(255, 255, 255, 0.65);
+  --bg-body-light: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  --text-light: #0f172a;
+  --border-light: rgba(15, 23, 42, 0.08);
+  --shadow-light: rgba(15, 23, 42, 0.08);
+
+  /* Dark Mode (Cyber Metallic Feel) */
+  --bg-dark: rgba(15, 23, 42, 0.75);
+  --bg-body-dark: radial-gradient(
+    circle at top center,
+    #1e293b 0%,
+    #0f172a 100%
+  );
+  --text-dark: #f8fafc;
+  --border-dark: rgba(255, 255, 255, 0.06);
+  --shadow-dark: rgba(0, 0, 0, 0.4);
+
+  /* Vibrant Accents */
+  --primary: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  --primary-glow: rgba(59, 130, 246, 0.35);
+  --danger: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+  --danger-glow: rgba(239, 68, 68, 0.35);
+  --success: linear-gradient(135deg, #10b981 0%, #047857 100%);
+  --success-glow: rgba(16, 185, 129, 0.35);
+
+  --blur: 24px;
+  --radius: 20px;
+
+  /* Default Setup */
+  --bg: var(--bg-light);
+  --bg-body: var(--bg-body-light);
+  --text: var(--text-light);
+  --border: var(--border-light);
+  --shadow-color: var(--shadow-light);
+}
+
+body.dark {
+  --bg: var(--bg-dark);
+  --bg-body: var(--bg-body-dark);
+  --text: var(--text-dark);
+  --border: var(--border-dark);
+  --shadow-color: var(--shadow-dark);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background: var(--bg-body);
+  color: var(--text);
+  margin: 0;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  font-size: 16px;
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition:
+    background 0.4s ease,
+    color 0.3s ease;
+}
+
+/* ─── Premium Card Container ────────── */
+.card {
+  background: var(--bg);
+  backdrop-filter: blur(var(--blur));
+  -webkit-backdrop-filter: blur(var(--blur));
+  border-radius: var(--radius);
+  padding: 3rem 2.5rem;
+  margin: 0 auto;
+  box-shadow:
+    0 20px 50px -12px var(--shadow-color),
+    0 0 0 1px var(--border);
+  border: none;
+  max-width: 550px;
+  width: 100%;
+  transition:
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.4s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 30px 60px -15px var(--shadow-color);
+}
+
+.card h3 {
+  text-align: center;
+}
+
+h2,
+h3 {
+  margin-top: 0;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  font-size: 2.2rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, var(--text), hsl(215, 60%, 50%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h3 {
+  font-size: 1.35rem;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+  text-align: var(--direction-start, left);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.9;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  color: var(--text);
+  opacity: 0.75;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/* RTL / LTR Alignment */
+html[dir="rtl"] {
+  --direction-start: right;
+  --direction-end: left;
+}
+html[dir="ltr"] {
+  --direction-start: left;
+  --direction-end: right;
+}
+
+/* ─── Neon Fields & Forms ────────── */
+input,
+select {
+  width: 100%;
+  padding: 16px 20px;
+  margin-bottom: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: var(--font-family);
+  background: rgba(128, 128, 128, 0.05);
+  color: var(--text);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+input:focus,
+select:focus {
+  outline: none;
+  background: rgba(128, 128, 128, 0.1);
+  border-color: #3b82f6;
+  box-shadow:
+    0 0 0 4px var(--primary-glow),
+    inset 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+body:not(.dark) input,
+body:not(.dark) select {
+  background: rgba(255, 255, 255, 0.8);
+}
+
+/* ─── Ultra Powerful Buttons ────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 15px;
+  font-family: var(--font-family);
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--primary-glow);
+}
+
+.btn-success {
+  background: var(--success);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--success-glow);
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 4px 14px var(--danger-glow);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(8px);
+}
+.btn-secondary:hover {
+  background: rgba(128, 128, 128, 0.1);
+}
+
+/* ─── Components Quick Tweak ────────── */
+.popup-body {
+  padding: 0.5rem;
+  width: 320px;
+}
+.popup-body .card {
+  padding: 2rem 1.5rem;
+  border-radius: var(--radius);
+}
+
+.add-site-box {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 2rem;
+}
+.add-site-box input {
+  margin: 0;
+}
+.add-site-box .btn {
+  width: auto;
+  margin: 0;
+  padding: 0 28px;
+}
+
+/* ─── Sleek Minimal Lists ────────── */
+ul {
+  padding: 0;
+  margin: 24px 0 2.5rem 0;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(128, 128, 128, 0.02);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+li {
+  list-style-type: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  text-align: var(--direction-start, left);
+  transition: background-color 0.2s ease;
+}
+
+li:last-child {
+  border-bottom: none;
+}
+li:hover {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+li .btn {
+  width: auto;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 8px;
+}
+
+/* ─── Modern Cyber Tables ────────── */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background: rgba(128, 128, 128, 0.01);
+}
+
+th,
+td {
+  padding: 14px 20px;
+  text-align: var(--direction-start, left);
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+th {
+  background-color: rgba(128, 128, 128, 0.06);
+  font-weight: 700;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.03em;
+}
+
+td {
+  border-bottom: 1px solid var(--border);
+  opacity: 0.9;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+tr:nth-child(even) {
+  background-color: rgba(128, 128, 128, 0.03);
+}
+
+.clear-log-btn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  opacity: 0.6;
+}
+.clear-log-btn:hover {
+  opacity: 1;
+  background: var(--danger);
+  color: white;
+  border-color: transparent;
+  box-shadow: 0 4px 12px var(--danger-glow);
+}
+
+/* 1. منع الجدول من الخروج وإظهار شريط تمرير داخلي مريح إذا لزم الأمر */
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 1.5rem;
+  margin-bottom: 2rem;
+  border-radius: 14px;
+}
+
+/* 2. تحديث خصائص الجدول ليتناسب مع الحاوية الجديدة */
+table {
+  width: 100%;
+  max-width: 100%;
+  table-layout: auto; /* يجعل توزيع الأعمدة مرناً */
+  margin-top: 0 !important; /* إلغاء الهامش القديم لأنه نُقل للحاوية */
+  margin-bottom: 0 !important;
+}
+
+/* 3. كسر الكلمات والروابط الطويلة جداً حتى لا تدفع بحدود الجدول للخارج */
+th,
+td {
+  white-space: nowrap; /* يمنع نزول النصوص القصيرة لسطر جديد بشكل مشوه */
+  word-break: break-word;
+}
+
+td:first-child {
+  white-space: normal;
+  min-width: 120px;
+}
+
+/* Custom Toast Notification System */
+#toastContainer {
+  position: fixed !important;
+  top: 8% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 2147483647 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+  pointer-events: none !important;
+  max-width: 520px !important;
+  width: 90vw !important;
+  min-width: 380px !important;
+}
+
+.toast {
+  background: var(--bg) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--border) !important;
+  border-left: 6px solid #3b82f6 !important;
+  padding: 20px 28px !important;
+  border-radius: 16px !important;
+  box-shadow: 0 20px 40px var(--shadow-color) !important;
+  color: var(--text) !important;
+  font-family: var(--font-family) !important;
+  font-size: 18px !important;
+  line-height: 1.5 !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 16px !important;
+  pointer-events: auto !important;
+  opacity: 0 !important;
+  transform: translateY(30px) scale(0.95) !important;
+  transition:
+    opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body[dir="rtl"] .toast {
+  border-left: none !important;
+  border-right: 6px solid #3b82f6 !important;
+}
+
+.toast.show {
+  opacity: 1 !important;
+  transform: translateY(0) scale(1) !important;
+}
+
+.toast.success {
+  border-left-color: #10b981 !important;
+}
+body[dir="rtl"] .toast.success {
+  border-right-color: #10b981 !important;
+  border-left: none !important;
+}
+
+.toast.error {
+  border-left-color: #ef4444 !important;
+}
+body[dir="rtl"] .toast.error {
+  border-right-color: #ef4444 !important;
+  border-left: none !important;
+}
+
+.toast.warning {
+  border-left-color: #fbbf24 !important;
+}
+body[dir="rtl"] .toast.warning {
+  border-right-color: #fbbf24 !important;
+  border-left: none !important;
+}

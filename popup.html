@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      .popup-body {
+        min-width: 360px;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .popup-body .card {
+        margin: 0;
+        padding-inline: 13px;
+        padding-top: 0;
+        padding-bottom: 20px;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .form-group {
+        margin-bottom: 12px;
+      }
+      .current-site-box {
+        background: var(--bg-hover);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 12px;
+        margin-bottom: 16px;
+        font-weight: 600;
+        word-break: break-all;
+      }
+      .preset-buttons {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+      }
+      .preset-btn {
+        flex: 1;
+        padding: 4px 8px;
+        font-size: 11px;
+        border-radius: 4px;
+        background: var(--bg-hover);
+        border: 1px solid var(--border);
+        color: var(--text);
+        cursor: pointer;
+      }
+      .preset-btn:hover {
+        background: var(--border);
+      }
+      .status-tag {
+        display: inline-block;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: bold;
+        margin-left: 6px;
+      }
+      .status-whitelisted {
+        background: #d1fae5;
+        color: #065f46;
+      }
+      .status-restricted {
+        background: #fef3c7;
+        color: #92400e;
+      }
+      .status-limited {
+        background: #dbeafe;
+        color: #1e40af;
+      }
+      .footer-actions {
+        margin-top: 16px;
+        display: flex;
+        gap: 8px;
+      }
+    </style>
+  </head>
+  <body class="popup-body">
+    <!-- Lock Screen Section -->
+    <div id="lockScreen" class="card">
+      <h3
+        style="border: none; padding: 0; margin-bottom: 1rem"
+        data-i18n="popupTitle"
+      >
+        Family Protection Active
+      </h3>
+      <div class="form-group">
+        <label
+          data-i18n="unlockPopup"
+          style="font-size: 12px; margin-bottom: 6px; display: block"
+          >Enter parent password to manage</label
+        >
+        <input type="password" id="popupPassword" style="margin-bottom: 8px" />
+        <button id="unlockBtn" class="btn btn-primary" data-i18n="unlockButton">
+          Unlock
+        </button>
+      </div>
+    </div>
+
+    <!-- Management Dashboard Section -->
+    <div id="managementDashboard" class="card hidden">
+      <h3
+        style="border: none; padding: 0; margin-bottom: 0.5rem"
+        data-i18n="optionsTitle"
+      >
+        Parental Control Panel
+      </h3>
+
+      <!-- Current Domain -->
+      <div class="current-site-box">
+        <span data-i18n="currentSite">Current Site:</span>
+        <div
+          id="currentDomain"
+          style="color: var(--primary); font-size: 14px; margin-top: 4px"
+        >
+          loading...
+        </div>
+      </div>
+
+      <!-- Current Status -->
+      <div class="form-group" style="font-size: 12px">
+        <span data-i18n="statusLabel">Status:</span>
+        <span
+          id="currentStatusTag"
+          class="status-tag status-restricted"
+          data-i18n="statusRestricted"
+          >Restricted</span
+        >
+      </div>
+
+      <!-- Whitelist Button -->
+      <div class="form-group">
+        <button
+          id="toggleWhitelistBtn"
+          class="btn btn-success"
+          style="width: 100%"
+          data-i18n="alwaysAllowSite"
+        >
+          Always Allow Site
+        </button>
+      </div>
+
+      <!-- Daily Limit Form -->
+      <div
+        class="form-group"
+        style="
+          border-top: 1px solid var(--border);
+          padding-top: 12px;
+          margin-top: 12px;
+        "
+      >
+        <h4 style="margin: 0 0 8px 0" data-i18n="setDailyLimit">
+          Set Daily Limit
+        </h4>
+        <input
+          type="number"
+          id="popupLimitMinutes"
+          data-i18n-placeholder="limitMinutesInput"
+          min="0"
+          style="margin-bottom: 6px"
+        />
+        <div class="preset-buttons">
+          <button class="preset-btn" data-minutes="15">15m</button>
+          <button class="preset-btn" data-minutes="30">30m</button>
+          <button class="preset-btn" data-minutes="60">1h</button>
+          <button class="preset-btn" data-minutes="120">2h</button>
+        </div>
+      </div>
+
+      <!-- Emergency Lock Toggle -->
+      <div
+        class="form-group"
+        style="
+          border-top: 1px solid var(--border);
+          padding-top: 12px;
+          margin-top: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <span
+          data-i18n="emergencyLockToggle"
+          style="font-size: 13px; font-weight: bold"
+          >Emergency Lock</span
+        >
+        <input
+          type="checkbox"
+          id="popupEmergencyLock"
+          style="width: auto; margin: 0"
+        />
+      </div>
+
+      <!-- Footer Buttons -->
+      <div class="footer-actions">
+        <button
+          id="savePopupSettingsBtn"
+          class="btn btn-primary"
+          style="flex: 1"
+          data-i18n="saveSettings"
+        >
+          Save Settings
+        </button>
+        <button
+          id="openOptions"
+          class="btn btn-secondary"
+          style="flex: 1"
+          data-i18n="openDashboard"
+        >
+          Open Control Panel
+        </button>
+      </div>
+    </div>
+
+    <script src="toast.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

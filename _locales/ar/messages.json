@@ -1,0 +1,274 @@
+{
+  "appName": {
+    "message": "مراقب مواقع العائلة",
+    "description": "اسم التطبيق."
+  },
+  "appDescription": {
+    "message": "إضافة متقدمة لحظر المواقع غير المصرح بها مع تحكم كامل في المسارات والجداول الزمنية وحماية بكلمة مرور أبوية.",
+    "description": "وصف التطبيق."
+  },
+  "optionsTitle": {
+    "message": "لوحة تحكم الرقابة الأبوية",
+    "description": "عنوان صفحة الخيارات."
+  },
+  "popupTitle": {
+    "message": "حماية العائلة مفعلة",
+    "description": "عنوان النافذة المنبثقة."
+  },
+  "openDashboard": {
+    "message": "فتح لوحة التحكم",
+    "description": "نص زر فتح صفحة الخيارات."
+  },
+  "blockedTitle": {
+    "message": "الموقع محظور",
+    "description": "عنوان صفحة الحظر."
+  },
+  "blockedSorry": {
+    "message": "عذراً، هذا الموقع غير مسموح به حالياً.",
+    "description": "العنوان الرئيسي في صفحة الحظر."
+  },
+  "blockedSite": {
+    "message": "الموقع المحظور:",
+    "description": "تسمية للرابط المحظور."
+  },
+  "blockedReasonDefault": {
+    "message": "مطلوب إذن ولي الأمر للوصول.",
+    "description": "السبب الافتراضي لحظر موقع."
+  },
+  "blockedReasonSchedule": {
+    "message": "تم حظر هذا الموقع لأنه خارج أوقات التصفح المسموح بها.",
+    "description": "سبب الحظر بسبب الجدول الزمني."
+  },
+  "blockedReasonLimit": {
+    "message": "تم حظر هذا الموقع لأنه تم تجاوز الحد الزمني اليومي.",
+    "description": "سبب الحظر بسبب الحد اليومي."
+  },
+  "blockedReasonEmergency": {
+    "message": "قفل الطوارئ مفعل. جميع المواقع محظورة.",
+    "description": "سبب الحظر بسبب قفل الطوارئ."
+  },
+  "enterParentPassword": {
+    "message": "أدخل كلمة مرور ولي الأمر",
+    "description": "نص مؤقت لحقل كلمة المرور."
+  },
+  "verify": {
+    "message": "تحقق",
+    "description": "نص زر التحقق من كلمة المرور."
+  },
+  "setupTitle": {
+    "message": "تعيين كلمة مرور ولي الأمر 🛡️",
+    "description": "عنوان شاشة الإعداد الأولي."
+  },
+  "setupDescription": {
+    "message": "يرجى تعيين كلمة مرور لحماية الإعدادات وإدارة المواقع.",
+    "description": "وصف شاشة الإعداد."
+  },
+  "loginTitle": {
+    "message": "تسجيل دخول ولي الأمر 🔑",
+    "description": "عنوان شاشة تسجيل الدخول."
+  },
+  "loginDescription": {
+    "message": "أدخل كلمة المرور لفتح لوحة التحكم.",
+    "description": "وصف شاشة تسجيل الدخول."
+  },
+  "saveAndActivate": {
+    "message": "حفظ وتفعيل الحماية",
+    "description": "نص زر حفظ كلمة المرور الأولية."
+  },
+  "siteAddedSuccess": {
+    "message": "تمت إضافة الموقع إلى القائمة البيضاء بنجاح!",
+    "description": "رسالة تنبيه."
+  },
+  "tempAllowSuccess": {
+    "message": "تم السماح بالموقع لمدة $MINUTES$ دقيقة.",
+    "description": "رسالة تنبيه للوصول المؤقت. $MINUTES$ هو متغير.",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "15"
+      }
+    }
+  },
+  "invalidMinutes": {
+    "message": "الرجاء إدخال عدد صحيح من الدقائق!",
+    "description": "رسالة تنبيه."
+  },
+  "passwordIncorrect": {
+    "message": "كلمة المرور غير صحيحة! يرجى المحاولة مرة أخرى.",
+    "description": "رسالة تنبيه."
+  },
+  "enterNewPassword": {
+    "message": "أدخل كلمة المرور الجديدة",
+    "description": "نص مؤقت لحقل كلمة المرور الجديدة."
+  },
+  "confirmPassword": {
+    "message": "تأكيد كلمة المرور",
+    "description": "نص مؤقت لتأكيد كلمة المرور."
+  },
+  "loginPasswordPlaceholder": {
+    "message": "كلمة المرور",
+    "description": "نص مؤقت لحقل كلمة مرور تسجيل الدخول."
+  },
+  "loginButton": {
+    "message": "تسجيل الدخول",
+    "description": "نص زر تسجيل الدخول."
+  },
+  "tabWhitelist": {
+    "message": "القائمة البيضاء",
+    "description": "عنوان تبويب القائمة البيضاء."
+  },
+  "tabSchedule": {
+    "message": "الجدول الزمني",
+    "description": "عنوان تبويب الجدول الزمني."
+  },
+  "tabLimits": {
+    "message": "الحدود الزمنية",
+    "description": "عنوان تبويب الحدود."
+  },
+  "tabLog": {
+    "message": "السجل",
+    "description": "عنوان تبويب سجل النشاط."
+  },
+  "tabSettings": {
+    "message": "الإعدادات",
+    "description": "عنوان تبويب الإعدادات."
+  },
+  "allowedWebsites": {
+    "message": "المواقع المسموح بها 🌐",
+    "description": "عنوان قسم إدارة القائمة البيضاء."
+  },
+  "addSitePlaceholder": {
+    "message": "https://example.com/page",
+    "description": "نص مؤقت لحقل إدخال الرابط."
+  },
+  "addButton": {
+    "message": "إضافة",
+    "description": "نص زر إضافة موقع للقائمة البيضاء."
+  },
+  "browsingSchedule": {
+    "message": "جدول التصفح",
+    "description": "عنوان قسم الجدول الزمني."
+  },
+  "allowedDays": {
+    "message": "الأيام المسموح بها:",
+    "description": "تسمية لمحدد الأيام."
+  },
+  "daySun": { "message": "الأحد" },
+  "dayMon": { "message": "الاثنين" },
+  "dayTue": { "message": "الثلاثاء" },
+  "dayWed": { "message": "الأربعاء" },
+  "dayThu": { "message": "الخميس" },
+  "dayFri": { "message": "الجمعة" },
+  "daySat": { "message": "السبت" },
+  "allowedTime": {
+    "message": "الوقت المسموح به:",
+    "description": "تسمية لمحدد نطاق الوقت."
+  },
+  "timeSeparator": {
+    "message": "إلى",
+    "description": "فاصل بين وقت البدء والانتهاء."
+  },
+  "saveScheduleButton": {
+    "message": "حفظ الجدول الزمني",
+    "description": "زر لحفظ إعدادات الجدول الزمني."
+  },
+  "dailyLimit": {
+    "message": "الحد اليومي",
+    "description": "عنوان قسم الحد اليومي."
+  },
+  "minutesPlaceholder": {
+    "message": "دقائق",
+    "description": "نص مؤقت لإدخال الدقائق."
+  },
+  "saveLimitButton": {
+    "message": "حفظ الحد",
+    "description": "زر لحفظ الحد اليومي."
+  },
+  "enableDailyLimit": {
+    "message": "تفعيل الحد اليومي للموقع",
+    "description": "تسمية لخيار تفعيل وضع التشغيل بالحد اليومي."
+  },
+  "emergencyLock": {
+    "message": "قفل الطوارئ 🔒",
+    "description": "عنوان قسم قفل الطوارئ."
+  },
+  "enableLockButton": {
+    "message": "تفعيل القفل",
+    "description": "زر لتفعيل قفل الطوارئ."
+  },
+  "disableLockButton": {
+    "message": "تعطيل القفل",
+    "description": "زر لتعطيل قفل الطوارئ."
+  },
+  "failedAttempts": {
+    "message": "المحاولات الفاشلة",
+    "description": "عنوان سجل المحاولات الفاشلة."
+  },
+  "tableHeaderWebsite": { "message": "الموقع" },
+  "tableHeaderTime": { "message": "الوقت" },
+  "clearLogButton": {
+    "message": "مسح السجل",
+    "description": "زر لمسح سجل النشاط."
+  },
+  "settingsAppearance": {
+    "message": "المظهر",
+    "description": "عنوان إعدادات المظهر."
+  },
+  "themeToggleDark": { "message": "الوضع الداكن" },
+  "themeToggleLight": { "message": "الوضع الفاتح" },
+  "changePassword": { "message": "تغيير كلمة المرور" },
+  "newPasswordPlaceholder": { "message": "كلمة المرور الجديدة" },
+  "confirmPasswordPlaceholder": { "message": "تأكيد كلمة المرور الجديدة" },
+  "changePasswordButton": { "message": "تغيير كلمة المرور" },
+  "backupAndRestore": { "message": "النسخ الاحتياطي والاستعادة" },
+  "exportButton": { "message": "تصدير" },
+  "importButton": { "message": "استيراد" },
+  "resetExtension": { "message": "إعادة تعيين الإضافة" },
+  "resetAllButton": { "message": "إعادة تعيين الكل" },
+  "chooseAction": { "message": "اختر إجراءً:" },
+  "allowAlways": { "message": "إضافة دائمة إلى القائمة البيضاء" },
+  "allowTemp": { "message": "السماح لوقت محدد (بالدقائق)" },
+  "minutesTempPlaceholder": { "message": "دقائق (إذا كان مؤقتاً)" },
+  "saveAndApply": { "message": "حفظ وتطبيق" },
+  "fillAllFields": { "message": "يرجى ملء جميع الحقول!" },
+  "passwordsDontMatch": { "message": "كلمات المرور غير متطابقة!" },
+  "invalidUrl": { "message": "رابط غير صالح!" },
+  "siteAlreadyWhitelisted": {
+    "message": "هذا الموقع موجود بالفعل في القائمة البيضاء!"
+  },
+  "deleteButton": { "message": "حذف" },
+  "noSitesAdded": {
+    "message": "لم تتم إضافة أي مواقع بعد. جميع المواقع محظورة حاليًا."
+  },
+  "scheduleSaved": { "message": "تم حفظ الجدول الزمني!" },
+  "dailyLimitSaved": { "message": "تم حفظ الحد اليومي!" },
+  "emergencyLockEnabled": { "message": "تم تفعيل قفل الطوارئ!" },
+  "emergencyLockDisabled": { "message": "تم تعطيل قفل الطوارئ!" },
+  "noFailedAttempts": { "message": "لم يتم تسجيل أي محاولات فاشلة." },
+  "passwordChanged": { "message": "تم تغيير كلمة المرور!" },
+  "dataImported": { "message": "تم استيراد البيانات!" },
+  "invalidFile": { "message": "ملف غير صالح!" },
+  "resetConfirm": {
+    "message": "هل أنت متأكد؟ سيؤدي هذا إلى حذف جميع البيانات."
+  },
+  "extensionReset": { "message": "تمت إعادة تعيين الإضافة!" },
+  "settingsLanguage": { "message": "اللغة" },
+  "unlockPopup": { "message": "أدخل كلمة مرور الأبوين للتحكم" },
+  "currentSite": { "message": "الموقع الحالي:" },
+  "alwaysAllowSite": { "message": "السماح دائماً بهذا الموقع" },
+  "removeFromWhitelist": { "message": "إزالة من القائمة البيضاء" },
+  "setDailyLimit": { "message": "تعيين حد يومي" },
+  "quickPresets": { "message": "خيارات سريعة" },
+  "limitMinutesInput": { "message": "الحد بالدقائق" },
+  "saveSettings": { "message": "حفظ الإعدادات" },
+  "unlockButton": { "message": "فتح القفل" },
+  "statusLabel": { "message": "الحالة:" },
+  "statusWhitelisted": { "message": "مسموح به دائماً" },
+  "statusRestricted": { "message": "خاضع للرقابة" },
+  "statusLimited": { "message": "محدد بوقت" },
+  "emergencyLockToggle": { "message": "قفل الطوارئ" },
+  "settingsSaved": {
+    "message": "تم حفظ الإعدادات بنجاح!",
+    "description": "رسالة نجاح عند حفظ إعدادات النافذة المنبثقة."
+  }
+}

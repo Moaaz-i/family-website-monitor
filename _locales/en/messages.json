@@ -1,0 +1,271 @@
+{
+  "appName": {
+    "message": "Family Website Monitor",
+    "description": "The name of the application."
+  },
+  "appDescription": {
+    "message": "An advanced extension to block unauthorized sites with full control over paths, schedules, and parental password protection.",
+    "description": "The description of the application."
+  },
+  "optionsTitle": {
+    "message": "Parental Control Panel",
+    "description": "Title for the options page."
+  },
+  "popupTitle": {
+    "message": "Family Protection Active",
+    "description": "Title for the popup."
+  },
+  "openDashboard": {
+    "message": "Open Control Panel",
+    "description": "Button text to open the options page."
+  },
+  "blockedTitle": {
+    "message": "Site Blocked",
+    "description": "Title for the blocked page."
+  },
+  "blockedSorry": {
+    "message": "Sorry, this site is not currently allowed.",
+    "description": "Main heading on the blocked page."
+  },
+  "blockedSite": {
+    "message": "Blocked Site:",
+    "description": "Label for the blocked URL."
+  },
+  "blockedReasonDefault": {
+    "message": "Parental permission is required for access.",
+    "description": "Default reason for a site being blocked."
+  },
+  "blockedReasonSchedule": {
+    "message": "This site is blocked because it is outside of the allowed browsing times.",
+    "description": "Reason for blocking due to schedule."
+  },
+  "blockedReasonLimit": {
+    "message": "This site is blocked because the daily time limit has been exceeded.",
+    "description": "Reason for blocking due to daily limit."
+  },
+  "blockedReasonEmergency": {
+    "message": "Emergency Lock is active. All sites are blocked.",
+    "description": "Reason for blocking due to emergency lock."
+  },
+  "enterParentPassword": {
+    "message": "Enter parent password",
+    "description": "Placeholder for password input."
+  },
+  "verify": {
+    "message": "Verify",
+    "description": "Button text to verify password."
+  },
+  "setupTitle": {
+    "message": "Set Parent Password 🛡️",
+    "description": "Title for the initial setup screen."
+  },
+  "setupDescription": {
+    "message": "Please set a password to protect settings and manage websites.",
+    "description": "Description for the setup screen."
+  },
+  "loginTitle": {
+    "message": "Parent Login 🔑",
+    "description": "Title for the login screen."
+  },
+  "loginDescription": {
+    "message": "Enter the password to open the control panel.",
+    "description": "Description for the login screen."
+  },
+  "saveAndActivate": {
+    "message": "Save and Activate Protection",
+    "description": "Button text for saving the initial password."
+  },
+  "siteAddedSuccess": {
+    "message": "Site added to whitelist successfully!",
+    "description": "Alert message."
+  },
+  "tempAllowSuccess": {
+    "message": "Site allowed for $MINUTES$ minutes.",
+    "description": "Alert message for temporary access. $MINUTES$ is a placeholder.",
+    "placeholders": {
+      "minutes": {
+        "content": "$1",
+        "example": "15"
+      }
+    }
+  },
+  "invalidMinutes": {
+    "message": "Please enter a valid number of minutes!",
+    "description": "Alert message."
+  },
+  "passwordIncorrect": {
+    "message": "Incorrect password! Please try again.",
+    "description": "Alert message."
+  },
+  "enterNewPassword": {
+    "message": "Enter new password",
+    "description": "Placeholder for new password input."
+  },
+  "confirmPassword": {
+    "message": "Confirm password",
+    "description": "Placeholder for confirming a password."
+  },
+  "loginPasswordPlaceholder": {
+    "message": "Password",
+    "description": "Placeholder for the main login password field."
+  },
+  "loginButton": {
+    "message": "Login",
+    "description": "Text for the login button."
+  },
+  "tabWhitelist": {
+    "message": "Whitelist",
+    "description": "Tab title for the whitelist section."
+  },
+  "tabSchedule": {
+    "message": "Schedule",
+    "description": "Tab title for the schedule section."
+  },
+  "tabLimits": {
+    "message": "Limits",
+    "description": "Tab title for the limits section."
+  },
+  "tabLog": {
+    "message": "Log",
+    "description": "Tab title for the activity log section."
+  },
+  "tabSettings": {
+    "message": "Settings",
+    "description": "Tab title for the settings section."
+  },
+  "allowedWebsites": {
+    "message": "Allowed Websites 🌐",
+    "description": "Header for the whitelist management section."
+  },
+  "addSitePlaceholder": {
+    "message": "https://example.com/page",
+    "description": "Placeholder for the URL input field."
+  },
+  "addButton": {
+    "message": "Add",
+    "description": "Button text to add a site to the whitelist."
+  },
+  "browsingSchedule": {
+    "message": "Browsing Schedule",
+    "description": "Header for the schedule section."
+  },
+  "allowedDays": {
+    "message": "Allowed Days:",
+    "description": "Label for the day selector."
+  },
+  "daySun": { "message": "Sun" },
+  "dayMon": { "message": "Mon" },
+  "dayTue": { "message": "Tue" },
+  "dayWed": { "message": "Wed" },
+  "dayThu": { "message": "Thu" },
+  "dayFri": { "message": "Fri" },
+  "daySat": { "message": "Sat" },
+  "allowedTime": {
+    "message": "Allowed Time:",
+    "description": "Label for the time range selector."
+  },
+  "timeSeparator": {
+    "message": "to",
+    "description": "Separator between start and end time."
+  },
+  "saveScheduleButton": {
+    "message": "Save Schedule",
+    "description": "Button to save schedule settings."
+  },
+  "dailyLimit": {
+    "message": "Daily Limit",
+    "description": "Header for the daily limit section."
+  },
+  "minutesPlaceholder": {
+    "message": "Minutes",
+    "description": "Placeholder for minutes input."
+  },
+  "saveLimitButton": {
+    "message": "Save Limit",
+    "description": "Button to save the daily limit."
+  },
+  "enableDailyLimit": {
+    "message": "Enable Daily Limit",
+    "description": "Label for the daily limit activation checkbox."
+  },
+  "emergencyLock": {
+    "message": "Emergency Lock 🔒",
+    "description": "Header for the emergency lock section."
+  },
+  "enableLockButton": {
+    "message": "Enable Lock",
+    "description": "Button to enable the emergency lock."
+  },
+  "disableLockButton": {
+    "message": "Disable Lock",
+    "description": "Button to disable the emergency lock."
+  },
+  "failedAttempts": {
+    "message": "Failed Attempts",
+    "description": "Header for the failed attempts log."
+  },
+  "tableHeaderWebsite": { "message": "Website" },
+  "tableHeaderTime": { "message": "Time" },
+  "clearLogButton": {
+    "message": "Clear Log",
+    "description": "Button to clear the activity log."
+  },
+  "settingsAppearance": {
+    "message": "Appearance",
+    "description": "Header for appearance settings."
+  },
+  "themeToggleDark": { "message": "Dark Mode" },
+  "themeToggleLight": { "message": "Light Mode" },
+  "changePassword": { "message": "Change Password" },
+  "newPasswordPlaceholder": { "message": "New password" },
+  "confirmPasswordPlaceholder": { "message": "Confirm new password" },
+  "changePasswordButton": { "message": "Change Password" },
+  "backupAndRestore": { "message": "Backup & Restore" },
+  "exportButton": { "message": "Export" },
+  "importButton": { "message": "Import" },
+  "resetExtension": { "message": "Reset Extension" },
+  "resetAllButton": { "message": "Reset All" },
+  "chooseAction": { "message": "Choose an action:" },
+  "allowAlways": { "message": "Add permanently to whitelist" },
+  "allowTemp": { "message": "Allow for a specific time (minutes)" },
+  "minutesTempPlaceholder": { "message": "Minutes (if temporary)" },
+  "saveAndApply": { "message": "Save and Apply" },
+  "fillAllFields": { "message": "Please fill all fields!" },
+  "passwordsDontMatch": { "message": "Passwords do not match!" },
+  "invalidUrl": { "message": "Invalid URL!" },
+  "siteAlreadyWhitelisted": {
+    "message": "This site is already on the whitelist!"
+  },
+  "deleteButton": { "message": "Delete" },
+  "noSitesAdded": {
+    "message": "No sites added yet. All websites are currently blocked."
+  },
+  "scheduleSaved": { "message": "Schedule saved!" },
+  "dailyLimitSaved": { "message": "Daily limit saved!" },
+  "emergencyLockEnabled": { "message": "Emergency Lock Enabled!" },
+  "emergencyLockDisabled": { "message": "Emergency Lock Disabled!" },
+  "noFailedAttempts": { "message": "No failed attempts recorded." },
+  "passwordChanged": { "message": "Password changed!" },
+  "dataImported": { "message": "Data imported!" },
+  "invalidFile": { "message": "Invalid file!" },
+  "resetConfirm": { "message": "Are you sure? This will delete all data." },
+  "extensionReset": { "message": "Extension reset!" },
+  "unlockPopup": { "message": "Enter parent password to manage" },
+  "currentSite": { "message": "Current Site:" },
+  "alwaysAllowSite": { "message": "Always Allow Site" },
+  "removeFromWhitelist": { "message": "Remove from Whitelist" },
+  "setDailyLimit": { "message": "Set Daily Limit" },
+  "quickPresets": { "message": "Quick Presets" },
+  "limitMinutesInput": { "message": "Limit in minutes" },
+  "saveSettings": { "message": "Save Settings" },
+  "unlockButton": { "message": "Unlock" },
+  "statusLabel": { "message": "Status:" },
+  "statusWhitelisted": { "message": "Always Allowed" },
+  "statusRestricted": { "message": "Restricted" },
+  "statusLimited": { "message": "Time Limited" },
+  "emergencyLockToggle": { "message": "Emergency Lock" },
+  "settingsSaved": {
+    "message": "Settings saved successfully!",
+    "description": "Success message when popup settings are saved."
+  }
+}

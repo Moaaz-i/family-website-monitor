@@ -1,0 +1,377 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Parental Control Panel</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 2rem;
+        justify-content: center;
+        flex-direction: row;
+      }
+      .tab-link {
+        padding: 12px 20px;
+        cursor: pointer;
+        border-bottom: 3px solid transparent;
+        margin-bottom: -1px;
+        transition: 0.2s;
+        color: var(--text);
+        opacity: 0.7;
+      }
+      .tab-link.active {
+        border-color: var(--primary);
+        font-weight: 600;
+        opacity: 1;
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+      .day-selector {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+      .day-selector input {
+        display: none;
+      }
+      .day-selector label {
+        padding: 8px 12px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      .day-selector input:checked + label {
+        background: var(--primary);
+        color: white;
+      }
+
+      .card {
+        max-width: 50%;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Setup -->
+    <div id="setupSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="setupTitle">Set Parent Password 🛡️</h2>
+        <input
+          type="password"
+          id="newPassword"
+          data-i18n-placeholder="enterNewPassword"
+        />
+        <input
+          type="password"
+          id="confirmPassword"
+          data-i18n-placeholder="confirmPassword"
+        />
+        <button
+          id="saveSetupBtn"
+          class="btn btn-success"
+          data-i18n="saveAndActivate"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div id="loginSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="loginTitle">Parent Login 🔑</h2>
+        <input
+          type="password"
+          id="loginPassword"
+          data-i18n-placeholder="loginPasswordPlaceholder"
+        />
+        <button
+          id="loginBtn"
+          class="btn btn-primary"
+          data-i18n="loginButton"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="optionsTitle">Parental Control Panel</h2>
+
+        <div class="tabs">
+          <span
+            class="tab-link active"
+            data-tab="tab-whitelist"
+            data-i18n="tabWhitelist"
+          ></span>
+          <span
+            class="tab-link"
+            data-tab="tab-schedule"
+            data-i18n="tabSchedule"
+          ></span>
+          <span
+            class="tab-link"
+            data-tab="tab-limits"
+            data-i18n="tabLimits"
+          ></span>
+          <span
+            class="tab-link"
+            data-tab="tab-activity"
+            data-i18n="tabLog"
+          ></span>
+          <span
+            class="tab-link"
+            data-tab="tab-settings"
+            data-i18n="tabSettings"
+          ></span>
+        </div>
+
+        <!-- Whitelist -->
+        <div id="tab-whitelist" class="tab-content active">
+          <h3 data-i18n="allowedWebsites">Allowed Websites 🌐</h3>
+          <input
+            type="text"
+            id="newSiteInput"
+            data-i18n-placeholder="addSitePlaceholder"
+          />
+          <button
+            id="addSiteBtn"
+            class="btn btn-success"
+            data-i18n="addButton"
+          ></button>
+          <ul id="whitelistContainer"></ul>
+        </div>
+
+        <!-- Schedule -->
+        <div id="tab-schedule" class="tab-content">
+          <h3 data-i18n="browsingSchedule">Browsing Schedule</h3>
+
+          <div class="form-group">
+            <label data-i18n="allowedDays">Allowed Days:</label>
+            <div class="day-selector">
+              <input type="checkbox" id="day0" /><label
+                for="day0"
+                data-i18n="daySun"
+              ></label>
+              <input type="checkbox" id="day1" /><label
+                for="day1"
+                data-i18n="dayMon"
+              ></label>
+              <input type="checkbox" id="day2" /><label
+                for="day2"
+                data-i18n="dayTue"
+              ></label>
+              <input type="checkbox" id="day3" /><label
+                for="day3"
+                data-i18n="dayWed"
+              ></label>
+              <input type="checkbox" id="day4" /><label
+                for="day4"
+                data-i18n="dayThu"
+              ></label>
+              <input type="checkbox" id="day5" /><label
+                for="day5"
+                data-i18n="dayFri"
+              ></label>
+              <input type="checkbox" id="day6" /><label
+                for="day6"
+                data-i18n="daySat"
+              ></label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="allowedTime">Allowed Time:</label>
+            <input type="time" id="startTime" />
+            <span data-i18n="timeSeparator">to</span>
+            <input type="time" id="endTime" />
+          </div>
+
+          <button
+            id="saveScheduleBtn"
+            class="btn btn-success"
+            data-i18n="saveScheduleButton"
+          ></button>
+        </div>
+
+        <!-- Limits -->
+        <div id="tab-limits" class="tab-content">
+          <h3 data-i18n="dailyLimit">Daily Limit</h3>
+
+          <div
+            class="form-group"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 1.5rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="dailyLimitEnabledCheckbox"
+              style="width: auto; margin: 0"
+            />
+            <label
+              for="dailyLimitEnabledCheckbox"
+              data-i18n="enableDailyLimit"
+              style="cursor: pointer; margin: 0"
+              >Enable Daily Limit</label
+            >
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="targetSite"
+              >Target Site (Example: youtube.com):</label
+            >
+            <input
+              type="text"
+              id="targetSiteInput"
+              placeholder="Enter the domain here..."
+            />
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="limitInMinutes">Limit in Minutes:</label>
+            <input
+              type="number"
+              id="dailyLimitInput"
+              data-i18n-placeholder="minutesPlaceholder"
+            />
+          </div>
+
+          <button
+            id="saveDailyLimitBtn"
+            class="btn btn-primary"
+            data-i18n="saveLimitButton"
+          ></button>
+
+          <hr />
+
+          <h3>Websites With Time Limits ⏳</h3>
+          <div class="table-container">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th>Website</th>
+                  <th>Total Time</th>
+                  <th>Consumed Time</th>
+                  <th>Remaining Time</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="limitsTableBody"></tbody>
+            </table>
+          </div>
+
+          <hr />
+
+          <h3 data-i18n="emergencyLock">Emergency Lock 🔒</h3>
+          <button
+            id="enableEmergencyBtn"
+            class="btn btn-danger"
+            data-i18n="enableLockButton"
+          ></button>
+          <button
+            id="disableEmergencyBtn"
+            class="btn btn-secondary"
+            data-i18n="disableLockButton"
+          ></button>
+        </div>
+
+        <!-- Activity -->
+        <div id="tab-activity" class="tab-content">
+          <h3 data-i18n="failedAttempts">Failed Attempts</h3>
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="tableHeaderWebsite"></th>
+                <th data-i18n="tableHeaderTime"></th>
+              </tr>
+            </thead>
+            <tbody id="logContainer"></tbody>
+          </table>
+          <br />
+          <button
+            id="clearLogBtn"
+            class="btn btn-secondary"
+            data-i18n="clearLogButton"
+          ></button>
+        </div>
+
+        <!-- Settings -->
+        <div id="tab-settings" class="tab-content">
+          <h3 data-i18n="settingsAppearance">Appearance</h3>
+          <button
+            id="themeToggleBtn"
+            class="btn btn-secondary"
+            data-i18n="themeToggleDark"
+          ></button>
+
+          <hr />
+
+          <h3 data-i18n="settingsLanguage">Language</h3>
+          <select id="languageSelector">
+            <option value="en">English</option>
+            <option value="ar">Arabic</option>
+          </select>
+
+          <hr />
+
+          <h3 data-i18n="changePassword">Change Password</h3>
+          <input
+            type="password"
+            id="newPassSetting"
+            data-i18n-placeholder="newPasswordPlaceholder"
+          />
+          <input
+            type="password"
+            id="confirmPassSetting"
+            data-i18n-placeholder="confirmPasswordPlaceholder"
+          />
+          <button
+            id="changePassBtn"
+            class="btn btn-primary"
+            data-i18n="changePasswordButton"
+          ></button>
+
+          <hr />
+
+          <h3 data-i18n="backupAndRestore">Backup & Restore</h3>
+          <button
+            id="exportDataBtn"
+            class="btn btn-success"
+            data-i18n="exportButton"
+          ></button>
+          <input type="file" id="importDataInput" style="display: none" />
+          <button
+            id="importDataBtn"
+            class="btn btn-secondary"
+            data-i18n="importButton"
+          ></button>
+
+          <hr />
+
+          <h3 data-i18n="resetExtension">Reset Extension</h3>
+          <button
+            id="resetExtensionBtn"
+            class="btn btn-danger"
+            data-i18n="resetAllButton"
+          ></button>
+        </div>
+      </div>
+    </div>
+
+    <script src="toast.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

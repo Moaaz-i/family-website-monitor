@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Site Blocked</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <script src="theme-loader.js"></script>
+    <div class="card">
+      <h2 data-i18n="blockedSorry">
+        Sorry, this site is not currently allowed.
+      </h2>
+      <p>
+        <span data-i18n="blockedSite">Blocked Site:</span>
+        <strong
+          id="blockedUrl"
+          style="direction: ltr; display: inline-block; word-break: break-all"
+          >...</strong
+        >
+      </p>
+      <p id="reasonMessage" data-i18n="blockedReasonDefault">
+        Parental permission is required for access.
+      </p>
+
+      <input
+        type="password"
+        id="password"
+        data-i18n-placeholder="enterParentPassword"
+      />
+      <button id="unlockBtn" class="btn btn-primary" data-i18n="verify">
+        Verify
+      </button>
+
+      <div id="optionsSection" style="display: none">
+        <h3 data-i18n="chooseAction">Choose an action:</h3>
+        <select id="actionType">
+          <option value="always" data-i18n="allowAlways">
+            Add permanently to whitelist
+          </option>
+          <option value="temp" data-i18n="allowTemp">
+            Allow for a specific time (minutes)
+          </option>
+        </select>
+        <input
+          type="number"
+          id="duration"
+          data-i18n-placeholder="minutesTempPlaceholder"
+          style="display: none"
+        />
+        <button id="saveBtn" class="btn btn-success" data-i18n="saveAndApply">
+          Save and Apply
+        </button>
+      </div>
+    </div>
+    <script src="toast.js"></script>
+    <script src="blocked.js"></script>
+  </body>
+</html>
