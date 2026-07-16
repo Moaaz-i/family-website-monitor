@@ -2,7 +2,7 @@
 
 # ===================================================
 #   Family Website Monitor — Auto Update Script
-#   يقوم بجلب آخر تحديثات من GitHub وتطبيقها
+#   Pulls the latest changes from GitHub and applies them
 # ===================================================
 
 REPO_URL="git@github.com:Moaaz-i/family-website-monitor.git"
@@ -14,65 +14,65 @@ echo "║   Family Website Monitor Updater     ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
 
-# التحقق من وجود git
+# Check if git is installed
 if ! command -v git &> /dev/null; then
-    echo "❌ خطأ: Git غير مثبت على الجهاز"
+    echo "❌ Error: Git is not installed on this machine"
     exit 1
 fi
 
 cd "$SCRIPT_DIR"
 
-# التحقق من وجود remote
+# Check if remote origin exists
 REMOTE=$(git remote get-url origin 2>/dev/null)
 if [ -z "$REMOTE" ]; then
-    echo "🔗 لا يوجد remote، جاري الربط بـ GitHub..."
+    echo "🔗 No remote found, connecting to GitHub..."
     git remote add origin "$REPO_URL"
 fi
 
 echo "📡 Remote: $REMOTE"
 echo ""
 
-# حفظ الـ commit الحالي قبل التحديث
-BEFORE=$(git rev-parse --short HEAD 2>/dev/null || echo "غير معروف")
+# Save current commit before updating
+BEFORE=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 
-echo "🔄 جاري جلب التحديثات من GitHub..."
+echo "🔄 Fetching latest updates from GitHub..."
 echo "─────────────────────────────────────"
 
-# جلب التحديثات
+# Fetch updates from remote
 git fetch origin main 2>&1
 
-# التحقق إذا كان هناك تحديثات
+# Check if there are any new updates
 LOCAL=$(git rev-parse HEAD)
 REMOTE_HEAD=$(git rev-parse origin/main)
 
 if [ "$LOCAL" = "$REMOTE_HEAD" ]; then
     echo ""
-    echo "✅ الملفات محدّثة بالفعل — لا توجد تغييرات جديدة"
-    echo "🏷️  الإصدار الحالي: $(git log -1 --format='%h — %s' 2>/dev/null)"
+    echo "✅ Already up to date — no new changes found"
+    echo "🏷️  Current version: $(git log -1 --format='%h — %s' 2>/dev/null)"
     echo ""
     exit 0
 fi
 
 echo ""
-echo "📦 تحديثات جديدة متوفرة! جاري التطبيق..."
+echo "📦 New updates available! Applying changes..."
 echo "─────────────────────────────────────"
 
-# تطبيق التحديثات (reset صارم لضمان استبدال كل الملفات)
+# Apply updates (hard reset to ensure all files are replaced)
 git reset --hard origin/main 2>&1
 
 AFTER=$(git rev-parse --short HEAD 2>/dev/null)
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║         ✅ تم التحديث بنجاح!         ║"
+echo "║       ✅ Update successful!          ║"
 echo "╠══════════════════════════════════════╣"
-echo "║  قبل:  $BEFORE                        "
-echo "║  بعد:  $AFTER                         "
+echo "║  Before: $BEFORE                      "
+echo "║  After:  $AFTER                       "
 echo "╚══════════════════════════════════════╝"
 echo ""
-echo "📋 الملفات التي تم تحديثها:"
+echo "📋 Updated files:"
 git diff --name-only "$BEFORE" HEAD 2>/dev/null | sed 's/^/   ✔ /'
 echo ""
-echo "⚠️  أعد تحميل الإضافة من:"
-echo "   chrome://extensions  →  🔄 زر Reload"
+echo "⚠️  Reload the extension from:"
+echo "   chrome://extensions  →  🔄 Reload button"
 echo ""
