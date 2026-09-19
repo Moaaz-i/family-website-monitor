@@ -1,4 +1,4 @@
 {
-  "version": "2.1.0",
-  "releaseNotes": "Initial stable release with parental controls, daily limits, schedule blocking, and emergency lock."
+  "version": "2.2.0",
+  "releaseNotes": "New: modular src/dist architecture with automated build, whole-domain allow mode (toggle per site in whitelist, popup and blocked page), unit tests for the rules engine, and stronger code separation."
 }

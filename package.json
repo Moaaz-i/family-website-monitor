@@ -1,6 +1,6 @@
 {
   "name": "family-website-monitor",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "Parental control Chrome extension (MV3) with whitelists, schedules, daily limits and emergency lock.",
   "private": true,
   "type": "module",
