@@ -5,74 +5,175 @@
     <link rel="stylesheet" href="style.css" />
     <style>
       .popup-body {
-        min-width: 360px;
+        min-width: 380px;
         margin: 0;
         padding: 0;
         box-sizing: border-box;
+        font-family: var(--font-family);
+        background: var(--bg-body);
+        color: var(--text);
       }
       .popup-body .card {
         margin: 0;
-        padding-inline: 13px;
-        padding-top: 0;
-        padding-bottom: 20px;
+        width: 100%;
+        max-width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        padding: 1.5rem 1.8rem;
+        box-sizing: border-box;
       }
       .hidden {
         display: none !important;
       }
-      .form-group {
-        margin-bottom: 12px;
+      
+      /* Premium Header */
+      .popup-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 1.2rem;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 1.5rem;
       }
+      .popup-logo-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .popup-logo-icon {
+        font-size: 1.8rem;
+      }
+      .popup-logo-title {
+        font-weight: 800;
+        font-size: 15px;
+        color: var(--text);
+        letter-spacing: -0.01em;
+        margin: 0;
+      }
+      .popup-status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 700;
+        color: #10b981;
+        background: rgba(16, 185, 129, 0.08);
+        padding: 4px 10px;
+        border-radius: 12px;
+        border: 1px solid rgba(16, 185, 129, 0.15);
+      }
+      .pulse-dot {
+        width: 7px;
+        height: 7px;
+        background-color: #10b981;
+        border-radius: 50%;
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        animation: pulse 1.6s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+        }
+      }
+
+      .form-group {
+        margin-bottom: 1.2rem;
+      }
+      
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      
       .current-site-box {
-        background: var(--bg-hover);
+        background: rgba(99, 102, 241, 0.03);
         border: 1px solid var(--border);
-        border-radius: 8px;
-        padding: 8px 12px;
-        margin-bottom: 16px;
-        font-weight: 600;
+        border-radius: 12px;
+        padding: 12px 14px;
+        margin-bottom: 1.5rem;
         word-break: break-all;
       }
+      .current-site-label {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        color: var(--text-muted);
+      }
+      .current-site-domain {
+        color: var(--primary);
+        font-size: 15px;
+        font-weight: 800;
+        margin-top: 4px;
+      }
+
       .preset-buttons {
         display: flex;
-        gap: 6px;
-        margin-top: 6px;
+        gap: 8px;
+        margin-top: 8px;
       }
       .preset-btn {
         flex: 1;
-        padding: 4px 8px;
+        padding: 8px 6px;
         font-size: 11px;
-        border-radius: 4px;
-        background: var(--bg-hover);
+        font-weight: 700;
+        border-radius: 8px;
+        background: rgba(99, 102, 241, 0.04);
         border: 1px solid var(--border);
         color: var(--text);
         cursor: pointer;
+        transition: all 0.2s ease;
       }
       .preset-btn:hover {
-        background: var(--border);
+        background: var(--primary);
+        color: #fff;
+        border-color: var(--primary);
+        box-shadow: 0 3px 8px var(--primary-glow);
       }
+      
       .status-tag {
         display: inline-block;
-        padding: 2px 6px;
-        border-radius: 4px;
+        padding: 4px 10px;
+        border-radius: 12px;
         font-size: 11px;
-        font-weight: bold;
-        margin-left: 6px;
+        font-weight: 800;
+        margin-left: 8px;
+        border: 1px solid transparent;
       }
       .status-whitelisted {
-        background: #d1fae5;
-        color: #065f46;
+        background: rgba(16, 185, 129, 0.08);
+        color: #10b981;
+        border-color: rgba(16, 185, 129, 0.15);
       }
       .status-restricted {
-        background: #fef3c7;
-        color: #92400e;
+        background: rgba(245, 158, 11, 0.08);
+        color: #d97706;
+        border-color: rgba(245, 158, 11, 0.15);
       }
       .status-limited {
-        background: #dbeafe;
-        color: #1e40af;
+        background: rgba(59, 130, 246, 0.08);
+        color: var(--primary);
+        border-color: rgba(59, 130, 246, 0.15);
       }
+      
       .footer-actions {
-        margin-top: 16px;
+        margin-top: 1.8rem;
         display: flex;
-        gap: 8px;
+        gap: 10px;
       }
 
       /* ── Update Banner ── */
@@ -80,7 +181,7 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 10px 14px;
+        padding: 10px 16px;
         background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
         color: #fff;
         font-size: 12px;
@@ -104,8 +205,8 @@
         background: rgba(255,255,255,0.25);
         border: 1px solid rgba(255,255,255,0.5);
         color: #fff;
-        border-radius: 5px;
-        padding: 3px 9px;
+        border-radius: 6px;
+        padding: 4px 10px;
         font-size: 11px;
         font-weight: 700;
         cursor: pointer;
@@ -142,9 +243,9 @@
       .update-modal {
         background: var(--bg);
         border: 1px solid var(--border);
-        border-radius: 12px;
+        border-radius: 16px;
         padding: 20px;
-        width: 300px;
+        width: 320px;
         max-width: 90%;
         box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       }
@@ -155,12 +256,12 @@
       }
       .update-modal .modal-version {
         font-size: 11px;
-        color: var(--text-muted, #888);
+        color: var(--text-muted);
         margin-bottom: 12px;
       }
       .update-modal .steps {
         background: var(--bg-hover);
-        border-radius: 8px;
+        border-radius: 10px;
         padding: 12px;
         margin-bottom: 14px;
         font-size: 12px;
@@ -168,16 +269,16 @@
       }
       .update-modal .steps code {
         background: var(--border);
-        padding: 1px 5px;
-        border-radius: 3px;
+        padding: 2px 6px;
+        border-radius: 4px;
         font-family: monospace;
         font-size: 11px;
       }
       .update-modal .modal-notes {
         font-size: 11px;
-        color: var(--text-muted, #888);
+        color: var(--text-muted);
         margin-bottom: 14px;
-        padding: 8px;
+        padding: 8px 12px;
         border-left: 3px solid var(--primary);
         background: var(--bg-hover);
         border-radius: 0 6px 6px 0;
@@ -188,10 +289,9 @@
         justify-content: flex-end;
       }
 
-      /* ── Check for Updates button ── */
       .btn-check-update {
         font-size: 11px;
-        padding: 6px 10px;
+        padding: 8px 12px;
         opacity: 0.85;
       }
       .btn-check-update:hover { opacity: 1; }
@@ -227,8 +327,8 @@
           <strong>Steps to update:</strong><br>
           1️⃣ Open Terminal in the extension folder<br>
           2️⃣ Run: <code>./update.sh</code><br>
-          3️⃣ Go to <code>chrome://extensions</code><br>
-          4️⃣ Click 🔄 <strong>Reload</strong> on this extension
+          3️⃣ Go to <code>chrome://extensions</code> and load the <code>dist</code> folder (or click 🔄 <strong>Reload</strong> if already loaded)<br>
+          4️⃣ Confirm the new version appears
         </div>
         <div class="modal-notes" id="modalReleaseNotes"></div>
         <div class="modal-footer">
@@ -239,20 +339,21 @@
 
     <!-- Lock Screen Section -->
     <div id="lockScreen" class="card">
-      <h3
-        style="border: none; padding: 0; margin-bottom: 1rem"
-        data-i18n="popupTitle"
-      >
-        Family Protection Active
-      </h3>
+      <div class="popup-header">
+        <div class="popup-logo-group">
+          <span class="popup-logo-icon">🛡️</span>
+          <h1 class="popup-logo-title" data-i18n="popupTitle">Family Protection</h1>
+        </div>
+        <div class="popup-status-indicator">
+          <span class="pulse-dot"></span>
+          <span data-i18n="statusActive">Active</span>
+        </div>
+      </div>
+      
       <div class="form-group">
-        <label
-          data-i18n="unlockPopup"
-          style="font-size: 12px; margin-bottom: 6px; display: block"
-          >Enter parent password to manage</label
-        >
-        <input type="password" id="popupPassword" style="margin-bottom: 8px" />
-        <button id="unlockBtn" class="btn btn-primary" data-i18n="unlockButton">
+        <label data-i18n="unlockPopup">Enter parent password to manage</label>
+        <input type="password" id="popupPassword" style="margin-bottom: 12px;" />
+        <button id="unlockBtn" class="btn btn-primary" style="width: 100%;" data-i18n="unlockButton">
           Unlock
         </button>
       </div>
@@ -260,27 +361,26 @@
 
     <!-- Management Dashboard Section -->
     <div id="managementDashboard" class="card hidden">
-      <h3
-        style="border: none; padding: 0; margin-bottom: 0.5rem"
-        data-i18n="optionsTitle"
-      >
-        Parental Control Panel
-      </h3>
-
-      <!-- Current Domain -->
-      <div class="current-site-box">
-        <span data-i18n="currentSite">Current Site:</span>
-        <div
-          id="currentDomain"
-          style="color: var(--primary); font-size: 14px; margin-top: 4px"
-        >
-          loading...
+      <div class="popup-header">
+        <div class="popup-logo-group">
+          <span class="popup-logo-icon">🛡️</span>
+          <h1 class="popup-logo-title" data-i18n="optionsTitle">Control Panel</h1>
+        </div>
+        <div class="popup-status-indicator">
+          <span class="pulse-dot"></span>
+          <span data-i18n="statusActive">Active</span>
         </div>
       </div>
 
+      <!-- Current Domain -->
+      <div class="current-site-box">
+        <div class="current-site-label" data-i18n="currentSite">Current Site:</div>
+        <div id="currentDomain" class="current-site-domain">loading...</div>
+      </div>
+
       <!-- Current Status -->
-      <div class="form-group" style="font-size: 12px">
-        <span data-i18n="statusLabel">Status:</span>
+      <div class="form-group" style="display: flex; align-items: center; justify-content: space-between;">
+        <span data-i18n="statusLabel" style="font-weight: 700; font-size: 13px;">Status:</span>
         <span
           id="currentStatusTag"
           class="status-tag status-restricted"
@@ -299,6 +399,14 @@
         >
           Always Allow Site
         </button>
+        <label
+          class="whole-domain-toggle"
+          style="justify-content: flex-start; margin-top: 8px"
+        >
+          <input type="checkbox" id="popupDomainWhitelist" />
+          <span class="switch-slider"></span>
+          <span data-i18n="allowWholeDomain" style="font-size: 12px"></span>
+        </label>
       </div>
 
       <!-- Daily Limit Form -->
@@ -310,7 +418,7 @@
           margin-top: 12px;
         "
       >
-        <h4 style="margin: 0 0 8px 0" data-i18n="setDailyLimit">
+        <h4 style="margin: 0 0 8px 0; font-weight: 800; font-size: 13px;" data-i18n="setDailyLimit">
           Set Daily Limit
         </h4>
         <input
@@ -352,6 +460,29 @@
         />
       </div>
 
+      <!-- Language Selector -->
+      <div
+        class="form-group"
+        style="
+          border-top: 1px solid var(--border);
+          padding-top: 12px;
+          margin-top: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        "
+      >
+        <span
+          data-i18n="settingsLanguage"
+          style="font-size: 13px; font-weight: bold"
+          >Language</span
+        >
+        <select id="popupLanguageSelector" style="width: auto; margin: 0; padding: 4px 8px; font-size: 12px; border-radius: 6px; height: auto;">
+          <option value="en">English</option>
+          <option value="ar">Arabic</option>
+        </select>
+      </div>
+
       <!-- Footer Buttons -->
       <div class="footer-actions" style="flex-wrap: wrap;">
         <button
@@ -380,7 +511,6 @@
       </div>
     </div>
 
-    <script src="toast.js"></script>
-    <script src="popup.js"></script>
+    <script src="./popup.js"></script>
   </body>
 </html>

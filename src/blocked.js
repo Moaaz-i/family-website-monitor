@@ -1,36 +1,34 @@
-const normalizeNumerals = (str) =>
-  str.replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1584));
+import { normalizeUrl, getHostname, isEntryAllowed } from "./lib/url.js";
+import { verifyPasswordInput, generateSecureId } from "./lib/security.js";
+import {
+  showToast,
+  startLockoutTimer,
+  handleLockout,
+  applyThemeClass,
+} from "./lib/ui.js";
+import {
+  WHITELIST_MAX,
+  BRUTE_FORCE_THRESHOLD,
+  BRUTE_FORCE_LOCKOUT_MS,
+  WRONG_ATTEMPT_LOG_MAX,
+} from "./lib/constants.js";
+import { t, onTranslationReady, initTranslations } from "./lib/translator.js";
 
-const buildStrictUrl = (urlString) => {
-  if (!urlString) return null;
-  try {
-    const urlObj = new URL(
-      urlString.includes("://") ? urlString : `https://${urlString}`,
-    );
-    const host = urlObj.hostname.toLowerCase().replace(/^www\./, "");
-    const path = urlObj.pathname.toLowerCase().replace(/\/+$/, "") || "/";
-    const hash = normalizeNumerals(
-      decodeURIComponent(urlObj.hash.toLowerCase()),
-    );
-    const params = new URLSearchParams(urlObj.search);
-    params.sort();
-    const search = params.toString() ? `?${params.toString()}` : "";
-    return `${host}${path}${search}${hash}`;
-  } catch {
-    return null;
-  }
-};
-
-function isMatchingSite(urlString, targetSite) {
-  if (!urlString || !targetSite) return false;
-  const parsedUrl = buildStrictUrl(urlString);
-  const parsedTarget = buildStrictUrl(targetSite);
-  return Boolean(parsedUrl && parsedTarget && parsedUrl === parsedTarget);
+// Security Feature #11: Anti-Clickjacking Frame Busting
+if (window.self !== window.top) {
+  document.body.style.display = "none";
+  throw new Error("Embedding this page is forbidden for security reasons.");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+applyThemeClass();
+
+initTranslations();
+
+onTranslationReady(() => {
   const urlParams = new URLSearchParams(window.location.search);
   const targetParam = urlParams.get("target");
+  const reason = urlParams.get("reason");
+  const target = urlParams.get("target");
 
   const navType = performance.getEntriesByType("navigation")[0]?.type;
   if (navType === "back_forward" && targetParam) {
@@ -47,39 +45,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const actionType = document.getElementById("actionType");
   const durationInput = document.getElementById("duration");
   const reasonMessage = document.getElementById("reasonMessage");
+  const passwordField = document.getElementById("password");
+  const unlockBtn = document.getElementById("unlockBtn");
 
-  function generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  }
-
-  function normalizeUrl(url) {
-    try {
-      const u = new URL(url.includes("://") ? url : `https://${url}`);
-      return u.href;
-    } catch {
-      return null;
-    }
-  }
-
-  function getHostname(urlString) {
-    try {
-      if (urlString.startsWith("http")) return new URL(urlString).hostname;
-      const match = urlString.match(/^chrome:\/\/([^\/]+)/);
-      return match ? match[1] : null;
-    } catch {
-      return null;
-    }
-  }
-
-  const reason = urlParams.get("reason");
-  const target = urlParams.get("target");
+  // Initial check for brute-force lockout
+  handleLockout(passwordField, unlockBtn);
 
   if (reasonMessage) {
     let messageKey = "blockedReasonDefault";
     if (reason === "schedule") messageKey = "blockedReasonSchedule";
     else if (reason === "limit") messageKey = "blockedReasonLimit";
     else if (reason === "emergency") messageKey = "blockedReasonEmergency";
-    reasonMessage.textContent = chrome.i18n.getMessage(messageKey);
+    else if (reason === "tampered") messageKey = "blockedReasonTampered";
+    reasonMessage.textContent = t(messageKey);
   }
 
   document.getElementById("blockedUrl").textContent = decodeURIComponent(
@@ -91,8 +69,7 @@ document.addEventListener("DOMContentLoaded", () => {
       actionType.value === "temp" ? "inline-block" : "none";
   });
 
-  document.getElementById("unlockBtn").addEventListener("click", () => {
-    const passwordField = document.getElementById("password");
+  unlockBtn.addEventListener("click", async () => {
     const passwordInput = passwordField.value;
     let currentHostname = "Unknown Site";
 
@@ -101,11 +78,16 @@ document.addEventListener("DOMContentLoaded", () => {
         getHostname(decodeURIComponent(targetParam)) || "Unknown Site";
     }
 
-    chrome.storage.local.get(["password", "wrongAttempts"], (data) => {
-      if (passwordInput === data.password) {
+    chrome.storage.local.get(["password", "wrongAttempts", "failedAttemptsCount"], async (data) => {
+      const correct = await verifyPasswordInput(passwordInput, data.password);
+
+      if (correct) {
+        // Reset brute-force lockout tracking
+        chrome.storage.local.set({ failedAttemptsCount: 0, lockoutExpiry: 0 });
+
         document.getElementById("optionsSection").style.display = "block";
         passwordField.style.display = "none";
-        document.getElementById("unlockBtn").style.display = "none";
+        unlockBtn.style.display = "none";
 
         document.getElementById("saveBtn").addEventListener("click", () => {
           const action = actionType.value;
@@ -121,28 +103,34 @@ document.addEventListener("DOMContentLoaded", () => {
               if (!cleanUrl) return;
 
               const siteExists = whitelist.some((entry) =>
-                isMatchingSite(entry.fullUrl, cleanUrl),
+                isEntryAllowed(cleanUrl, entry),
               );
+
+              // Whitelist size cap (Security Feature #18)
               if (!siteExists) {
+                if (whitelist.length >= WHITELIST_MAX) {
+                  showToast("Whitelist storage capacity exceeded (max 1000 items)", "error");
+                  return;
+                }
+                const wholeDomain = document.getElementById("blockedDomainWhitelist").checked;
                 whitelist.push({
-                  id: generateId(),
+                  id: generateSecureId(),
                   fullUrl: cleanUrl,
                   addedAt: Date.now(),
+                  mode: wholeDomain ? "domain" : "exact",
                 });
               }
-              chrome.storage.local.set({ whitelist: whitelist }, () => {
+
+              // Clear timeTampered if we bypass/unlock
+              chrome.storage.local.set({ whitelist: whitelist, timeTampered: false, lastActiveTime: Date.now() }, () => {
                 if (decodedUrl) window.location.replace(decodedUrl);
-                else
-                  showToast(
-                    chrome.i18n.getMessage("siteAddedSuccess"),
-                    "success",
-                  );
+                else showToast(t("siteAddedSuccess"), "success");
               });
             });
           } else if (action === "temp") {
             const minutes = parseInt(durationInput.value, 10);
             if (!minutes || minutes <= 0) {
-              showToast(chrome.i18n.getMessage("invalidMinutes"), "error");
+              showToast(t("invalidMinutes"), "error");
               return;
             }
             const expiry = new Date().getTime() + minutes * 60 * 1000;
@@ -153,27 +141,44 @@ document.addEventListener("DOMContentLoaded", () => {
                 const cleanUrl = normalizeUrl(decodedUrl);
                 if (cleanUrl) tempAllowed[cleanUrl] = expiry;
               }
-              chrome.storage.local.set({ tempAllowed }, () => {
+
+              // Clear timeTampered if we bypass/unlock
+              chrome.storage.local.set({ tempAllowed, timeTampered: false, lastActiveTime: Date.now() }, () => {
                 if (targetParam)
                   window.location.replace(decodeURIComponent(targetParam));
                 else
-                  showToast(
-                    chrome.i18n.getMessage("tempAllowSuccess", String(minutes)),
-                    "success",
-                  );
+                  showToast(t("tempAllowSuccess", String(minutes)), "success");
               });
             });
           }
         });
       } else {
+        // Increment fail counter for Brute-force lockout
+        const attemptsCount = (data.failedAttemptsCount || 0) + 1;
+        const updates = { failedAttemptsCount: attemptsCount };
+
+        if (attemptsCount >= BRUTE_FORCE_THRESHOLD) {
+          const lockoutExpiryTime = Date.now() + BRUTE_FORCE_LOCKOUT_MS;
+          updates.lockoutExpiry = lockoutExpiryTime;
+          startLockoutTimer(passwordField, unlockBtn, lockoutExpiryTime);
+        }
+
         const attempt = {
           site: currentHostname,
           time: new Date().toLocaleString("en-US"),
         };
         const wrongAttempts = data.wrongAttempts || [];
         wrongAttempts.push(attempt);
-        chrome.storage.local.set({ wrongAttempts }, () => {
-          showToast(chrome.i18n.getMessage("passwordIncorrect"), "error");
+
+        // Log Cap limit to 100 entries (Security Feature #18)
+        if (wrongAttempts.length > WRONG_ATTEMPT_LOG_MAX) {
+          wrongAttempts.shift();
+        }
+
+        updates.wrongAttempts = wrongAttempts;
+
+        chrome.storage.local.set(updates, () => {
+          showToast(t("passwordIncorrect"), "error");
           passwordField.value = "";
           passwordField.focus();
         });

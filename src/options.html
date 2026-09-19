@@ -1,0 +1,435 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Parental Control Panel</title>
+    <link rel="stylesheet" href="style.css" />
+
+    <style>
+      .card {
+        width: 100%;
+        max-width: 500px;
+        box-sizing: border-box;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Setup -->
+    <div id="setupSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="setupTitle">Set Parent Password 🛡️</h2>
+        <input
+          type="password"
+          id="newPassword"
+          data-i18n-placeholder="enterNewPassword"
+        />
+        <input
+          type="password"
+          id="confirmPassword"
+          data-i18n-placeholder="confirmPassword"
+        />
+        <button
+          id="saveSetupBtn"
+          class="btn btn-success"
+          data-i18n="saveAndActivate"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div id="loginSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="loginTitle">Parent Login 🔑</h2>
+        <input
+          type="password"
+          id="loginPassword"
+          data-i18n-placeholder="loginPasswordPlaceholder"
+        />
+        <button
+          id="loginBtn"
+          class="btn btn-primary"
+          data-i18n="loginButton"
+        ></button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboardSection" class="dashboard-container" style="display: none">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">🛡️</span>
+          <h2 data-i18n="appName" style="font-size: 1.15rem; margin: 0; background: none; -webkit-text-fill-color: initial; text-shadow: none;">Family Monitor</h2>
+        </div>
+        <nav class="sidebar-nav">
+          <span
+            class="tab-link active"
+            data-tab="tab-whitelist"
+            data-i18n="tabWhitelist"
+          >Whitelist</span>
+          <span
+            class="tab-link"
+            data-tab="tab-schedule"
+            data-i18n="tabSchedule"
+          >Schedule</span>
+          <span
+            class="tab-link"
+            data-tab="tab-limits"
+            data-i18n="tabLimits"
+          >Limits</span>
+          <span
+            class="tab-link"
+            data-tab="tab-activity"
+            data-i18n="tabLog"
+          >Activity Log</span>
+          <span
+            class="tab-link"
+            data-tab="tab-settings"
+            data-i18n="tabSettings"
+          >Settings</span>
+        </nav>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <header class="content-header">
+          <h2 data-i18n="optionsTitle" style="margin: 0; font-size: 1.7rem; background: none; -webkit-text-fill-color: initial;">Parental Control Panel</h2>
+        </header>
+
+        <!-- Whitelist -->
+        <div id="tab-whitelist" class="tab-content active">
+          <h3 data-i18n="allowedWebsites">Allowed Websites 🌐</h3>
+          <div class="inline-form">
+            <input
+              type="text"
+              id="newSiteInput"
+              data-i18n-placeholder="addSitePlaceholder"
+            />
+            <button
+              id="addSiteBtn"
+              class="btn btn-success"
+              data-i18n="addButton"
+            ></button>
+          </div>
+          <label
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-size: 13px;
+              cursor: pointer;
+              margin-bottom: 1.2rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="domainWhitelistCheckbox"
+              style="width: auto; margin: 0"
+            />
+            <span data-i18n="allowWholeDomain">Allow the whole domain (all sub-links)</span>
+          </label>
+          <ul id="whitelistContainer"></ul>
+        </div>
+
+        <!-- Schedule -->
+        <div id="tab-schedule" class="tab-content">
+          <h3 data-i18n="browsingSchedule">Browsing Schedule</h3>
+
+          <div
+            class="form-group"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 1.5rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="scheduleEnabledCheckbox"
+              style="width: auto; margin: 0"
+            />
+            <label
+              for="scheduleEnabledCheckbox"
+              data-i18n="enableSchedule"
+              style="cursor: pointer; margin: 0"
+              >Enable Browsing Schedule</label
+            >
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="allowedDays">Allowed Days:</label>
+            <div class="day-selector">
+              <input type="checkbox" id="day0" /><label
+                for="day0"
+                data-i18n="daySun"
+              ></label>
+              <input type="checkbox" id="day1" /><label
+                for="day1"
+                data-i18n="dayMon"
+              ></label>
+              <input type="checkbox" id="day2" /><label
+                for="day2"
+                data-i18n="dayTue"
+              ></label>
+              <input type="checkbox" id="day3" /><label
+                for="day3"
+                data-i18n="dayWed"
+              ></label>
+              <input type="checkbox" id="day4" /><label
+                for="day4"
+                data-i18n="dayThu"
+              ></label>
+              <input type="checkbox" id="day5" /><label
+                for="day5"
+                data-i18n="dayFri"
+              ></label>
+              <input type="checkbox" id="day6" /><label
+                for="day6"
+                data-i18n="daySat"
+              ></label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label data-i18n="allowedTime">Allowed Time:</label>
+            <input type="time" id="startTime" />
+            <span data-i18n="timeSeparator">to</span>
+            <input type="time" id="endTime" />
+          </div>
+
+          <button
+            id="saveScheduleBtn"
+            class="btn btn-success"
+            data-i18n="saveScheduleButton"
+          ></button>
+        </div>
+
+        <!-- Limits -->
+        <div id="tab-limits" class="tab-content">
+          <h3 data-i18n="dailyLimit">Daily Limit</h3>
+
+          <div
+            class="form-group"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 1.5rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="dailyLimitEnabledCheckbox"
+              style="width: auto; margin: 0"
+            />
+            <label
+              for="dailyLimitEnabledCheckbox"
+              data-i18n="enableDailyLimit"
+              style="cursor: pointer; margin: 0"
+              >Enable Daily Limit</label
+            >
+          </div>
+
+          <div class="limit-input-grid">
+            <div class="form-group">
+              <label data-i18n="targetSite"
+                >Target Site (Example: youtube.com):</label
+              >
+              <input
+                type="text"
+                id="targetSiteInput"
+                placeholder="Enter the domain here..."
+              />
+            </div>
+
+            <div class="form-group">
+              <label data-i18n="limitInMinutes">Limit in Minutes:</label>
+              <input
+                type="number"
+                id="dailyLimitInput"
+                data-i18n-placeholder="minutesPlaceholder"
+              />
+            </div>
+          </div>
+
+          <button
+            id="saveDailyLimitBtn"
+            class="btn btn-primary"
+            data-i18n="saveLimitButton"
+            style="width: auto; margin-top: 0.5rem;"
+          ></button>
+
+          <hr />
+
+          <h3>Websites With Time Limits ⏳</h3>
+          <div class="table-container">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th>Website</th>
+                  <th>Total Time</th>
+                  <th>Consumed Time</th>
+                  <th>Remaining Time</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="limitsTableBody"></tbody>
+            </table>
+          </div>
+
+          <hr />
+
+          <h3 data-i18n="emergencyLock">Emergency Lock 🔒</h3>
+          <button
+            id="enableEmergencyBtn"
+            class="btn btn-danger"
+            data-i18n="enableLockButton"
+          ></button>
+          <button
+            id="disableEmergencyBtn"
+            class="btn btn-secondary"
+            data-i18n="disableLockButton"
+          ></button>
+        </div>
+
+        <!-- Activity -->
+        <div id="tab-activity" class="tab-content">
+          <h3 data-i18n="failedAttempts">Failed Attempts</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th data-i18n="tableHeaderWebsite"></th>
+                  <th data-i18n="tableHeaderTime"></th>
+                </tr>
+              </thead>
+              <tbody id="logContainer"></tbody>
+            </table>
+          </div>
+          <br />
+          <button
+            id="clearLogBtn"
+            class="btn btn-secondary"
+            data-i18n="clearLogButton"
+          ></button>
+        </div>
+
+        <!-- Settings -->
+        <div id="tab-settings" class="tab-content">
+          <!-- General Settings -->
+          <div class="settings-section-card">
+            <h4 data-i18n="settingsGeneral">General Settings</h4>
+            <div class="limit-input-grid">
+              <div class="form-group">
+                <label data-i18n="settingsLanguage">Language</label>
+                <select id="languageSelector">
+                  <option value="en">English</option>
+                  <option value="ar">Arabic</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label data-i18n="settingsAppearance">Appearance Theme</label>
+                <button
+                  id="themeToggleBtn"
+                  class="btn btn-secondary"
+                  data-i18n="themeToggleDark"
+                  style="width: 100%; margin: 0; padding: 12px;"
+                ></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Extensions Access Control -->
+          <div class="settings-section-card">
+            <h4 data-i18n="extensionsAccessHeader">Extension Settings Access</h4>
+            <p data-i18n="extensionsAccessDesc" style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;">
+              Allow access to the chrome://extensions page to manage other extensions.
+            </p>
+            <button
+              id="allowExtensionsBtn"
+              class="btn btn-primary"
+              data-i18n="allowExtensionsButton"
+              style="width: auto;"
+            >
+              Allow Access (20 Minutes)
+            </button>
+            <div id="extensionsTimerDisplay" style="margin-top: 14px; font-weight: bold; color: var(--text); opacity: 0.9; display: none;"></div>
+          </div>
+
+          <!-- Change Password -->
+          <div class="settings-section-card">
+            <h4 data-i18n="changePassword">Change Password</h4>
+            <div class="limit-input-grid">
+              <div class="form-group">
+                <label data-i18n-placeholder="newPasswordPlaceholder">New Password</label>
+                <input
+                  type="password"
+                  id="newPassSetting"
+                  data-i18n-placeholder="newPasswordPlaceholder"
+                  style="margin: 0;"
+                />
+              </div>
+              <div class="form-group">
+                <label data-i18n-placeholder="confirmPasswordPlaceholder">Confirm Password</label>
+                <input
+                  type="password"
+                  id="confirmPassSetting"
+                  data-i18n-placeholder="confirmPasswordPlaceholder"
+                  style="margin: 0;"
+                />
+              </div>
+            </div>
+            <button
+              id="changePassBtn"
+              class="btn btn-primary"
+              data-i18n="changePasswordButton"
+              style="width: auto; margin-top: 0.5rem;"
+            ></button>
+          </div>
+
+          <!-- Backup & Restore -->
+          <div class="settings-section-card">
+            <h4 data-i18n="backupAndRestore">Backup & Restore</h4>
+            <p style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;">
+              Export your configurations to a secure backup file or import them back.
+            </p>
+            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+              <button
+                id="exportDataBtn"
+                class="btn btn-success"
+                data-i18n="exportButton"
+                style="width: auto; margin: 0;"
+              ></button>
+              <input type="file" id="importDataInput" style="display: none" />
+              <button
+                id="importDataBtn"
+                class="btn btn-secondary"
+                data-i18n="importButton"
+                style="width: auto; margin: 0;"
+              ></button>
+            </div>
+          </div>
+
+          <!-- Reset Extension -->
+          <div class="settings-section-card" style="border-color: rgba(239, 68, 68, 0.2); background: rgba(239, 68, 68, 0.01);">
+            <h4 data-i18n="resetExtension" style="color: #ef4444; border-bottom-color: rgba(239, 68, 68, 0.1);">Reset Extension</h4>
+            <p style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;">
+              Warning: Resetting the extension will delete all configurations, whitelists, limits, and parent password.
+            </p>
+            <button
+              id="resetExtensionBtn"
+              class="btn btn-danger"
+              data-i18n="resetAllButton"
+              style="width: auto;"
+            ></button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <script src="./options.js"></script>
+  </body>
+</html>

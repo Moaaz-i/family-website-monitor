@@ -1,34 +1,33 @@
-const normalizeNumerals = (str) =>
-  str.replace(/[٠-٩]/g, (d) => String.fromCharCode(d.charCodeAt(0) - 1584));
+import { isMatchingSite, isEntryAllowed } from "./lib/url.js";
+import {
+  verifyPasswordInput,
+  generateSecureId,
+} from "./lib/security.js";
+import {
+  showToast,
+  startLockoutTimer,
+  handleLockout,
+  applyThemeClass,
+} from "./lib/ui.js";
+import {
+  WHITELIST_MAX,
+  SESSION_DURATION_MS,
+  BRUTE_FORCE_THRESHOLD,
+  BRUTE_FORCE_LOCKOUT_MS,
+} from "./lib/constants.js";
+import { t, onTranslationReady, initTranslations } from "./lib/translator.js";
 
-const buildStrictUrl = (urlString) => {
-  if (!urlString) return null;
-  try {
-    const urlObj = new URL(
-      urlString.includes("://") ? urlString : `https://${urlString}`,
-    );
-    const host = urlObj.hostname.toLowerCase().replace(/^www\./, "");
-    const path = urlObj.pathname.toLowerCase().replace(/\/+$/, "") || "/";
-    const hash = normalizeNumerals(
-      decodeURIComponent(urlObj.hash.toLowerCase()),
-    );
-    const params = new URLSearchParams(urlObj.search);
-    params.sort();
-    const search = params.toString() ? `?${params.toString()}` : "";
-    return `${host}${path}${search}${hash}`;
-  } catch {
-    return null;
-  }
-};
-
-function isMatchingSite(urlString, targetSite) {
-  if (!urlString || !targetSite) return false;
-  const parsedUrl = buildStrictUrl(urlString);
-  const parsedTarget = buildStrictUrl(targetSite);
-  return Boolean(parsedUrl && parsedTarget && parsedUrl === parsedTarget);
+// Security Feature #11: Anti-Clickjacking Frame Busting
+if (window.self !== window.top) {
+  document.body.style.display = "none";
+  throw new Error("Embedding this page is forbidden for security reasons.");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+applyThemeClass();
+
+initTranslations();
+
+onTranslationReady(() => {
   // ── Update UI ──────────────────────────────────────────────────────────────
   const updateBanner      = document.getElementById("updateBanner");
   const updateBannerVer   = document.getElementById("updateBannerVersion");
@@ -102,39 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   // ──────────────────────────────────────────────────────────────────────────
 
-
   let activeTabUrl = "";
-
-  chrome.storage.local.get("language", (data) => {
-    const lang = data.language || "en";
-    document.documentElement.setAttribute("lang", lang);
-    document.documentElement.setAttribute("dir", lang === "ar" ? "rtl" : "ltr");
-    const elements = document.querySelectorAll("[data-i18n]");
-    elements.forEach((el) => {
-      const msgKey = el.getAttribute("data-i18n");
-      const msg = chrome.i18n.getMessage(msgKey);
-      if (msg) {
-        el.textContent = msg;
-        if (el.placeholder) el.setAttribute("placeholder", msg);
-        if (el.hasAttribute("title")) el.setAttribute("title", msg);
-      }
-    });
-    const placeholders = document.querySelectorAll("[data-i18n-placeholder]");
-    placeholders.forEach((el) => {
-      const msgKey = el.getAttribute("data-i18n-placeholder");
-      const msg = chrome.i18n.getMessage(msgKey);
-      if (msg) el.placeholder = msg;
-    });
-  });
-
-  chrome.storage.local.get("theme", (data) => {
-    const savedTheme = data.theme;
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
-    const theme = savedTheme || (prefersDark ? "dark" : "light");
-    document.body.classList.toggle("dark", theme === "dark");
-  });
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs && tabs.length > 0) {
@@ -164,9 +131,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const lockScreen = document.getElementById("lockScreen");
   const managementDashboard = document.getElementById("managementDashboard");
 
-  unlockBtn.addEventListener("click", () => {
+  // Initial brute force check
+  handleLockout(popupPasswordInput, unlockBtn);
+
+  // Load language selector state
+  chrome.storage.local.get("language", (data) => {
+    const selector = document.getElementById("popupLanguageSelector");
+    if (selector) {
+      selector.value = data.language || "en";
+      selector.addEventListener("change", () => {
+        chrome.storage.local.set({ language: selector.value }, () => {
+          location.reload();
+        });
+      });
+    }
+  });
+
+  // Dynamic Session token & auto-lock
+  chrome.storage.local.get(["sessionToken", "sessionExpiry"], (data) => {
+    const now = Date.now();
+    if (data.sessionToken && data.sessionExpiry > now) {
+      // Direct access if parent session is still active
+      lockScreen.classList.add("hidden");
+      managementDashboard.classList.remove("hidden");
+      loadDashboardData();
+    }
+  });
+
+  unlockBtn.addEventListener("click", async () => {
     const enteredPassword = popupPasswordInput.value;
-    chrome.storage.local.get(["password"], (data) => {
+    chrome.storage.local.get(["password", "failedAttemptsCount"], async (data) => {
       if (!data.password) {
         showToast(
           "Please set up a parent password in options page first.",
@@ -177,12 +171,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 1500);
         return;
       }
-      if (enteredPassword === data.password) {
+
+      const correct = await verifyPasswordInput(enteredPassword, data.password);
+
+      if (correct) {
+        // Reset lockout tracking
+        chrome.storage.local.set({ failedAttemptsCount: 0, lockoutExpiry: 0 });
+
+        // Generate temporary session token (expires in 5 minutes)
+        const sessionToken = Date.now().toString(36) + Math.random().toString(36);
+        const sessionExpiry = Date.now() + SESSION_DURATION_MS;
+        chrome.storage.local.set({ sessionToken, sessionExpiry });
+
         lockScreen.classList.add("hidden");
         managementDashboard.classList.remove("hidden");
         loadDashboardData();
       } else {
-        showToast(chrome.i18n.getMessage("passwordIncorrect"), "error");
+        const attemptsCount = (data.failedAttemptsCount || 0) + 1;
+        const updates = { failedAttemptsCount: attemptsCount };
+
+        if (attemptsCount >= BRUTE_FORCE_THRESHOLD) {
+          const lockoutExpiryTime = Date.now() + BRUTE_FORCE_LOCKOUT_MS;
+          updates.lockoutExpiry = lockoutExpiryTime;
+          startLockoutTimer(popupPasswordInput, unlockBtn, lockoutExpiryTime);
+        }
+
+        chrome.storage.local.set(updates, () => {
+          showToast(t("passwordIncorrect"), "error");
+          popupPasswordInput.value = "";
+          popupPasswordInput.focus();
+        });
       }
     });
   });
@@ -196,10 +214,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ["whitelist", "dailyLimit", "emergencyLock"],
       (data) => {
         const whitelist = data.whitelist || [];
-        const isWhitelisted = whitelist.some((e) =>
-          isMatchingSite(e.fullUrl, activeTabUrl),
-        );
+        const matchedEntry = whitelist.find((e) => isEntryAllowed(activeTabUrl, e));
+        const isWhitelisted = Boolean(matchedEntry);
         updateWhitelistButtonState(isWhitelisted);
+
+        const domainToggle = document.getElementById("popupDomainWhitelist");
+        if (domainToggle) {
+          domainToggle.checked = isWhitelisted && matchedEntry.mode === "domain";
+        }
 
         const dl = data.dailyLimit || {
           enabled: false,
@@ -225,10 +247,10 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateWhitelistButtonState(isWhitelisted) {
     const toggleBtn = document.getElementById("toggleWhitelistBtn");
     if (isWhitelisted) {
-      toggleBtn.textContent = chrome.i18n.getMessage("removeFromWhitelist");
+      toggleBtn.textContent = t("removeFromWhitelist");
       toggleBtn.className = "btn btn-danger";
     } else {
-      toggleBtn.textContent = chrome.i18n.getMessage("alwaysAllowSite");
+      toggleBtn.textContent = t("alwaysAllowSite");
       toggleBtn.className = "btn btn-success";
     }
   }
@@ -238,13 +260,13 @@ document.addEventListener("DOMContentLoaded", () => {
     tag.className = "status-tag";
     if (isWhitelisted) {
       tag.classList.add("status-whitelisted");
-      tag.textContent = chrome.i18n.getMessage("statusWhitelisted");
+      tag.textContent = t("statusWhitelisted");
     } else if (hasLimit) {
       tag.classList.add("status-limited");
-      tag.textContent = chrome.i18n.getMessage("statusLimited");
+      tag.textContent = t("statusLimited");
     } else {
       tag.classList.add("status-restricted");
-      tag.textContent = chrome.i18n.getMessage("statusRestricted");
+      tag.textContent = t("statusRestricted");
     }
   }
 
@@ -252,19 +274,38 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("toggleWhitelistBtn")
     .addEventListener("click", () => {
       if (!activeTabUrl) return;
-      chrome.storage.local.get({ whitelist: [] }, (data) => {
-        let whitelist = data.whitelist;
+
+      // Verification of active session prior to whitelisting
+      chrome.storage.local.get(["sessionExpiry", "whitelist"], (data) => {
+        if (!data.sessionExpiry || data.sessionExpiry < Date.now()) {
+          showToast("Session expired. Please log in again.", "error");
+          location.reload();
+          return;
+        }
+
+        let whitelist = data.whitelist || [];
         const index = whitelist.findIndex((e) =>
-          isMatchingSite(e.fullUrl, activeTabUrl),
+          isEntryAllowed(activeTabUrl, e),
         );
         if (index > -1) {
           whitelist.splice(index, 1);
           chrome.storage.local.set({ whitelist }, () => loadDashboardData());
         } else {
+          // Whitelist size cap (Security Feature #18)
+          if (whitelist.length >= WHITELIST_MAX) {
+            showToast("Whitelist storage capacity exceeded (max 1000 items)", "error");
+            return;
+          }
+
+          // Secure Cryptographic ID generation (Security Feature #7)
+          const secureId = generateSecureId();
+          const wholeDomain = document.getElementById("popupDomainWhitelist").checked;
+
           whitelist.push({
-            id: Date.now().toString(36),
+            id: secureId,
             fullUrl: activeTabUrl,
             addedAt: Date.now(),
+            mode: wholeDomain ? "domain" : "exact",
           });
           chrome.storage.local.set({ whitelist }, () => loadDashboardData());
         }
@@ -283,12 +324,20 @@ document.addEventListener("DOMContentLoaded", () => {
     .getElementById("savePopupSettingsBtn")
     .addEventListener("click", () => {
       if (!activeTabUrl) return;
-      const minutesVal = document.getElementById("popupLimitMinutes").value;
-      const minutes = parseInt(minutesVal || "0");
-      const emergencyLock =
-        document.getElementById("popupEmergencyLock").checked;
 
-      chrome.storage.local.get(["dailyLimit"], (data) => {
+      // Verification of active session prior to saving settings
+      chrome.storage.local.get(["sessionExpiry", "dailyLimit"], (data) => {
+        if (!data.sessionExpiry || data.sessionExpiry < Date.now()) {
+          showToast("Session expired. Please log in again.", "error");
+          location.reload();
+          return;
+        }
+
+        const minutesVal = document.getElementById("popupLimitMinutes").value;
+        const minutes = parseInt(minutesVal || "0");
+        const emergencyLock =
+          document.getElementById("popupEmergencyLock").checked;
+
         const existingDl = data.dailyLimit || {};
         let newDl = { ...existingDl };
         if (minutes > 0) {
@@ -312,7 +361,7 @@ document.addEventListener("DOMContentLoaded", () => {
         chrome.storage.local.set(
           { dailyLimit: newDl, emergencyLock: emergencyLock },
           () => {
-            showToast(chrome.i18n.getMessage("settingsSaved"), "success");
+            showToast(t("settingsSaved"), "success");
             loadDashboardData();
           },
         );

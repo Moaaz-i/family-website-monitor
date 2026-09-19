@@ -267,5 +267,66 @@
   "settingsSaved": {
     "message": "Settings saved successfully!",
     "description": "Success message when popup settings are saved."
+  },
+  "blockedExtensionsTitle": {
+    "message": "Access Restricted 🔒"
+  },
+  "blockedExtensionsDesc": {
+    "message": "For security and stability, access to browser extension settings and developer pages is restricted."
+  },
+  "blockedExtensionsReason": {
+    "message": "Parental control settings do not permit loading extension management pages to prevent disabling the safety filters."
+  },
+  "blockedReasonTampered": {
+    "message": "Access is blocked because the computer's system clock has been tampered with. Please restore the correct time."
+  },
+  "lockedOut": {
+    "message": "Temporarily locked out"
+  },
+  "extensionsAccessHeader": {
+    "message": "Extension Management Access"
+  },
+  "extensionsAccessDesc": {
+    "message": "Allow access to chrome://extensions to manage or configure other browser extensions."
+  },
+  "allowExtensionsButton": {
+    "message": "Allow Access (20 Minutes)"
+  },
+  "lockExtensionsButton": {
+    "message": "Lock Access Now"
+  },
+  "accessAllowedToast": {
+    "message": "Access to chrome://extensions is allowed for 20 minutes."
+  },
+  "accessLockedToast": {
+    "message": "Access to chrome://extensions has been locked."
+  },
+  "enableSchedule": {
+    "message": "Enable Browsing Schedule"
+  },
+  "timeLeft": {
+    "message": "Time remaining: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "19:59"
+      }
+    }
+  },
+  "allowWholeDomain": {
+    "message": "Allow the whole domain (all sub-links)",
+    "description": "Checkbox label to allow an entire domain instead of a single URL."
+  },
+  "wholeDomainLabel": {
+    "message": "Whole domain",
+    "description": "Short label next to the domain toggle switch."
+  },
+  "wholeDomainEnabled": {
+    "message": "Full access enabled for this site (all sub-links).",
+    "description": "Toast when whole-domain mode is switched on."
+  },
+  "wholeDomainDisabled": {
+    "message": "Full access disabled. Now only the exact link is allowed.",
+    "description": "Toast when whole-domain mode is switched off."
   }
 }

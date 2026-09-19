@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Family Website Monitor — Uninstalled Successfully</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+      body {
+        background: linear-gradient(135deg, #f4f8ff 0%, #e6effd 100%) !important;
+        color: #1e293b !important;
+      }
+      .card {
+        max-width: 600px;
+        padding: 3.5rem 3rem;
+      }
+      h2 {
+        background: linear-gradient(to right, #4f46e5, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1.5rem;
+      }
+      .emoji-badge {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        display: inline-block;
+      }
+      .options-list {
+        text-align: left;
+        margin: 2rem 0;
+      }
+      .option-item {
+        background: rgba(99, 102, 241, 0.04);
+        border: 1px solid rgba(99, 102, 241, 0.08);
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .option-item:hover {
+        background: rgba(99, 102, 241, 0.08);
+        border-color: #3b82f6;
+        transform: translateY(-1px);
+      }
+      .option-item input[type="radio"] {
+        width: auto;
+        margin: 0;
+        cursor: pointer;
+      }
+      .option-item label {
+        font-weight: 600;
+        cursor: pointer;
+        font-size: 14px;
+        color: #334155;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <span class="emoji-badge">🛡️</span>
+      <h2>Family Website Monitor</h2>
+      <p style="font-size: 16px; margin-bottom: 1.5rem; font-weight: 600; color: #475569;">
+        We're sorry to see you go. The extension has been uninstalled.
+      </p>
+      <p style="font-size: 14px; margin-bottom: 2rem; color: #64748b;">
+        Your children are no longer protected by the website browsing schedules and whitelists. Please let us know why you uninstalled so we can improve the safety features.
+      </p>
+
+      <div class="options-list">
+        <div class="option-item">
+          <input type="radio" id="opt1" name="reason" />
+          <label for="opt1">It blocked websites that shouldn't be blocked.</label>
+        </div>
+        <div class="option-item">
+          <input type="radio" id="opt2" name="reason" />
+          <label for="opt2">It was too easy for my child to bypass.</label>
+        </div>
+        <div class="option-item">
+          <input type="radio" id="opt3" name="reason" />
+          <label for="opt3">It was difficult to set up the schedules or limits.</label>
+        </div>
+        <div class="option-item">
+          <input type="radio" id="opt4" name="reason" />
+          <label for="opt4">I don't need parental controls anymore.</label>
+        </div>
+      </div>
+
+      <button class="btn btn-primary" onclick="alert('Thank you for your feedback! We will continue improving our services.')">
+        Submit Feedback & Close
+      </button>
+    </div>
+  </body>
+</html>

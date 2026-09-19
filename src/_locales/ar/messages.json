@@ -270,5 +270,66 @@
   "settingsSaved": {
     "message": "تم حفظ الإعدادات بنجاح!",
     "description": "رسالة نجاح عند حفظ إعدادات النافذة المنبثقة."
+  },
+  "blockedExtensionsTitle": {
+    "message": "الوصول مقيد 🔒"
+  },
+  "blockedExtensionsDesc": {
+    "message": "لدواعي الأمان والاستقرار، تم تقييد الوصول إلى إعدادات إضافات المتصفح وصفحات المطورين."
+  },
+  "blockedExtensionsReason": {
+    "message": "إعدادات الرقابة الأبوية لا تسمح بتحميل صفحات إدارة الإضافات لمنع تعطيل فلاتر الحماية."
+  },
+  "blockedReasonTampered": {
+    "message": "تم حظر الوصول لأن ساعة النظام بالكمبيوتر قد تم التلاعب بها. يرجى إعادة ضبط الوقت الصحيح."
+  },
+  "lockedOut": {
+    "message": "مغلق مؤقتاً"
+  },
+  "extensionsAccessHeader": {
+    "message": "الوصول إلى إدارة الإضافات"
+  },
+  "extensionsAccessDesc": {
+    "message": "السماح بالوصول إلى صفحة الإضافات chrome://extensions لإدارة أو ضبط الإضافات الأخرى في المتصفح."
+  },
+  "allowExtensionsButton": {
+    "message": "السماح بالوصول (20 دقيقة)"
+  },
+  "lockExtensionsButton": {
+    "message": "قفل الوصول الآن"
+  },
+  "accessAllowedToast": {
+    "message": "تم السماح بالوصول لصفحة الإضافات لمدة 20 دقيقة."
+  },
+  "accessLockedToast": {
+    "message": "تم قفل الوصول لصفحة الإضافات."
+  },
+  "enableSchedule": {
+    "message": "تفعيل جدول التصفح"
+  },
+  "timeLeft": {
+    "message": "الوقت المتبقي: $TIME$",
+    "placeholders": {
+      "time": {
+        "content": "$1",
+        "example": "19:59"
+      }
+    }
+  },
+  "allowWholeDomain": {
+    "message": "السماح بالكامل للنطاق (جميع الروابط الفرعية)",
+    "description": "عنوان خانة اختيار للسماح بالنطاق كاملاً بدلاً من رابط واحد."
+  },
+  "wholeDomainLabel": {
+    "message": "النطاق الكامل",
+    "description": "تسمية قصيرة بجانب مفتاح التبديل."
+  },
+  "wholeDomainEnabled": {
+    "message": "تم تفعيل السماح الكامل لهذا الموقع (جميع الروابط الفرعية).",
+    "description": "رسالة عند تفعيل وضع النطاق الكامل."
+  },
+  "wholeDomainDisabled": {
+    "message": "تم إيقاف السماح الكامل. الآن يُسمح بالرابط المحدد فقط.",
+    "description": "رسالة عند إيقاف وضع النطاق الكامل."
   }
 }

@@ -1,22 +1,18 @@
-function resolveRedirectUrl(urlString) {
-  if (!urlString) return urlString;
-  try {
-    const urlObj = new URL(urlString);
-    if (urlObj.hostname.includes("google.") && urlObj.pathname === "/url") {
-      const target =
-        urlObj.searchParams.get("q") || urlObj.searchParams.get("url");
-      if (target) return target;
+import { resolveRedirectUrl } from "./lib/url.js";
+
+function safeSendMessage(message, callback) {
+  if (typeof chrome !== "undefined" && chrome && chrome.runtime && chrome.runtime.id) {
+    try {
+      chrome.runtime.sendMessage(message, (response) => {
+        if (chrome.runtime.lastError) {
+          return;
+        }
+        if (callback) callback(response);
+      });
+    } catch (e) {
+      // Prevent throwing exception when context is invalidated
     }
-    if (
-      urlObj.hostname.includes("duckduckgo.com") &&
-      (urlObj.pathname === "/y.js" || urlObj.pathname === "/l/")
-    ) {
-      const target =
-        urlObj.searchParams.get("u") || urlObj.searchParams.get("uddg");
-      if (target) return target;
-    }
-  } catch (e) {}
-  return urlString;
+  }
 }
 
 function moveChatList() {
@@ -198,19 +194,18 @@ startObserver();
   }
 
   function checkAndStartTimer() {
-    chrome.runtime.sendMessage({ type: "checkTimeStatus" }, (response) => {
-      if (chrome.runtime.lastError || !response) return;
+    safeSendMessage({ type: "checkTimeStatus" }, (response) => {
+      if (!response) return;
       if (!response.dlData.isTarget && !response.tempData.isTemp) return;
       updateTimer(response.dlData, response.tempData);
       if (!timerInterval) {
         timerInterval = setInterval(() => {
           if (document.hasFocus() && document.visibilityState === "visible") {
-            chrome.runtime.sendMessage({ type: "heartbeat" }, () => {
-              chrome.runtime.sendMessage(
+            safeSendMessage({ type: "heartbeat" }, () => {
+              safeSendMessage(
                 { type: "checkTimeStatus" },
                 (statusResp) => {
                   if (
-                    chrome.runtime.lastError ||
                     !statusResp ||
                     (!statusResp.dlData.isTarget && !statusResp.tempData.isTemp)
                   ) {
@@ -259,10 +254,10 @@ startObserver();
       e.preventDefault();
       e.stopPropagation();
 
-      chrome.runtime.sendMessage(
+      safeSendMessage(
         { type: "checkLinkStatus", url: realUrl },
         (response) => {
-          if (chrome.runtime.lastError || !response) {
+          if (!response) {
             window.location.href = realUrl;
             return;
           }
@@ -270,7 +265,7 @@ startObserver();
             if (link.target === "_blank") window.open(realUrl, "_blank");
             else window.location.href = realUrl;
           } else {
-            chrome.runtime.sendMessage({
+            safeSendMessage({
               type: "forceBlockRedirect",
               url: realUrl,
               reason: response.reason || "default",
@@ -289,12 +284,12 @@ startObserver();
     try {
       const absoluteUrl = new URL(targetUrl, window.location.origin).href;
       const realUrl = resolveRedirectUrl(absoluteUrl);
-      chrome.runtime.sendMessage(
+      safeSendMessage(
         { type: "checkLinkStatus", url: realUrl },
         (response) => {
-          if (chrome.runtime.lastError || !response) return;
+          if (!response) return;
           if (response.status !== "allowed") {
-            chrome.runtime.sendMessage({
+            safeSendMessage({
               type: "forceBlockRedirect",
               url: realUrl,
               reason: response.reason || "default",

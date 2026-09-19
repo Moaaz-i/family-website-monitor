@@ -6,7 +6,6 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <script src="theme-loader.js"></script>
     <div class="card">
       <h2 data-i18n="blockedSorry">
         Sorry, this site is not currently allowed.
@@ -48,12 +47,19 @@
           data-i18n-placeholder="minutesTempPlaceholder"
           style="display: none"
         />
+        <label
+          class="whole-domain-toggle"
+          style="margin: 12px 0; justify-content: flex-start"
+        >
+          <input type="checkbox" id="blockedDomainWhitelist" />
+          <span class="switch-slider"></span>
+          <span data-i18n="allowWholeDomain" style="font-size: 13px"></span>
+        </label>
         <button id="saveBtn" class="btn btn-success" data-i18n="saveAndApply">
           Save and Apply
         </button>
       </div>
     </div>
-    <script src="toast.js"></script>
-    <script src="blocked.js"></script>
+    <script src="./blocked.js"></script>
   </body>
 </html>

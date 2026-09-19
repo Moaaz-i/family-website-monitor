@@ -73,6 +73,16 @@ echo ""
 echo "📋 Updated files:"
 git diff --name-only "$BEFORE" HEAD 2>/dev/null | sed 's/^/   ✔ /'
 echo ""
+
+# Install dependencies and rebuild the extension bundles (dist/)
+echo "🔨 Installing dependencies (if needed) and rebuilding dist/..."
+if [ ! -d "node_modules" ]; then
+    npm install --silent
+fi
+npm run build
+
+echo ""
 echo "⚠️  Reload the extension from:"
 echo "   chrome://extensions  →  🔄 Reload button"
+echo "   (make sure the unpacked extension points to the 'dist' folder)
 echo ""
