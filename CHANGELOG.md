@@ -96,6 +96,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
+- **Allowed sites bounced to the blocked page on load** — every modern page
+  creates an `about:blank` (or `about:srcdoc` / `blob:` / `data:`) frame for
+  a lazy embed, and frame-aware enforcement judged that empty box like a
+  site, so an allowed page dragged the whole tab to
+  `blocked.html?target=about:blank&reason=default`. Only real destinations
+  (http/https/file) are judged now; a `data:` frame cannot smuggle a site
+  in either, because any http(s) navigation inside it is still checked.
 - Daily limits and temporary allowances matched the full URL path, so they
   never matched any real page (`youtube.com` vs `youtube.com/watch`).
 - A page blocked inside an iframe could bounce the user into the settings

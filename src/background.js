@@ -1,4 +1,4 @@
-import { resolveRedirectUrl, isSameSite, isValidRedirectTarget } from "./lib/url.js";
+import { resolveRedirectUrl, isSameSite, isValidRedirectTarget, isEnforceableUrl } from "./lib/url.js";
 import { encodePolicy, decodePolicy, stableStringify, chunkKey, SYNC_META_KEY, SYNC_CHUNK_PREFIX } from "./lib/sync-codec.js";
 import { normalizeSyncedPayload, planApplySync } from "./lib/sync-policy.js";
 import {
@@ -435,6 +435,11 @@ async function enforceExtensionsGuard(tabId) {
 // are now evaluated for every frame; a blocked sub-frame drags the whole tab
 // to the blocked page (an extension page cannot be framed, so redirecting the
 // frame itself would just leave a blank box).
+//
+// Only *destinations* are judged (see isEnforceableUrl): a frame whose URL is
+// about:blank, about:srcdoc, data: or blob: is an empty or parent-owned box —
+// every site creates them for lazy embeds — and blocking those bounced whole
+// tabs to blocked.html?target=about:blank the moment an allowed page loaded.
 const recentBlockRedirects = new Map(); // `${tabId}` -> { url, at }
 const BLOCK_REDIRECT_COOLDOWN_MS = 4000;
 
@@ -449,6 +454,15 @@ function checkAndApplyRules(url, tabId, frameId = 0) {
   }
 
   if (resolvedUrl.startsWith("chrome://") || resolvedUrl.startsWith("chrome-extension://")) {
+    return;
+  }
+
+  // `about:blank`, `about:srcdoc`, `data:` and `blob:` frames are not sites:
+  // they are empty or parent-owned boxes inside a page that was checked
+  // already. Every real http(s) destination — in any frame — is still
+  // judged below. (Skipping them here is what stops an allowed site from
+  // bouncing the whole tab the moment it creates a lazy embed.)
+  if (!isEnforceableUrl(resolvedUrl)) {
     return;
   }
 

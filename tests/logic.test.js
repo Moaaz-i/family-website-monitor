@@ -5,6 +5,7 @@ import {
   buildStrictUrl,
   isMatchingSite,
   isEntryAllowed,
+  isEnforceableUrl,
   resolveRedirectUrl,
   isValidRedirectTarget,
   normalizeUrl,
@@ -73,6 +74,37 @@ test("resolveRedirectUrl unwraps Google redirect links", () => {
 test("isValidRedirectTarget only accepts http/https", () => {
   assert.equal(isValidRedirectTarget("https://example.com"), true);
   assert.equal(isValidRedirectTarget("file:///etc/passwd"), false);
+});
+
+test("isEnforceableUrl judges only real destinations", () => {
+  // Real sites: always judged.
+  assert.equal(isEnforceableUrl("https://example.com"), true);
+  assert.equal(isEnforceableUrl("http://example.com/watch?v=1"), true);
+  // A local file opened in a tab is still refused by the whitelist.
+  assert.equal(isEnforceableUrl("file:///etc/passwd"), true);
+
+  // Empty or parent-owned boxes: the page that creates them was checked
+  // already. This is the bug that bounced every allowed site to
+  // blocked.html?target=about:blank&reason=default the moment it created a
+  // lazy embed.
+  assert.equal(isEnforceableUrl("about:blank"), false);
+  assert.equal(isEnforceableUrl("about:srcdoc"), false);
+  assert.equal(isEnforceableUrl("blob:https://example.com/uuid-1"), false);
+
+  // Opaque or internal schemes: no whitelist can apply to them, and any
+  // http(s) navigation inside a data: frame still reaches the handlers.
+  assert.equal(isEnforceableUrl("data:text/html,<h1>hi</h1>"), false);
+  assert.equal(isEnforceableUrl("javascript:alert(1)"), false);
+  assert.equal(isEnforceableUrl("view-source:https://example.com"), false);
+  assert.equal(isEnforceableUrl("chrome://extensions"), false);
+  assert.equal(isEnforceableUrl("chrome-extension://abc/options.html"), false);
+  assert.equal(isEnforceableUrl("devtools://devtools/b.html"), false);
+
+  // Nothing to judge.
+  assert.equal(isEnforceableUrl(""), false);
+  assert.equal(isEnforceableUrl(null), false);
+  assert.equal(isEnforceableUrl(undefined), false);
+  assert.equal(isEnforceableUrl("not a url"), false);
 });
 
 test("normalizeUrl adds https scheme", () => {

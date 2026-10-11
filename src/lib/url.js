@@ -123,6 +123,23 @@ export function normalizeUrl(url) {
   }
 }
 
+// Only real destinations are judged: http(s), plus file: (a local file the
+// child opens in a tab must still be refused by a whitelist).
+//
+// A sub-frame's `about:blank` / `about:srcdoc` URL carries no content of its
+// own — it is an empty box that the page which owns it fills later, and that
+// page was already checked. `blob:` frames inherit the origin of the page
+// that created them, and `data:` frames are opaque, so any http(s)
+// navigation inside them still reaches the rule handlers.
+//
+// Treating these as sites is what made every modern page bounce to the
+// blocked page the moment it created a lazy embed (the frame reported
+// `about:blank` with reason "default").
+export function isEnforceableUrl(urlString) {
+  const value = String(urlString || "");
+  return /^https?:\/\//i.test(value) || /^file:/i.test(value);
+}
+
 export function isValidRedirectTarget(urlString) {
   if (!urlString) return false;
   try {
