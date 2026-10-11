@@ -41,6 +41,12 @@ export function translateDOM() {
     const val = t(key);
     if (val && val !== key) {
       el.placeholder = val;
+      // A placeholder is not a label: without one, an input is announced as
+      // "edit text blank" by screen readers. Mirror it unless the markup
+      // already provides a real label.
+      if (!el.hasAttribute("aria-label") && !el.getAttribute("aria-labelledby")) {
+        el.setAttribute("aria-label", val);
+      }
     }
   });
 }

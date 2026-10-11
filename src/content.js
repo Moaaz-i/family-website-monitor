@@ -1,325 +1,209 @@
-import { resolveRedirectUrl } from "./lib/url.js";
+// Content script — lightweight by design.
+//
+// Navigation enforcement does NOT happen here. The service worker already
+// listens to webNavigation.onBeforeNavigate / onHistoryStateUpdated and
+// tabs.onUpdated, so intercepting clicks with preventDefault() only broke
+// Ctrl/Cmd+click, middle-click, target="_blank" and window.open().
+//
+// This file has exactly two jobs:
+//   1. Beat once per second on EVERY page so the service worker can build the
+//      activity report (time per host per day) — not only on limited sites.
+//   2. Render the "time remaining" pill when the current page is limited.
 
 function safeSendMessage(message, callback) {
   if (typeof chrome !== "undefined" && chrome && chrome.runtime && chrome.runtime.id) {
     try {
       chrome.runtime.sendMessage(message, (response) => {
-        if (chrome.runtime.lastError) {
-          return;
-        }
+        if (chrome.runtime.lastError) return;
         if (callback) callback(response);
       });
-    } catch (e) {
-      // Prevent throwing exception when context is invalidated
+    } catch {
+      // Context invalidated during an extension reload — ignore.
     }
   }
 }
-
-function moveChatList() {
-  const sidebar = document.querySelector(".sidebar-slider-item");
-  const sidebarContent = document.querySelector(".sidebar-content");
-  const chatListContainer = document.querySelector("#chatlist-container");
-  const chatListPart = document.querySelector(".chatlist-parts");
-  const chatList = document.querySelector(".chatlist-top");
-  const chatListHeader = document.querySelectorAll(
-    "[data-testid=chatlist-header]",
-  );
-  const searchbar = document.querySelector(
-    "[data-testid=chat-list-search-container]",
-  );
-  const tablist = document.querySelector("[role=tablist]");
-
-  if (tablist) tablist.remove();
-  if (searchbar) searchbar.remove();
-  if (chatListHeader) {
-    chatListHeader.forEach((element) => {
-      element.remove();
-    });
-  }
-
-  if (
-    chatList &&
-    sidebar &&
-    sidebarContent &&
-    chatListPart &&
-    chatListContainer
-  ) {
-    if (
-      chatListPart.firstElementChild === chatList &&
-      sidebarContent.firstElementChild === chatListContainer &&
-      sidebar.firstElementChild === sidebarContent
-    ) {
-      return;
-    }
-    observer.disconnect();
-    chatListPart.replaceChildren(chatList);
-    sidebarContent.replaceChildren(chatListContainer);
-    sidebar.replaceChildren(sidebarContent);
-    startObserver();
-  }
-}
-
-function startObserver() {
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
-const observer = new MutationObserver(moveChatList);
-moveChatList();
-startObserver();
 
 (function () {
-  let timerInterval = null;
-  let timerElement = null;
+  const FOCUSED_BEAT_MS = 1000;
+  const IDLE_BEAT_MS = 5000;
 
-  function formatTime(seconds) {
+  let intervalId = null;
+  let host = null;
+  let hostRoot = null;
+
+  const formatTime = (totalSeconds) => {
+    const seconds = Math.max(0, totalSeconds);
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
-    return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
+    return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+  };
+
+  function buildPill() {
+    const shadowHost = document.createElement("div");
+    shadowHost.id = "family-website-monitor-timer";
+    shadowHost.style.cssText =
+      "position:fixed !important;bottom:20px !important;right:20px !important;z-index:2147483647 !important;";
+
+    const root = shadowHost.attachShadow({ mode: "closed" });
+    hostRoot = root;
+    root.innerHTML = `
+      <style>
+        :host { all: initial; }
+        .pill {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 16px;
+          border-radius: 999px;
+          background: rgba(17, 24, 39, 0.92);
+          color: #fff;
+          font: 600 14px/1 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+          user-select: none;
+          direction: ltr;
+          transition: opacity 0.2s ease;
+        }
+        .pill.idle { opacity: 0.45; }
+        .dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #4ade80;
+          box-shadow: 0 0 8px #4ade80;
+        }
+        .dot.warn { background: #fbbf24; box-shadow: 0 0 8px #fbbf24; }
+        .dot.crit { background: #f87171; box-shadow: 0 0 8px #f87171; }
+        .label { font-size: 10px; opacity: 0.72; }
+      </style>
+      <div class="pill" part="pill">
+        <span class="dot"></span>
+        <span class="time">00:00</span>
+        <span class="label"></span>
+      </div>
+    `;
+    return shadowHost;
   }
 
-  function createTimerUI(remainingSeconds, label) {
-    if (timerElement) return;
-    timerElement = document.createElement("div");
-    timerElement.id = "family-website-monitor-timer";
-    timerElement.style.cssText = `
-      position: fixed !important;
-      bottom: 20px !important;
-      right: 20px !important;
-      z-index: 2147483647 !important;
-      background: rgba(20, 20, 20, 0.85) !important;
-      backdrop-filter: blur(8px) !important;
-      -webkit-backdrop-filter: blur(8px) !important;
-      color: #ffffff !important;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
-      font-size: 14px !important;
-      font-weight: 600 !important;
-      padding: 10px 18px !important;
-      border-radius: 30px !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 8px !important;
-      user-select: none !important;
-      transition: opacity 0.2s ease !important;
-      direction: ltr !important;
-    `;
-
-    timerElement.addEventListener("mouseenter", () => {
-      timerElement.style.opacity = "0.2";
-    });
-    timerElement.addEventListener("mouseleave", () => {
-      timerElement.style.opacity = "1";
-    });
-
-    const indicator = document.createElement("span");
-    indicator.id = "family-website-monitor-timer-indicator";
-    indicator.style.cssText = `
-      width: 8px !important;
-      height: 8px !important;
-      border-radius: 50% !important;
-      background: #4ade80 !important;
-      display: inline-block !important;
-      box-shadow: 0 0 8px #4ade80 !important;
-    `;
-
-    const text = document.createElement("span");
-    text.id = "family-website-monitor-timer-text";
-    text.textContent = formatTime(remainingSeconds);
-
-    const typeLabel = document.createElement("small");
-    typeLabel.id = "family-website-monitor-timer-label";
-    typeLabel.style.cssText = `
-      font-size: 10px !important;
-      opacity: 0.7 !important;
-      margin-left: 2px !important;
-    `;
-    typeLabel.textContent = `(${label})`;
-
-    timerElement.appendChild(indicator);
-    timerElement.appendChild(text);
-    timerElement.appendChild(typeLabel);
-    document.body.appendChild(timerElement);
+  function ensurePill() {
+    if (host && host.isConnected) return;
+    host = buildPill();
+    (document.body || document.documentElement).appendChild(host);
   }
 
-  function updateTimer(dlData, tempData) {
-    let activeTime = 0;
-    let activeLabel = "";
-    if (tempData.isTemp && dlData.isTarget) {
-      if (tempData.remainingSeconds < dlData.remainingSeconds) {
-        activeTime = tempData.remainingSeconds;
-        activeLabel = "temp";
-      } else {
-        activeTime = dlData.remainingSeconds;
-        activeLabel = "daily";
+  function removePill() {
+    if (host) host.remove();
+    host = null;
+    hostRoot = null;
+  }
+
+  function render(seconds, label, focused) {
+    ensurePill();
+    const root = hostRoot;
+    if (!root) return;
+    const pill = root.querySelector(".pill");
+    const timeEl = root.querySelector(".time");
+    const dot = root.querySelector(".dot");
+    const labelEl = root.querySelector(".label");
+
+    timeEl.textContent = formatTime(seconds);
+    labelEl.textContent = label ? `(${label})` : "";
+    pill.classList.toggle("idle", !focused);
+
+    dot.classList.remove("warn", "crit");
+    if (seconds < 60) dot.classList.add("crit");
+    else if (seconds < 300) dot.classList.add("warn");
+  }
+
+  function isVisible() {
+    return document.visibilityState === "visible";
+  }
+
+  function isFocused() {
+    return isVisible() && document.hasFocus();
+  }
+
+  function beat() {
+    const focused = isFocused();
+    safeSendMessage({ type: "heartbeat", focused }, (response) => {
+      if (!response) return;
+      // The pill only exists on limited/temporarily-allowed pages.
+      if (!response.isTarget && !response.tempSeconds) {
+        removePill();
+        return;
       }
-    } else if (tempData.isTemp) {
-      activeTime = tempData.remainingSeconds;
-      activeLabel = "temp";
-    } else if (dlData.isTarget) {
-      activeTime = dlData.remainingSeconds;
-      activeLabel = "daily";
-    }
+      const active = pickActive(
+        { isTarget: response.isTarget, remainingSeconds: response.remainingSeconds },
+        {
+          isTemp: response.tempSeconds > 0,
+          remainingSeconds: response.tempSeconds,
+        },
+      );
+      if (!active) {
+        removePill();
+        return;
+      }
+      render(active.seconds, active.label, response.focused !== false && focused);
+    });
+  }
 
-    if (!timerElement) {
-      createTimerUI(activeTime, activeLabel);
+  function pickActive(dl, temp) {
+    if (dl.isTarget && temp.isTemp) {
+      return temp.remainingSeconds < dl.remainingSeconds
+        ? { seconds: temp.remainingSeconds, label: "temp" }
+        : { seconds: dl.remainingSeconds, label: "daily" };
+    }
+    if (temp.isTemp) return { seconds: temp.remainingSeconds, label: "temp" };
+    if (dl.isTarget) return { seconds: dl.remainingSeconds, label: "daily" };
+    return null;
+  }
+
+  function schedule() {
+    const period = isFocused() ? FOCUSED_BEAT_MS : IDLE_BEAT_MS;
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(beat, period);
+  }
+
+  function start() {
+    if (!intervalId) schedule();
+    beat();
+  }
+
+  // Hidden tab: send one last unfocused beat so the service worker resets its
+  // clock, then go fully silent — a background tab would only waste messages.
+  function suspend() {
+    if (intervalId) clearInterval(intervalId);
+    intervalId = null;
+    safeSendMessage({ type: "heartbeat", focused: false });
+    removePill();
+  }
+
+  function init() {
+    if (!document.body) {
+      document.addEventListener("DOMContentLoaded", init, { once: true });
       return;
     }
 
-    const textElem = document.getElementById(
-      "family-website-monitor-timer-text",
-    );
-    if (textElem) textElem.textContent = formatTime(activeTime);
-
-    const labelElem = document.getElementById(
-      "family-website-monitor-timer-label",
-    );
-    if (labelElem) labelElem.textContent = `(${activeLabel})`;
-
-    const indicator = document.getElementById(
-      "family-website-monitor-timer-indicator",
-    );
-    if (indicator) {
-      if (activeTime < 60) {
-        indicator.style.background = "#f87171";
-        indicator.style.boxShadow = "0 0 8px #f87171";
-      } else if (activeTime < 300) {
-        indicator.style.background = "#fbbf24";
-        indicator.style.boxShadow = "0 0 8px #fbbf24";
-      } else {
-        indicator.style.background = "#4ade80";
-        indicator.style.boxShadow = "0 0 8px #4ade80";
-      }
-    }
-  }
-
-  function checkAndStartTimer() {
-    safeSendMessage({ type: "checkTimeStatus" }, (response) => {
-      if (!response) return;
-      if (!response.dlData.isTarget && !response.tempData.isTemp) return;
-      updateTimer(response.dlData, response.tempData);
-      if (!timerInterval) {
-        timerInterval = setInterval(() => {
-          if (document.hasFocus() && document.visibilityState === "visible") {
-            safeSendMessage({ type: "heartbeat" }, () => {
-              safeSendMessage(
-                { type: "checkTimeStatus" },
-                (statusResp) => {
-                  if (
-                    !statusResp ||
-                    (!statusResp.dlData.isTarget && !statusResp.tempData.isTemp)
-                  ) {
-                    if (timerElement) {
-                      timerElement.remove();
-                      timerElement = null;
-                    }
-                    clearInterval(timerInterval);
-                    timerInterval = null;
-                    return;
-                  }
-                  updateTimer(statusResp.dlData, statusResp.tempData);
-                },
-              );
-            });
-          }
-        }, 1000);
-      }
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") suspend();
+      else start();
     });
+
+    // The window can lose focus while the page stays visible; slow the beat
+    // down and tell the worker to stop accruing seconds.
+    window.addEventListener("blur", () => {
+      if (!isVisible()) return;
+      schedule();
+      safeSendMessage({ type: "heartbeat", focused: false });
+    });
+    window.addEventListener("focus", () => {
+      if (!isVisible()) return;
+      schedule();
+      beat();
+    });
+
+    start();
   }
 
-  if (
-    document.readyState === "complete" ||
-    document.readyState === "interactive"
-  ) {
-    checkAndStartTimer();
-  } else {
-    document.addEventListener("DOMContentLoaded", checkAndStartTimer);
-  }
-})();
-
-(function () {
-  document.addEventListener(
-    "click",
-    function (e) {
-      const link = e.target.closest("a");
-      if (!link || !link.href) return;
-      if (
-        link.href.startsWith("javascript:") ||
-        link.href.startsWith("#") ||
-        link.href.trim() === ""
-      )
-        return;
-
-      const realUrl = resolveRedirectUrl(link.href);
-      e.preventDefault();
-      e.stopPropagation();
-
-      safeSendMessage(
-        { type: "checkLinkStatus", url: realUrl },
-        (response) => {
-          if (!response) {
-            window.location.href = realUrl;
-            return;
-          }
-          if (response.status === "allowed") {
-            if (link.target === "_blank") window.open(realUrl, "_blank");
-            else window.location.href = realUrl;
-          } else {
-            safeSendMessage({
-              type: "forceBlockRedirect",
-              url: realUrl,
-              reason: response.reason || "default",
-              openInNewTab: link.target === "_blank",
-            });
-          }
-        },
-      );
-    },
-    true,
-  );
-})();
-
-(function () {
-  function checkSpaUrl(targetUrl) {
-    try {
-      const absoluteUrl = new URL(targetUrl, window.location.origin).href;
-      const realUrl = resolveRedirectUrl(absoluteUrl);
-      safeSendMessage(
-        { type: "checkLinkStatus", url: realUrl },
-        (response) => {
-          if (!response) return;
-          if (response.status !== "allowed") {
-            safeSendMessage({
-              type: "forceBlockRedirect",
-              url: realUrl,
-              reason: response.reason || "default",
-              openInNewTab: false,
-            });
-          }
-        },
-      );
-    } catch (e) {
-      console.error("Error parsing SPA URL:", e);
-    }
-  }
-
-  const patchHistory = function (type) {
-    const orig = history[type];
-    return function () {
-      const result = orig.apply(this, arguments);
-      const url = arguments[2];
-      if (url) checkSpaUrl(url);
-      return result;
-    };
-  };
-
-  history.pushState = patchHistory("pushState");
-  history.replaceState = patchHistory("replaceState");
-
-  window.addEventListener("popstate", () => {
-    checkSpaUrl(window.location.href);
-  });
-  window.addEventListener("hashchange", () => {
-    checkSpaUrl(window.location.href);
-  });
+  init();
 })();

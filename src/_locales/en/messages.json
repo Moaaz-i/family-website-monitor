@@ -56,7 +56,7 @@
     "description": "Button text to verify password."
   },
   "setupTitle": {
-    "message": "Set Parent Password 🛡️",
+    "message": "Set Parent Password",
     "description": "Title for the initial setup screen."
   },
   "setupDescription": {
@@ -64,7 +64,7 @@
     "description": "Description for the setup screen."
   },
   "loginTitle": {
-    "message": "Parent Login 🔑",
+    "message": "Parent Login",
     "description": "Title for the login screen."
   },
   "loginDescription": {
@@ -96,6 +96,34 @@
   "passwordIncorrect": {
     "message": "Incorrect password! Please try again.",
     "description": "Alert message."
+  },
+  "passwordTooShort": {
+    "message": "Use at least 6 characters for the parent password.",
+    "description": "Alert message shown when the chosen password is too short."
+  },
+  "incognitoHeader": {
+    "message": "Incognito Protection",
+    "description": "Settings card title for the Incognito bypass warning."
+  },
+  "incognitoDesc": {
+    "message": "Chrome does not run extensions in Incognito windows until you allow it. Leaving it off is the easiest way around every rule.",
+    "description": "Help text under the Incognito Protection heading."
+  },
+  "incognitoButton": {
+    "message": "Open settings to allow Incognito",
+    "description": "Button that opens chrome://extensions focused on this extension."
+  },
+  "incognitoRecheck": {
+    "message": "Re-check Incognito status",
+    "description": "Button label once Incognito access has already been granted."
+  },
+  "incognitoOn": {
+    "message": "Protection is active in Incognito windows.",
+    "description": "Status text when Incognito access is granted."
+  },
+  "incognitoOff": {
+    "message": "Not protected in Incognito windows yet.",
+    "description": "Status text when Incognito access is missing."
   },
   "enterNewPassword": {
     "message": "Enter new password",
@@ -134,7 +162,7 @@
     "description": "Tab title for the settings section."
   },
   "allowedWebsites": {
-    "message": "Allowed Websites 🌐",
+    "message": "Allowed Websites",
     "description": "Header for the whitelist management section."
   },
   "addSitePlaceholder": {
@@ -153,13 +181,27 @@
     "message": "Allowed Days:",
     "description": "Label for the day selector."
   },
-  "daySun": { "message": "Sun" },
-  "dayMon": { "message": "Mon" },
-  "dayTue": { "message": "Tue" },
-  "dayWed": { "message": "Wed" },
-  "dayThu": { "message": "Thu" },
-  "dayFri": { "message": "Fri" },
-  "daySat": { "message": "Sat" },
+  "daySun": {
+    "message": "Sun"
+  },
+  "dayMon": {
+    "message": "Mon"
+  },
+  "dayTue": {
+    "message": "Tue"
+  },
+  "dayWed": {
+    "message": "Wed"
+  },
+  "dayThu": {
+    "message": "Thu"
+  },
+  "dayFri": {
+    "message": "Fri"
+  },
+  "daySat": {
+    "message": "Sat"
+  },
   "allowedTime": {
     "message": "Allowed Time:",
     "description": "Label for the time range selector."
@@ -189,7 +231,7 @@
     "description": "Label for the daily limit activation checkbox."
   },
   "emergencyLock": {
-    "message": "Emergency Lock 🔒",
+    "message": "Emergency Lock",
     "description": "Header for the emergency lock section."
   },
   "enableLockButton": {
@@ -204,8 +246,12 @@
     "message": "Failed Attempts",
     "description": "Header for the failed attempts log."
   },
-  "tableHeaderWebsite": { "message": "Website" },
-  "tableHeaderTime": { "message": "Time" },
+  "tableHeaderWebsite": {
+    "message": "Website"
+  },
+  "tableHeaderTime": {
+    "message": "Time"
+  },
   "clearLogButton": {
     "message": "Clear Log",
     "description": "Button to clear the activity log."
@@ -214,62 +260,150 @@
     "message": "Appearance",
     "description": "Header for appearance settings."
   },
-  "themeToggleDark": { "message": "Dark Mode" },
-  "themeToggleLight": { "message": "Light Mode" },
-  "changePassword": { "message": "Change Password" },
-  "newPasswordPlaceholder": { "message": "New password" },
-  "confirmPasswordPlaceholder": { "message": "Confirm new password" },
-  "changePasswordButton": { "message": "Change Password" },
-  "backupAndRestore": { "message": "Backup & Restore" },
-  "exportButton": { "message": "Export" },
-  "importButton": { "message": "Import" },
-  "resetExtension": { "message": "Reset Extension" },
-  "resetAllButton": { "message": "Reset All" },
-  "chooseAction": { "message": "Choose an action:" },
-  "allowAlways": { "message": "Add permanently to whitelist" },
-  "allowTemp": { "message": "Allow for a specific time (minutes)" },
-  "minutesTempPlaceholder": { "message": "Minutes (if temporary)" },
-  "saveAndApply": { "message": "Save and Apply" },
-  "fillAllFields": { "message": "Please fill all fields!" },
-  "passwordsDontMatch": { "message": "Passwords do not match!" },
-  "invalidUrl": { "message": "Invalid URL!" },
+  "themeToggleDark": {
+    "message": "Dark Mode"
+  },
+  "themeToggleLight": {
+    "message": "Light Mode"
+  },
+  "changePassword": {
+    "message": "Change Password"
+  },
+  "newPasswordPlaceholder": {
+    "message": "New password"
+  },
+  "confirmPasswordPlaceholder": {
+    "message": "Confirm new password"
+  },
+  "changePasswordButton": {
+    "message": "Change Password"
+  },
+  "backupAndRestore": {
+    "message": "Backup & Restore"
+  },
+  "exportButton": {
+    "message": "Export"
+  },
+  "importButton": {
+    "message": "Import"
+  },
+  "resetExtension": {
+    "message": "Reset Extension"
+  },
+  "resetAllButton": {
+    "message": "Reset All"
+  },
+  "chooseAction": {
+    "message": "Choose an action:"
+  },
+  "allowAlways": {
+    "message": "Add permanently to whitelist"
+  },
+  "allowTemp": {
+    "message": "Allow for a specific time (minutes)"
+  },
+  "minutesTempPlaceholder": {
+    "message": "Minutes (if temporary)"
+  },
+  "saveAndApply": {
+    "message": "Save and Apply"
+  },
+  "fillAllFields": {
+    "message": "Please fill all fields!"
+  },
+  "passwordsDontMatch": {
+    "message": "Passwords do not match!"
+  },
+  "invalidUrl": {
+    "message": "Invalid URL!"
+  },
   "siteAlreadyWhitelisted": {
     "message": "This site is already on the whitelist!"
   },
-  "deleteButton": { "message": "Delete" },
+  "deleteButton": {
+    "message": "Delete"
+  },
   "noSitesAdded": {
     "message": "No sites added yet. All websites are currently blocked."
   },
-  "scheduleSaved": { "message": "Schedule saved!" },
-  "dailyLimitSaved": { "message": "Daily limit saved!" },
-  "emergencyLockEnabled": { "message": "Emergency Lock Enabled!" },
-  "emergencyLockDisabled": { "message": "Emergency Lock Disabled!" },
-  "noFailedAttempts": { "message": "No failed attempts recorded." },
-  "passwordChanged": { "message": "Password changed!" },
-  "dataImported": { "message": "Data imported!" },
-  "invalidFile": { "message": "Invalid file!" },
-  "resetConfirm": { "message": "Are you sure? This will delete all data." },
-  "extensionReset": { "message": "Extension reset!" },
-  "unlockPopup": { "message": "Enter parent password to manage" },
-  "currentSite": { "message": "Current Site:" },
-  "alwaysAllowSite": { "message": "Always Allow Site" },
-  "removeFromWhitelist": { "message": "Remove from Whitelist" },
-  "setDailyLimit": { "message": "Set Daily Limit" },
-  "quickPresets": { "message": "Quick Presets" },
-  "limitMinutesInput": { "message": "Limit in minutes" },
-  "saveSettings": { "message": "Save Settings" },
-  "unlockButton": { "message": "Unlock" },
-  "statusLabel": { "message": "Status:" },
-  "statusWhitelisted": { "message": "Always Allowed" },
-  "statusRestricted": { "message": "Restricted" },
-  "statusLimited": { "message": "Time Limited" },
-  "emergencyLockToggle": { "message": "Emergency Lock" },
+  "scheduleSaved": {
+    "message": "Schedule saved!"
+  },
+  "dailyLimitSaved": {
+    "message": "Daily limit saved!"
+  },
+  "emergencyLockEnabled": {
+    "message": "Emergency Lock Enabled!"
+  },
+  "emergencyLockDisabled": {
+    "message": "Emergency Lock Disabled!"
+  },
+  "noFailedAttempts": {
+    "message": "No failed attempts recorded."
+  },
+  "passwordChanged": {
+    "message": "Password changed!"
+  },
+  "dataImported": {
+    "message": "Data imported!"
+  },
+  "invalidFile": {
+    "message": "Invalid file!"
+  },
+  "resetConfirm": {
+    "message": "Are you sure? This will delete all data."
+  },
+  "extensionReset": {
+    "message": "Extension reset!"
+  },
+  "unlockPopup": {
+    "message": "Enter parent password to manage"
+  },
+  "currentSite": {
+    "message": "Current Site:"
+  },
+  "alwaysAllowSite": {
+    "message": "Always Allow Site"
+  },
+  "removeFromWhitelist": {
+    "message": "Remove from Whitelist"
+  },
+  "setDailyLimit": {
+    "message": "Set Daily Limit"
+  },
+  "quickPresets": {
+    "message": "Quick Presets"
+  },
+  "limitMinutesInput": {
+    "message": "Limit in minutes"
+  },
+  "saveSettings": {
+    "message": "Save Settings"
+  },
+  "unlockButton": {
+    "message": "Unlock"
+  },
+  "statusLabel": {
+    "message": "Status:"
+  },
+  "statusWhitelisted": {
+    "message": "Always Allowed"
+  },
+  "statusRestricted": {
+    "message": "Restricted"
+  },
+  "statusLimited": {
+    "message": "Time Limited"
+  },
+  "emergencyLockToggle": {
+    "message": "Emergency Lock"
+  },
   "settingsSaved": {
     "message": "Settings saved successfully!",
     "description": "Success message when popup settings are saved."
   },
   "blockedExtensionsTitle": {
-    "message": "Access Restricted 🔒"
+    "message": "Access Restricted"
   },
   "blockedExtensionsDesc": {
     "message": "For security and stability, access to browser extension settings and developer pages is restricted."
@@ -328,5 +462,350 @@
   "wholeDomainDisabled": {
     "message": "Full access disabled. Now only the exact link is allowed.",
     "description": "Toast when whole-domain mode is switched off."
+  },
+  "tabBlocklist": {
+    "message": "Blocklist"
+  },
+  "tabReport": {
+    "message": "Report"
+  },
+  "blocklistTitle": {
+    "message": "Blocked Websites"
+  },
+  "blocklistDesc": {
+    "message": "Blocked sites can never be opened — a block also outranks the whitelist."
+  },
+  "addKeywordPlaceholder": {
+    "message": "Domain or keyword to block (e.g. youtube.com)"
+  },
+  "noKeywords": {
+    "message": "Nothing is blocked yet."
+  },
+  "keywordAdded": {
+    "message": "Added to the blocklist."
+  },
+  "keywordRemoved": {
+    "message": "Removed from the blocklist."
+  },
+  "keywordInvalid": {
+    "message": "Enter at least 3 characters (a domain or a keyword)."
+  },
+  "keywordDuplicate": {
+    "message": "That entry is already on the blocklist."
+  },
+  "keywordLimit": {
+    "message": "Blocklist storage capacity exceeded (max 500 items)."
+  },
+  "presetsTitle": {
+    "message": "Quick Block Packs"
+  },
+  "presetsDesc": {
+    "message": "Block a whole category of sites with one click. You can remove any entry afterwards."
+  },
+  "presetApplied": {
+    "message": "Pack applied."
+  },
+  "presetAlready": {
+    "message": "Everything in this pack is already configured."
+  },
+  "presetSocial": {
+    "message": "Social media"
+  },
+  "presetVideo": {
+    "message": "Video platforms"
+  },
+  "presetGaming": {
+    "message": "Online games"
+  },
+  "presetShopping": {
+    "message": "Shopping"
+  },
+  "presetStreaming": {
+    "message": "Movie streaming"
+  },
+  "safePacksTitle": {
+    "message": "Quick Safe Packs"
+  },
+  "safePacksDesc": {
+    "message": "Pre-reviewed sites that are safe for children."
+  },
+  "safeLearning": {
+    "message": "Learning sites"
+  },
+  "safeKids": {
+    "message": "Kids sites"
+  },
+  "reportTitle": {
+    "message": "Usage Report"
+  },
+  "reportDesc": {
+    "message": "Time spent, visits and blocked attempts per site. Kept for the last 14 days."
+  },
+  "reportDayLabel": {
+    "message": "Day"
+  },
+  "reportColSite": {
+    "message": "Website"
+  },
+  "reportColTime": {
+    "message": "Time"
+  },
+  "reportColVisits": {
+    "message": "Visits"
+  },
+  "reportColBlocked": {
+    "message": "Blocked"
+  },
+  "reportNoData": {
+    "message": "No activity recorded for this day."
+  },
+  "reportTotals": {
+    "message": "Total: $1 · $2 visits · $3 blocked attempts"
+  },
+  "clearReportButton": {
+    "message": "Clear report data"
+  },
+  "reportCleared": {
+    "message": "Report data cleared."
+  },
+  "notificationsHeader": {
+    "message": "Time Warnings"
+  },
+  "notificationsDesc": {
+    "message": "Get a desktop warning 5 minutes and 1 minute before a site's daily time runs out."
+  },
+  "notificationsToggle": {
+    "message": "Enable time warnings"
+  },
+  "notificationsOn": {
+    "message": "Time warnings are on."
+  },
+  "notificationsOff": {
+    "message": "Time warnings are off."
+  },
+  "parentAreaTitle": {
+    "message": "Parents"
+  },
+  "statusAllowed": {
+    "message": "Allowed"
+  },
+  "statusBlocked": {
+    "message": "Blocked"
+  },
+  "parentAreaHint": {
+    "message": "Enter the parent password to change this rule."
+  },
+  "blockedReasonBlocklist": {
+    "message": "This site is on the blocklist set by a parent."
+  },
+  "targetSite": {
+    "message": "Target Site (Example: youtube.com):"
+  },
+  "limitInMinutes": {
+    "message": "Limit in Minutes:"
+  },
+  "settingsGeneral": {
+    "message": "General Settings"
+  },
+  "settingsLanguage": {
+    "message": "Language"
+  },
+  "statusActive": {
+    "message": "Active"
+  },
+  "askMoreTimeButton": {
+    "message": "Ask a parent for $1 more minutes"
+  },
+  "askMoreTimeSent": {
+    "message": "Asked! Waiting for a parent to answer ($1 minutes)."
+  },
+  "askMoreTimeCooldown": {
+    "message": "You can ask again in $1 seconds."
+  },
+  "askMoreTimeAlready": {
+    "message": "This site is already open."
+  },
+  "askMoreTimeFailed": {
+    "message": "Could not send the request."
+  },
+  "blockedReasonBudget": {
+    "message": "Your screen time for today is used up. Come back tomorrow!"
+  },
+  "screenTimeHeader": {
+    "message": "Total daily screen time"
+  },
+  "screenTimeDesc": {
+    "message": "One allowance for the whole day across every site. Sites you allow always stay open."
+  },
+  "screenTimeEnabledLabel": {
+    "message": "Enforce a daily screen-time budget"
+  },
+  "screenTimeMinutesLabel": {
+    "message": "Minutes per day"
+  },
+  "screenTimeUsedLabel": {
+    "message": "Used today"
+  },
+  "screenTimeRemainingLabel": {
+    "message": "Left today"
+  },
+  "screenTimeSave": {
+    "message": "Save screen time"
+  },
+  "screenTimeSaved": {
+    "message": "Screen-time budget saved."
+  },
+  "syncStatusOk": {
+    "message": "Settings sync between your devices."
+  },
+  "syncStatusQuota": {
+    "message": "Sync quota exceeded — trim your lists."
+  },
+  "syncStatusTooLarge": {
+    "message": "Lists too large to sync ( max)."
+  },
+  "syncStatusOff": {
+    "message": "Not synced yet."
+  },
+  "screenTimeError": {
+    "message": "Enter between 5 and 1440 minutes to enable the budget."
+  },
+  "dailyLimitError": {
+    "message": "Please enter the target site and a valid number of minutes (> 0) to enable the limit."
+  },
+  "whitelistCapacityError": {
+    "message": "Whitelist capacity limit (max 1000 items) exceeded."
+  },
+  "sessionExpiredError": {
+    "message": "Session expired. Please log in again."
+  },
+  "incognitoWarning": {
+    "message": "Warning: the extension is disabled in Incognito mode. Enable it in extension settings to prevent bypasses."
+  },
+  "limitRemoved": {
+    "message": "Limit removed for $1"
+  },
+  "limitsTableTitle": {
+    "message": "Websites With Time Limits"
+  },
+  "limitColTotal": {
+    "message": "Total Time"
+  },
+  "limitColConsumed": {
+    "message": "Consumed Time"
+  },
+  "limitColRemaining": {
+    "message": "Remaining Time"
+  },
+  "limitColStatus": {
+    "message": "Status"
+  },
+  "limitColAction": {
+    "message": "Action"
+  },
+  "searchListPlaceholder": {
+    "message": "Search the list…"
+  },
+  "listCount": {
+    "message": "Showing $1 of $2"
+  },
+  "noMatches": {
+    "message": "No matches."
+  },
+  "exportReportButton": {
+    "message": "Export CSV"
+  },
+  "reportExported": {
+    "message": "Report exported as CSV."
+  },
+  "pinHeader": {
+    "message": "PIN quick unlock"
+  },
+  "pinDesc": {
+    "message": "A short code so you can unlock the popup without typing the full password in front of your child. The password is still required to change any rule."
+  },
+  "pinNewLabel": {
+    "message": "New PIN (4-8 digits)"
+  },
+  "pinConfirmLabel": {
+    "message": "Repeat PIN"
+  },
+  "pinSave": {
+    "message": "Save PIN"
+  },
+  "pinRemove": {
+    "message": "Remove PIN"
+  },
+  "pinSet": {
+    "message": "A PIN is set."
+  },
+  "pinNotSet": {
+    "message": "No PIN set yet."
+  },
+  "pinSaved": {
+    "message": "PIN saved."
+  },
+  "pinRemoved": {
+    "message": "PIN removed."
+  },
+  "pinMismatch": {
+    "message": "The two PINs do not match."
+  },
+  "pinInvalid": {
+    "message": "Use 4 to 8 digits only."
+  },
+  "setupRequired": {
+    "message": "Please set up a parent password in options page first."
+  },
+  "pinEnterLabel": {
+    "message": "Enter parent PIN"
+  },
+  "pinUnlockButton": {
+    "message": "Unlock with PIN"
+  },
+  "usePasswordInstead": {
+    "message": "Use password instead"
+  },
+  "usePinInstead": {
+    "message": "Use PIN instead"
+  },
+  "onboardingTitle": {
+    "message": "You're protected — three quick choices"
+  },
+  "onboardingDesc": {
+    "message": "Choose what to block and how much screen time is allowed. You can change everything later from the panel."
+  },
+  "onboardingPacksTitle": {
+    "message": "Block packs"
+  },
+  "onboardingMinutesPlaceholder": {
+    "message": "Minutes per day (5–1440)"
+  },
+  "onboardingMinutesHint": {
+    "message": "Leave empty to keep screen time unlimited for now."
+  },
+  "onboardingFinish": {
+    "message": "Apply and open the panel"
+  },
+  "onboardingSkip": {
+    "message": "Skip for now"
+  },
+  "onboardingSaved": {
+    "message": "Setup complete. The panel is ready."
+  },
+  "newtabSitesTitle": {
+    "message": "Allowed sites"
+  },
+  "newtabNoSites": {
+    "message": "No allowed sites yet. A parent can add them in the panel."
+  },
+  "newtabTimeLeft": {
+    "message": "$1 of screen time left today"
+  },
+  "newtabExhausted": {
+    "message": "Screen time is used up for today."
+  },
+  "newtabStatusActive": {
+    "message": "Protection is on."
   }
 }

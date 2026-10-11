@@ -4,6 +4,9 @@ const normalizeNumerals = (str) =>
 export function buildStrictUrl(urlString) {
   if (!urlString) return null;
   try {
+    // Stripping control chars before parsing is the point — they must never
+    // reach the address bar.
+    // eslint-disable-next-line no-control-regex
     let cleanUrl = urlString.trim().replace(/[\x00-\x1F\x7F-\x9F]/g, "");
     cleanUrl = cleanUrl.replace(/\.+$|^\.+/, "");
     const urlObj = new URL(
@@ -28,10 +31,15 @@ export function getHostname(urlString) {
     return new URL(urlString).hostname;
   } catch {
     if (urlString.startsWith("chrome://")) {
-      const match = urlString.match(/^chrome:\/\/([^\/]+)/);
+      const match = urlString.match(/^chrome:\/\/([^/]+)/);
       return match ? match[1] : null;
     }
-    return null;
+    // Bare hosts ("youtube.com") are the most common form parents type.
+    try {
+      return new URL(`https://${urlString}`).hostname;
+    } catch {
+      return null;
+    }
   }
 }
 
@@ -52,7 +60,9 @@ export function resolveRedirectUrl(urlString) {
         urlObj.searchParams.get("u") || urlObj.searchParams.get("uddg");
       if (target) return target;
     }
-  } catch (e) {}
+  } catch {
+    // Not a URL at all — hand the raw string back to the caller.
+  }
   return urlString;
 }
 
@@ -61,6 +71,19 @@ export function isMatchingSite(urlString, targetSite) {
   const parsedUrl = buildStrictUrl(urlString);
   const parsedTarget = buildStrictUrl(targetSite);
   return Boolean(parsedUrl && parsedTarget && parsedUrl === parsedTarget);
+}
+
+// Site-level comparison used by temporary allowances and daily limits: the
+// parent means "this site", so the host decides — never the path. Matching
+// the full path silently disabled both features on every real URL
+// (youtube.com/watch never equalled the configured "youtube.com").
+// The key may be a bare host or a full URL; subdomains count too.
+export function isSameSite(urlString, targetString) {
+  if (!urlString || !targetString) return false;
+  const host = (getHostname(urlString) || "").toLowerCase().replace(/^www\./, "");
+  const target = (getHostname(targetString) || "").toLowerCase().replace(/^www\./, "");
+  if (!host || !target) return false;
+  return host === target || host.endsWith("." + target);
 }
 
 function cleanHostname(urlString) {

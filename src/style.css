@@ -1,14 +1,18 @@
-/* Import Google Fonts (Inter for English, Cairo for Arabic) */
-@import url("https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap");
+/* No remote @import: an extension page used to fetch Google Fonts on every
+   open (extra request + flash of unstyled text). The stack below prefers a
+   locally installed Cairo/Inter and falls back to the platform UI font, which
+   renders Arabic correctly on every OS. */
 
 /* ─── CSS Variables & Base Styles ────────── */
 :root {
-  --font-family: "Cairo", "Inter", "Segoe UI", sans-serif;
+  --font-family: "Cairo", "Inter", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Noto Sans Arabic", "Helvetica Neue", Arial, sans-serif;
 
   /* Light Mode (Premium Warm Sky Protection Theme) */
   --bg-light: rgba(255, 255, 255, 0.85);
   --bg-body-light: linear-gradient(135deg, #f4f8ff 0%, #e6effd 100%);
   --text-light: #1e293b;
+  --text-muted-light: #64748b;
   --border-light: rgba(99, 102, 241, 0.08);
   --shadow-light: rgba(99, 102, 241, 0.06);
 
@@ -20,6 +24,7 @@
     #0f111a 100%
   );
   --text-dark: #f1f5f9;
+  --text-muted-dark: #94a3b8;
   --border-dark: rgba(99, 102, 241, 0.12);
   --shadow-dark: rgba(0, 0, 0, 0.4);
 
@@ -33,11 +38,19 @@
 
   --blur: 20px;
   --radius: 24px;
+  --radius-sm: 14px;
+
+  /* Status colours (AA on both themes) */
+  --success-solid: #059669;
+  --warning-solid: #b45309;
+  --danger-solid: #dc2626;
+  --info-solid: #2563eb;
 
   /* Default Setup (Always fallback to Light) */
   --bg: var(--bg-light);
   --bg-body: var(--bg-body-light);
   --text: var(--text-light);
+  --text-muted: var(--text-muted-light);
   --border: var(--border-light);
   --shadow-color: var(--shadow-light);
 }
@@ -46,6 +59,7 @@ body.dark {
   --bg: var(--bg-dark);
   --bg-body: var(--bg-body-dark);
   --text: var(--text-dark);
+  --text-muted: var(--text-muted-dark);
   --border: var(--border-dark);
   --shadow-color: var(--shadow-dark);
 }
@@ -94,8 +108,15 @@ body {
 }
 
 .card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
   box-shadow: 0 30px 60px -15px var(--shadow-color);
+}
+
+/* Forms and cards that hold inputs must not move under the pointer while
+   the parent is typing — hover elevation is reserved for display-only cards. */
+.card:has(input):hover,
+.card:has(textarea):hover {
+  transform: none;
 }
 
 .card h3 {
@@ -112,9 +133,7 @@ h3 {
 h2 {
   font-size: 2.2rem;
   margin-bottom: 1rem;
-  background: linear-gradient(to right, var(--text), hsl(215, 60%, 50%));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: var(--text);
 }
 
 h3 {
@@ -414,7 +433,9 @@ td:first-child {
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
   border: 1px solid var(--border) !important;
-  border-left: 6px solid #3b82f6 !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-inline-start: 6px solid #3b82f6 !important;
   padding: 20px 28px !important;
   border-radius: 16px !important;
   box-shadow: 0 20px 40px var(--shadow-color) !important;
@@ -434,38 +455,23 @@ td:first-child {
     transform 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-body[dir="rtl"] .toast {
-  border-left: none !important;
-  border-right: 6px solid #3b82f6 !important;
-}
-
+/* The accent stripe follows the writing direction: `dir` lives on <html>
+   (set by the translator), so logical properties are the only reliable way. */
 .toast.show {
   opacity: 1 !important;
   transform: translateY(0) scale(1) !important;
 }
 
 .toast.success {
-  border-left-color: #10b981 !important;
-}
-body[dir="rtl"] .toast.success {
-  border-right-color: #10b981 !important;
-  border-left: none !important;
+  border-inline-start-color: #10b981 !important;
 }
 
 .toast.error {
-  border-left-color: #ef4444 !important;
-}
-body[dir="rtl"] .toast.error {
-  border-right-color: #ef4444 !important;
-  border-left: none !important;
+  border-inline-start-color: #ef4444 !important;
 }
 
 .toast.warning {
-  border-left-color: #fbbf24 !important;
-}
-body[dir="rtl"] .toast.warning {
-  border-right-color: #fbbf24 !important;
-  border-left: none !important;
+  border-inline-start-color: #fbbf24 !important;
 }
 
 /* ─── Premium Dashboard Sidebar Layout ─── */
@@ -770,7 +776,7 @@ body.has-dashboard {
   position: absolute;
   width: 16px;
   height: 16px;
-  left: 3px;
+  inset-inline-start: 3px;
   top: 3px;
   background: #fff;
   border-radius: 50%;
@@ -787,6 +793,10 @@ body.has-dashboard {
   transform: translateX(18px);
 }
 
+html[dir="rtl"] .whole-domain-toggle input:checked + .switch-slider::before {
+  transform: translateX(-18px);
+}
+
 .whole-domain-toggle input:focus-visible + .switch-slider {
   outline: 2px solid var(--primary, #4f46e5);
   outline-offset: 2px;
@@ -795,4 +805,358 @@ body.has-dashboard {
 .whole-domain-toggle span:last-child {
   font-size: 12px;
   color: var(--text-muted, inherit);
+}
+
+/* ─── Interaction states & accessibility ─────────────────── */
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+.btn:focus-visible,
+input:focus-visible,
+select:focus-visible,
+.tab-link:focus-visible,
+.day-selector label:has(input:focus-visible) {
+  outline: 3px solid var(--info-solid);
+  outline-offset: 2px;
+}
+
+/* Icons and text must remain selectable/copyable and readable for screen
+   readers — no more transparent-fill headings. */
+[hidden],
+.hidden {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border-light: rgba(30, 41, 59, 0.45);
+    --border-dark: rgba(226, 232, 240, 0.55);
+    --text-muted-light: #475569;
+    --text-muted-dark: #cbd5e1;
+  }
+}
+
+/* ─── Blocklist, packs & report (Phase C) ────────────────────────────────── */
+.tab-hint {
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin: 0.2rem 0 1rem;
+}
+
+.preset-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 1.5rem;
+  padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.preset-chip {
+  width: auto;
+  margin: 0;
+  padding: 9px 16px;
+  font-size: 13.5px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+}
+
+.list-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  direction: ltr;
+  unicode-bidi: plaintext;
+}
+
+.empty-state {
+  justify-content: center;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.report-totals {
+  margin: 0 0 1.25rem;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(128, 128, 128, 0.04);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  margin: 0;
+}
+
+.tab-content select {
+  max-width: 100%;
+  min-width: 220px;
+}
+
+/* ─── Inline SVG icons (replaced platform-dependent emoji) ───────────────── */
+.sidebar-logo {
+  display: inline-flex;
+  align-items: center;
+}
+.sidebar-logo svg {
+  width: 34px;
+  height: 34px;
+  display: block;
+  color: var(--info-solid);
+}
+
+.emoji-badge svg {
+  width: 52px;
+  height: 52px;
+  display: block;
+  margin-inline: auto;
+  color: var(--info-solid);
+}
+
+.popup-logo-icon svg {
+  width: 30px;
+  height: 30px;
+  display: block;
+  color: var(--info-solid);
+}
+
+.update-banner .update-icon {
+  display: inline-flex;
+  align-items: center;
+}
+.update-banner .update-icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* ─── Limit status cells ─────────────────────────────────────────────────── */
+.status-ok {
+  color: var(--success-solid);
+  font-weight: 700;
+}
+.status-blocked {
+  color: var(--danger-solid);
+  font-weight: 700;
+}
+
+/* ─── Blocked page: child message first, parent controls second ─────────── */
+.blocked-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.blocked-card {
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+}
+
+.blocked-hero {
+  width: 64px;
+  height: 64px;
+  margin-inline: auto;
+  margin-bottom: 1rem;
+  color: var(--info-solid);
+}
+.blocked-hero svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.blocked-site-line {
+  font-size: 14.5px;
+  color: var(--text-muted);
+}
+.blocked-site-line strong {
+  display: inline-block;
+  direction: ltr;
+  unicode-bidi: plaintext;
+  word-break: break-all;
+  color: var(--text);
+}
+
+.blocked-reason {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.parent-area {
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed var(--border);
+  text-align: start;
+}
+.parent-area h3 {
+  margin: 0 0 0.35rem;
+  font-size: 12.5px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.parent-area-hint {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0 0 0.85rem;
+}
+.parent-unlock {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.parent-unlock input {
+  flex: 1;
+  min-width: 180px;
+  margin: 0;
+}
+.parent-unlock .btn {
+  width: auto;
+  margin: 0;
+}
+.parent-options {
+  text-align: start;
+}
+.parent-domain-toggle {
+  margin: 12px 0;
+  justify-content: flex-start;
+}
+
+.ask-more-time {
+  width: auto;
+  margin-top: 1.1rem;
+  padding: 10px 18px;
+  font-size: 13.5px;
+}
+.ask-status {
+  min-height: 1.1em;
+  margin: 0.55rem 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+/* ── Usage report: bar chart ─────────────────────────────────────────────── */
+/* Decorative twin of the table above it — the numbers stay in the markup. */
+.report-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 1rem 0 1.2rem;
+}
+.chart-row {
+  display: grid;
+  grid-template-columns: minmax(90px, 24%) 1fr auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+.chart-label {
+  font-weight: 600;
+  color: var(--text-muted);
+  direction: ltr;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chart-track {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+}
+.chart-bar {
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+}
+.chart-value {
+  min-width: 56px;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.report-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.report-actions .btn {
+  width: auto;
+}
+
+/* ── First-run wizard ────────────────────────────────────────────────────── */
+/* Pack choices are real checkboxes (they change state on click), so they read
+   as inputs rather than as the preset chips used inside the panel. */
+.onboarding-packs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 0.5rem 0 1.4rem;
+}
+.onboarding-pack {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.onboarding-pack input {
+  width: auto;
+  margin: 0;
+}
+.onboarding-pack small {
+  margin-inline-start: auto;
+  color: var(--text-muted);
+  font-weight: 500;
 }

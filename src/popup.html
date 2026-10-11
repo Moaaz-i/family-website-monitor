@@ -3,313 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" href="style.css" />
-    <style>
-      .popup-body {
-        min-width: 380px;
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: var(--font-family);
-        background: var(--bg-body);
-        color: var(--text);
-      }
-      .popup-body .card {
-        margin: 0;
-        width: 100%;
-        max-width: 100%;
-        border-radius: 0;
-        border: none;
-        box-shadow: none;
-        background: transparent;
-        padding: 1.5rem 1.8rem;
-        box-sizing: border-box;
-      }
-      .hidden {
-        display: none !important;
-      }
-      
-      /* Premium Header */
-      .popup-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding-bottom: 1.2rem;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 1.5rem;
-      }
-      .popup-logo-group {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .popup-logo-icon {
-        font-size: 1.8rem;
-      }
-      .popup-logo-title {
-        font-weight: 800;
-        font-size: 15px;
-        color: var(--text);
-        letter-spacing: -0.01em;
-        margin: 0;
-      }
-      .popup-status-indicator {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        font-weight: 700;
-        color: #10b981;
-        background: rgba(16, 185, 129, 0.08);
-        padding: 4px 10px;
-        border-radius: 12px;
-        border: 1px solid rgba(16, 185, 129, 0.15);
-      }
-      .pulse-dot {
-        width: 7px;
-        height: 7px;
-        background-color: #10b981;
-        border-radius: 50%;
-        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-        animation: pulse 1.6s infinite;
-      }
-      @keyframes pulse {
-        0% {
-          transform: scale(0.95);
-          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-        }
-        70% {
-          transform: scale(1);
-          box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
-        }
-        100% {
-          transform: scale(0.95);
-          box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-        }
-      }
-
-      .form-group {
-        margin-bottom: 1.2rem;
-      }
-      
-      .form-group label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: var(--text-muted);
-        margin-bottom: 6px;
-      }
-      
-      .current-site-box {
-        background: rgba(99, 102, 241, 0.03);
-        border: 1px solid var(--border);
-        border-radius: 12px;
-        padding: 12px 14px;
-        margin-bottom: 1.5rem;
-        word-break: break-all;
-      }
-      .current-site-label {
-        font-size: 11px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        color: var(--text-muted);
-      }
-      .current-site-domain {
-        color: var(--primary);
-        font-size: 15px;
-        font-weight: 800;
-        margin-top: 4px;
-      }
-
-      .preset-buttons {
-        display: flex;
-        gap: 8px;
-        margin-top: 8px;
-      }
-      .preset-btn {
-        flex: 1;
-        padding: 8px 6px;
-        font-size: 11px;
-        font-weight: 700;
-        border-radius: 8px;
-        background: rgba(99, 102, 241, 0.04);
-        border: 1px solid var(--border);
-        color: var(--text);
-        cursor: pointer;
-        transition: all 0.2s ease;
-      }
-      .preset-btn:hover {
-        background: var(--primary);
-        color: #fff;
-        border-color: var(--primary);
-        box-shadow: 0 3px 8px var(--primary-glow);
-      }
-      
-      .status-tag {
-        display: inline-block;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 800;
-        margin-left: 8px;
-        border: 1px solid transparent;
-      }
-      .status-whitelisted {
-        background: rgba(16, 185, 129, 0.08);
-        color: #10b981;
-        border-color: rgba(16, 185, 129, 0.15);
-      }
-      .status-restricted {
-        background: rgba(245, 158, 11, 0.08);
-        color: #d97706;
-        border-color: rgba(245, 158, 11, 0.15);
-      }
-      .status-limited {
-        background: rgba(59, 130, 246, 0.08);
-        color: var(--primary);
-        border-color: rgba(59, 130, 246, 0.15);
-      }
-      
-      .footer-actions {
-        margin-top: 1.8rem;
-        display: flex;
-        gap: 10px;
-      }
-
-      /* ── Update Banner ── */
-      .update-banner {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        padding: 10px 16px;
-        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-        color: #fff;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: default;
-        animation: slideDown 0.3s ease;
-      }
-      @keyframes slideDown {
-        from { transform: translateY(-100%); opacity: 0; }
-        to   { transform: translateY(0);    opacity: 1; }
-      }
-      .update-banner .update-icon { font-size: 16px; flex-shrink: 0; }
-      .update-banner .update-text { flex: 1; }
-      .update-banner .update-version {
-        font-size: 10px;
-        opacity: 0.85;
-        display: block;
-        margin-top: 1px;
-      }
-      .update-banner-btn {
-        background: rgba(255,255,255,0.25);
-        border: 1px solid rgba(255,255,255,0.5);
-        color: #fff;
-        border-radius: 6px;
-        padding: 4px 10px;
-        font-size: 11px;
-        font-weight: 700;
-        cursor: pointer;
-        white-space: nowrap;
-        transition: background 0.2s;
-      }
-      .update-banner-btn:hover { background: rgba(255,255,255,0.4); }
-      .update-dismiss {
-        background: none;
-        border: none;
-        color: rgba(255,255,255,0.7);
-        font-size: 16px;
-        cursor: pointer;
-        padding: 0;
-        line-height: 1;
-        flex-shrink: 0;
-      }
-      .update-dismiss:hover { color: #fff; }
-
-      /* ── Update Modal ── */
-      .update-modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.55);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        animation: fadeIn 0.2s ease;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; } to { opacity: 1; }
-      }
-      .update-modal {
-        background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 20px;
-        width: 320px;
-        max-width: 90%;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-      }
-      .update-modal h4 {
-        margin: 0 0 4px 0;
-        font-size: 15px;
-        color: var(--primary);
-      }
-      .update-modal .modal-version {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-bottom: 12px;
-      }
-      .update-modal .steps {
-        background: var(--bg-hover);
-        border-radius: 10px;
-        padding: 12px;
-        margin-bottom: 14px;
-        font-size: 12px;
-        line-height: 1.8;
-      }
-      .update-modal .steps code {
-        background: var(--border);
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-family: monospace;
-        font-size: 11px;
-      }
-      .update-modal .modal-notes {
-        font-size: 11px;
-        color: var(--text-muted);
-        margin-bottom: 14px;
-        padding: 8px 12px;
-        border-left: 3px solid var(--primary);
-        background: var(--bg-hover);
-        border-radius: 0 6px 6px 0;
-      }
-      .update-modal .modal-footer {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-      }
-
-      .btn-check-update {
-        font-size: 11px;
-        padding: 8px 12px;
-        opacity: 0.85;
-      }
-      .btn-check-update:hover { opacity: 1; }
-      .checking-spinner {
-        display: inline-block;
-        animation: spin 0.8s linear infinite;
-      }
-      @keyframes spin {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(360deg); }
-      }
-    </style>
+    <link rel="stylesheet" href="popup.css" />
   </head>
   <body class="popup-body">
 
     <!-- Update Banner (hidden by default) -->
     <div id="updateBanner" class="update-banner hidden">
-      <span class="update-icon">🔔</span>
+      <span class="update-icon"><svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><path d="M12 3a6 6 0 0 0-6 6v3.6L4.4 15a1 1 0 0 0 .9 1.5h13.4a1 1 0 0 0 .9-1.5L18 12.6V9a6 6 0 0 0-6-6Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span>
       <div class="update-text">
         Update available!
         <span class="update-version" id="updateBannerVersion"></span>
@@ -321,14 +21,14 @@
     <!-- Update Modal (hidden by default) -->
     <div id="updateModal" class="update-modal-overlay hidden">
       <div class="update-modal">
-        <h4>🚀 Update Available</h4>
+        <h4>Update Available</h4>
         <div class="modal-version" id="modalVersionText"></div>
         <div class="steps">
           <strong>Steps to update:</strong><br>
-          1️⃣ Open Terminal in the extension folder<br>
-          2️⃣ Run: <code>./update.sh</code><br>
-          3️⃣ Go to <code>chrome://extensions</code> and load the <code>dist</code> folder (or click 🔄 <strong>Reload</strong> if already loaded)<br>
-          4️⃣ Confirm the new version appears
+          1. Open Terminal in the extension folder<br>
+          2. Run: <code>./update.sh</code><br>
+          3. Go to <code>chrome://extensions</code> and load the <code>dist</code> folder (or click <strong>Reload</strong> if already loaded)<br>
+          4. Confirm the new version appears
         </div>
         <div class="modal-notes" id="modalReleaseNotes"></div>
         <div class="modal-footer">
@@ -341,7 +41,7 @@
     <div id="lockScreen" class="card">
       <div class="popup-header">
         <div class="popup-logo-group">
-          <span class="popup-logo-icon">🛡️</span>
+          <span class="popup-logo-icon"><svg viewBox="0 0 48 48" focusable="false" aria-hidden="true"><path d="M24 4 8 10v12c0 10.5 6.9 18.9 16 22 9.1-3.1 16-11.5 16-22V10L24 4Z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M17 24h14M24 17v14" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
           <h1 class="popup-logo-title" data-i18n="popupTitle">Family Protection</h1>
         </div>
         <div class="popup-status-indicator">
@@ -350,11 +50,49 @@
         </div>
       </div>
       
-      <div class="form-group">
+      <!-- PIN group: shown only when a PIN is configured. It unlocks the
+           popup; changing the rules still requires the full password. -->
+      <div id="pinGroup" class="form-group hidden">
+        <label data-i18n="pinEnterLabel">Enter parent PIN</label>
+        <input
+          type="password"
+          id="popupPin"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="8"
+          style="margin-bottom: 12px"
+        />
+        <button
+          id="pinUnlockBtn"
+          class="btn btn-primary"
+          style="width: 100%"
+          data-i18n="pinUnlockButton"
+        >
+          Unlock with PIN
+        </button>
+        <button
+          id="usePasswordBtn"
+          class="btn btn-secondary"
+          style="width: 100%; margin-top: 8px"
+          data-i18n="usePasswordInstead"
+        >
+          Use password instead
+        </button>
+      </div>
+
+      <div id="passwordGroup" class="form-group">
         <label data-i18n="unlockPopup">Enter parent password to manage</label>
         <input type="password" id="popupPassword" style="margin-bottom: 12px;" />
         <button id="unlockBtn" class="btn btn-primary" style="width: 100%;" data-i18n="unlockButton">
           Unlock
+        </button>
+        <button
+          id="usePinBtn"
+          class="btn btn-secondary hidden"
+          style="width: 100%; margin-top: 8px"
+          data-i18n="usePinInstead"
+        >
+          Use PIN instead
         </button>
       </div>
     </div>
@@ -363,7 +101,7 @@
     <div id="managementDashboard" class="card hidden">
       <div class="popup-header">
         <div class="popup-logo-group">
-          <span class="popup-logo-icon">🛡️</span>
+          <span class="popup-logo-icon"><svg viewBox="0 0 48 48" focusable="false" aria-hidden="true"><path d="M24 4 8 10v12c0 10.5 6.9 18.9 16 22 9.1-3.1 16-11.5 16-22V10L24 4Z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><path d="M17 24h14M24 17v14" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></svg></span>
           <h1 class="popup-logo-title" data-i18n="optionsTitle">Control Panel</h1>
         </div>
         <div class="popup-status-indicator">
@@ -376,6 +114,14 @@
       <div class="current-site-box">
         <div class="current-site-label" data-i18n="currentSite">Current Site:</div>
         <div id="currentDomain" class="current-site-domain">loading...</div>
+      </div>
+
+      <!-- Whole-day screen-time budget -->
+      <div id="screenTimeBox" class="current-site-box hidden">
+        <div class="current-site-label" data-i18n="screenTimeRemainingLabel">
+          Left today
+        </div>
+        <div id="screenTimeValue" class="current-site-domain">—</div>
       </div>
 
       <!-- Current Status -->
@@ -506,7 +252,7 @@
           class="btn btn-secondary btn-check-update"
           style="width: 100%; margin-top: 0;"
         >
-          🔄 Check for Updates
+          Check for Updates
         </button>
       </div>
     </div>

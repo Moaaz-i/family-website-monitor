@@ -56,7 +56,7 @@
     "description": "نص زر التحقق من كلمة المرور."
   },
   "setupTitle": {
-    "message": "تعيين كلمة مرور ولي الأمر 🛡️",
+    "message": "تعيين كلمة مرور ولي الأمر",
     "description": "عنوان شاشة الإعداد الأولي."
   },
   "setupDescription": {
@@ -64,7 +64,7 @@
     "description": "وصف شاشة الإعداد."
   },
   "loginTitle": {
-    "message": "تسجيل دخول ولي الأمر 🔑",
+    "message": "تسجيل دخول ولي الأمر",
     "description": "عنوان شاشة تسجيل الدخول."
   },
   "loginDescription": {
@@ -96,6 +96,34 @@
   "passwordIncorrect": {
     "message": "كلمة المرور غير صحيحة! يرجى المحاولة مرة أخرى.",
     "description": "رسالة تنبيه."
+  },
+  "passwordTooShort": {
+    "message": "استخدم 6 أحرف على الأقل لكلمة مرور الأبوين.",
+    "description": "رسالة تنبيه عند اختيار كلمة مرور قصيرة جداً."
+  },
+  "incognitoHeader": {
+    "message": "الحماية في النوافذ الخاصة",
+    "description": "عنوان بطاقة الإعدادات الخاصة بتحذير التحايل عبر النوافذ الخاصة."
+  },
+  "incognitoDesc": {
+    "message": "كروم لا يشغّل الإضافات في النوافذ الخاصة إلا بعد السماح لها. إبقاء هذا الخيار مطفأً هو أسرع طريقة لتجاوز كل القواعد.",
+    "description": "نص شرح أسفل عنوان الحماية في النوافذ الخاصة."
+  },
+  "incognitoButton": {
+    "message": "افتح الإعدادات للسماح بالنوافذ الخاصة",
+    "description": "زر يفتح صفحة chrome://extensions مصبوغة على هذه الإضافة."
+  },
+  "incognitoRecheck": {
+    "message": "إعادة فحص حالة النوافذ الخاصة",
+    "description": "عنوان الزر بعد منح الإذن مسبقاً."
+  },
+  "incognitoOn": {
+    "message": "الحماية مفعّلة في النوافذ الخاصة.",
+    "description": "نص الحالة عند منح الإذن."
+  },
+  "incognitoOff": {
+    "message": "الحماية غير مفعّلة في النوافذ الخاصة بعد.",
+    "description": "نص الحالة عند غياب الإذن."
   },
   "enterNewPassword": {
     "message": "أدخل كلمة المرور الجديدة",
@@ -134,7 +162,7 @@
     "description": "عنوان تبويب الإعدادات."
   },
   "allowedWebsites": {
-    "message": "المواقع المسموح بها 🌐",
+    "message": "المواقع المسموح بها",
     "description": "عنوان قسم إدارة القائمة البيضاء."
   },
   "addSitePlaceholder": {
@@ -153,13 +181,27 @@
     "message": "الأيام المسموح بها:",
     "description": "تسمية لمحدد الأيام."
   },
-  "daySun": { "message": "الأحد" },
-  "dayMon": { "message": "الاثنين" },
-  "dayTue": { "message": "الثلاثاء" },
-  "dayWed": { "message": "الأربعاء" },
-  "dayThu": { "message": "الخميس" },
-  "dayFri": { "message": "الجمعة" },
-  "daySat": { "message": "السبت" },
+  "daySun": {
+    "message": "الأحد"
+  },
+  "dayMon": {
+    "message": "الاثنين"
+  },
+  "dayTue": {
+    "message": "الثلاثاء"
+  },
+  "dayWed": {
+    "message": "الأربعاء"
+  },
+  "dayThu": {
+    "message": "الخميس"
+  },
+  "dayFri": {
+    "message": "الجمعة"
+  },
+  "daySat": {
+    "message": "السبت"
+  },
   "allowedTime": {
     "message": "الوقت المسموح به:",
     "description": "تسمية لمحدد نطاق الوقت."
@@ -189,7 +231,7 @@
     "description": "تسمية لخيار تفعيل وضع التشغيل بالحد اليومي."
   },
   "emergencyLock": {
-    "message": "قفل الطوارئ 🔒",
+    "message": "قفل الطوارئ",
     "description": "عنوان قسم قفل الطوارئ."
   },
   "enableLockButton": {
@@ -204,8 +246,12 @@
     "message": "المحاولات الفاشلة",
     "description": "عنوان سجل المحاولات الفاشلة."
   },
-  "tableHeaderWebsite": { "message": "الموقع" },
-  "tableHeaderTime": { "message": "الوقت" },
+  "tableHeaderWebsite": {
+    "message": "الموقع"
+  },
+  "tableHeaderTime": {
+    "message": "الوقت"
+  },
   "clearLogButton": {
     "message": "مسح السجل",
     "description": "زر لمسح سجل النشاط."
@@ -214,65 +260,153 @@
     "message": "المظهر",
     "description": "عنوان إعدادات المظهر."
   },
-  "themeToggleDark": { "message": "الوضع الداكن" },
-  "themeToggleLight": { "message": "الوضع الفاتح" },
-  "changePassword": { "message": "تغيير كلمة المرور" },
-  "newPasswordPlaceholder": { "message": "كلمة المرور الجديدة" },
-  "confirmPasswordPlaceholder": { "message": "تأكيد كلمة المرور الجديدة" },
-  "changePasswordButton": { "message": "تغيير كلمة المرور" },
-  "backupAndRestore": { "message": "النسخ الاحتياطي والاستعادة" },
-  "exportButton": { "message": "تصدير" },
-  "importButton": { "message": "استيراد" },
-  "resetExtension": { "message": "إعادة تعيين الإضافة" },
-  "resetAllButton": { "message": "إعادة تعيين الكل" },
-  "chooseAction": { "message": "اختر إجراءً:" },
-  "allowAlways": { "message": "إضافة دائمة إلى القائمة البيضاء" },
-  "allowTemp": { "message": "السماح لوقت محدد (بالدقائق)" },
-  "minutesTempPlaceholder": { "message": "دقائق (إذا كان مؤقتاً)" },
-  "saveAndApply": { "message": "حفظ وتطبيق" },
-  "fillAllFields": { "message": "يرجى ملء جميع الحقول!" },
-  "passwordsDontMatch": { "message": "كلمات المرور غير متطابقة!" },
-  "invalidUrl": { "message": "رابط غير صالح!" },
+  "themeToggleDark": {
+    "message": "الوضع الداكن"
+  },
+  "themeToggleLight": {
+    "message": "الوضع الفاتح"
+  },
+  "changePassword": {
+    "message": "تغيير كلمة المرور"
+  },
+  "newPasswordPlaceholder": {
+    "message": "كلمة المرور الجديدة"
+  },
+  "confirmPasswordPlaceholder": {
+    "message": "تأكيد كلمة المرور الجديدة"
+  },
+  "changePasswordButton": {
+    "message": "تغيير كلمة المرور"
+  },
+  "backupAndRestore": {
+    "message": "النسخ الاحتياطي والاستعادة"
+  },
+  "exportButton": {
+    "message": "تصدير"
+  },
+  "importButton": {
+    "message": "استيراد"
+  },
+  "resetExtension": {
+    "message": "إعادة تعيين الإضافة"
+  },
+  "resetAllButton": {
+    "message": "إعادة تعيين الكل"
+  },
+  "chooseAction": {
+    "message": "اختر إجراءً:"
+  },
+  "allowAlways": {
+    "message": "إضافة دائمة إلى القائمة البيضاء"
+  },
+  "allowTemp": {
+    "message": "السماح لوقت محدد (بالدقائق)"
+  },
+  "minutesTempPlaceholder": {
+    "message": "دقائق (إذا كان مؤقتاً)"
+  },
+  "saveAndApply": {
+    "message": "حفظ وتطبيق"
+  },
+  "fillAllFields": {
+    "message": "يرجى ملء جميع الحقول!"
+  },
+  "passwordsDontMatch": {
+    "message": "كلمات المرور غير متطابقة!"
+  },
+  "invalidUrl": {
+    "message": "رابط غير صالح!"
+  },
   "siteAlreadyWhitelisted": {
     "message": "هذا الموقع موجود بالفعل في القائمة البيضاء!"
   },
-  "deleteButton": { "message": "حذف" },
+  "deleteButton": {
+    "message": "حذف"
+  },
   "noSitesAdded": {
     "message": "لم تتم إضافة أي مواقع بعد. جميع المواقع محظورة حاليًا."
   },
-  "scheduleSaved": { "message": "تم حفظ الجدول الزمني!" },
-  "dailyLimitSaved": { "message": "تم حفظ الحد اليومي!" },
-  "emergencyLockEnabled": { "message": "تم تفعيل قفل الطوارئ!" },
-  "emergencyLockDisabled": { "message": "تم تعطيل قفل الطوارئ!" },
-  "noFailedAttempts": { "message": "لم يتم تسجيل أي محاولات فاشلة." },
-  "passwordChanged": { "message": "تم تغيير كلمة المرور!" },
-  "dataImported": { "message": "تم استيراد البيانات!" },
-  "invalidFile": { "message": "ملف غير صالح!" },
+  "scheduleSaved": {
+    "message": "تم حفظ الجدول الزمني!"
+  },
+  "dailyLimitSaved": {
+    "message": "تم حفظ الحد اليومي!"
+  },
+  "emergencyLockEnabled": {
+    "message": "تم تفعيل قفل الطوارئ!"
+  },
+  "emergencyLockDisabled": {
+    "message": "تم تعطيل قفل الطوارئ!"
+  },
+  "noFailedAttempts": {
+    "message": "لم يتم تسجيل أي محاولات فاشلة."
+  },
+  "passwordChanged": {
+    "message": "تم تغيير كلمة المرور!"
+  },
+  "dataImported": {
+    "message": "تم استيراد البيانات!"
+  },
+  "invalidFile": {
+    "message": "ملف غير صالح!"
+  },
   "resetConfirm": {
     "message": "هل أنت متأكد؟ سيؤدي هذا إلى حذف جميع البيانات."
   },
-  "extensionReset": { "message": "تمت إعادة تعيين الإضافة!" },
-  "settingsLanguage": { "message": "اللغة" },
-  "unlockPopup": { "message": "أدخل كلمة مرور الأبوين للتحكم" },
-  "currentSite": { "message": "الموقع الحالي:" },
-  "alwaysAllowSite": { "message": "السماح دائماً بهذا الموقع" },
-  "removeFromWhitelist": { "message": "إزالة من القائمة البيضاء" },
-  "setDailyLimit": { "message": "تعيين حد يومي" },
-  "quickPresets": { "message": "خيارات سريعة" },
-  "limitMinutesInput": { "message": "الحد بالدقائق" },
-  "saveSettings": { "message": "حفظ الإعدادات" },
-  "unlockButton": { "message": "فتح القفل" },
-  "statusLabel": { "message": "الحالة:" },
-  "statusWhitelisted": { "message": "مسموح به دائماً" },
-  "statusRestricted": { "message": "خاضع للرقابة" },
-  "statusLimited": { "message": "محدد بوقت" },
-  "emergencyLockToggle": { "message": "قفل الطوارئ" },
+  "extensionReset": {
+    "message": "تمت إعادة تعيين الإضافة!"
+  },
+  "settingsLanguage": {
+    "message": "اللغة"
+  },
+  "unlockPopup": {
+    "message": "أدخل كلمة مرور الأبوين للتحكم"
+  },
+  "currentSite": {
+    "message": "الموقع الحالي:"
+  },
+  "alwaysAllowSite": {
+    "message": "السماح دائماً بهذا الموقع"
+  },
+  "removeFromWhitelist": {
+    "message": "إزالة من القائمة البيضاء"
+  },
+  "setDailyLimit": {
+    "message": "تعيين حد يومي"
+  },
+  "quickPresets": {
+    "message": "خيارات سريعة"
+  },
+  "limitMinutesInput": {
+    "message": "الحد بالدقائق"
+  },
+  "saveSettings": {
+    "message": "حفظ الإعدادات"
+  },
+  "unlockButton": {
+    "message": "فتح القفل"
+  },
+  "statusLabel": {
+    "message": "الحالة:"
+  },
+  "statusWhitelisted": {
+    "message": "مسموح به دائماً"
+  },
+  "statusRestricted": {
+    "message": "خاضع للرقابة"
+  },
+  "statusLimited": {
+    "message": "محدد بوقت"
+  },
+  "emergencyLockToggle": {
+    "message": "قفل الطوارئ"
+  },
   "settingsSaved": {
     "message": "تم حفظ الإعدادات بنجاح!",
     "description": "رسالة نجاح عند حفظ إعدادات النافذة المنبثقة."
   },
   "blockedExtensionsTitle": {
-    "message": "الوصول مقيد 🔒"
+    "message": "الوصول مقيد"
   },
   "blockedExtensionsDesc": {
     "message": "لدواعي الأمان والاستقرار، تم تقييد الوصول إلى إعدادات إضافات المتصفح وصفحات المطورين."
@@ -331,5 +465,347 @@
   "wholeDomainDisabled": {
     "message": "تم إيقاف السماح الكامل. الآن يُسمح بالرابط المحدد فقط.",
     "description": "رسالة عند إيقاف وضع النطاق الكامل."
+  },
+  "tabBlocklist": {
+    "message": "القائمة السوداء"
+  },
+  "tabReport": {
+    "message": "التقرير"
+  },
+  "blocklistTitle": {
+    "message": "المواقع المحجوبة"
+  },
+  "blocklistDesc": {
+    "message": "لا يمكن فتح المواقع المحجوبة إطلاقاً — والحجب يتجاوز القائمة البيضاء."
+  },
+  "addKeywordPlaceholder": {
+    "message": "نطاق أو كلمة للحجب (مثال: youtube.com)"
+  },
+  "noKeywords": {
+    "message": "لا يوجد شيء محجوب حتى الآن."
+  },
+  "keywordAdded": {
+    "message": "تمت الإضافة إلى القائمة السوداء."
+  },
+  "keywordRemoved": {
+    "message": "تمت الإزالة من القائمة السوداء."
+  },
+  "keywordInvalid": {
+    "message": "أدخل 3 أحرف على الأقل (نطاق أو كلمة)."
+  },
+  "keywordDuplicate": {
+    "message": "هذه الإضافة موجودة في القائمة السوداء بالفعل."
+  },
+  "keywordLimit": {
+    "message": "تم تجاوز سعة القائمة السوداء (بحد أقصى 500 عنصر)."
+  },
+  "presetsTitle": {
+    "message": "حزم حجب جاهزة"
+  },
+  "presetsDesc": {
+    "message": "احجب فئة كاملة من المواقع بنقرة واحدة، ويمكنك إزالة أي عنصر لاحقاً."
+  },
+  "presetApplied": {
+    "message": "تم تطبيق الحزمة."
+  },
+  "presetAlready": {
+    "message": "كل عناصر هذه الحزمة مضافة مسبقاً."
+  },
+  "presetSocial": {
+    "message": "وسائل التواصل"
+  },
+  "presetVideo": {
+    "message": "منصات الفيديو"
+  },
+  "presetGaming": {
+    "message": "ألعاب أونلاين"
+  },
+  "presetShopping": {
+    "message": "التسوق"
+  },
+  "presetStreaming": {
+    "message": "بث الأفلام"
+  },
+  "safePacksTitle": {
+    "message": "حزم مواقع آمنة"
+  },
+  "safePacksDesc": {
+    "message": "مواقع مراجعة ومناسبة للأطفال."
+  },
+  "safeLearning": {
+    "message": "مواقع تعليمية"
+  },
+  "safeKids": {
+    "message": "مواقع أطفال"
+  },
+  "reportTitle": {
+    "message": "تقرير الاستخدام"
+  },
+  "reportDesc": {
+    "message": "الوقت المنقضي والزيارات والمحاولات المحجوبة لكل موقع. يُحفظ لأربعة عشر يوماً."
+  },
+  "reportDayLabel": {
+    "message": "اليوم"
+  },
+  "reportColSite": {
+    "message": "الموقع"
+  },
+  "reportColTime": {
+    "message": "الوقت"
+  },
+  "reportColVisits": {
+    "message": "الزيارات"
+  },
+  "reportColBlocked": {
+    "message": "المحجوب"
+  },
+  "reportNoData": {
+    "message": "لا يوجد نشاط مسجل في هذا اليوم."
+  },
+  "reportTotals": {
+    "message": "الإجمالي: $1 · $2 زيارة · $3 محاولة محجوبة"
+  },
+  "clearReportButton": {
+    "message": "مسح بيانات التقرير"
+  },
+  "reportCleared": {
+    "message": "تم مسح بيانات التقرير."
+  },
+  "notificationsHeader": {
+    "message": "تنبيهات الوقت"
+  },
+  "notificationsDesc": {
+    "message": "احصل على تنبيه على سطح المكتب قبل انتهاء وقت الموقع بـ 5 دقائق ودقيقة واحدة."
+  },
+  "notificationsToggle": {
+    "message": "تفعيل تنبيهات الوقت"
+  },
+  "notificationsOn": {
+    "message": "تنبيهات الوقت مفعّلة."
+  },
+  "notificationsOff": {
+    "message": "تنبيهات الوقت متوقفة."
+  },
+  "parentAreaTitle": {
+    "message": "الوالدان"
+  },
+  "statusAllowed": {
+    "message": "مسموح"
+  },
+  "statusBlocked": {
+    "message": "محجوب"
+  },
+  "parentAreaHint": {
+    "message": "أدخل كلمة مرور الوالدين لتغيير هذا الحكم."
+  },
+  "blockedReasonBlocklist": {
+    "message": "هذا الموقع ضمن القائمة السوداء التي ضبطها أحد الوالدين."
+  },
+  "targetSite": {
+    "message": "الموقع المستهدف (مثال: youtube.com):"
+  },
+  "limitInMinutes": {
+    "message": "الحد بالدقائق:"
+  },
+  "settingsGeneral": {
+    "message": "إعدادات عامة"
+  },
+  "statusActive": {
+    "message": "مفعّل"
+  },
+  "askMoreTimeButton": {
+    "message": "اطلب من الوالدين $1 دقيقة إضافية"
+  },
+  "askMoreTimeSent": {
+    "message": "تم الإرسال! بانتظار رد أحد الوالدين ($1 دقائق)."
+  },
+  "askMoreTimeCooldown": {
+    "message": "يمكنك الطلب مجدداً بعد $1 ثانية."
+  },
+  "askMoreTimeAlready": {
+    "message": "هذا الموقع مفتوح بالفعل."
+  },
+  "askMoreTimeFailed": {
+    "message": "تعذر إرسال الطلب."
+  },
+  "blockedReasonBudget": {
+    "message": "انتهى وقت الشاشة المسموح به اليوم. عد غداً!"
+  },
+  "screenTimeHeader": {
+    "message": "إجمالي وقت الشاشة اليومي"
+  },
+  "screenTimeDesc": {
+    "message": "مبلغ واحد ليوم كامل لكل المواقع. المواقع التي تسمح بها تبقى مفتوحة دائماً."
+  },
+  "screenTimeEnabledLabel": {
+    "message": "تفعيل حدّ يومي لوقت الشاشة"
+  },
+  "screenTimeMinutesLabel": {
+    "message": "الدقائق في اليوم"
+  },
+  "screenTimeUsedLabel": {
+    "message": "المستهلك اليوم"
+  },
+  "screenTimeRemainingLabel": {
+    "message": "المتبقي اليوم"
+  },
+  "screenTimeSave": {
+    "message": "حفظ وقت الشاشة"
+  },
+  "screenTimeSaved": {
+    "message": "تم حفظ حدّ وقت الشاشة."
+  },
+  "syncStatusOk": {
+    "message": "تتم مزامنة الإعدادات بين أجهزتك."
+  },
+  "syncStatusQuota": {
+    "message": "تجاوز حدّ المزامنة — قلّص قوائمك."
+  },
+  "syncStatusTooLarge": {
+    "message": "القوائم كبيرة جداً للمزامنة ( كحد أقصى)."
+  },
+  "syncStatusOff": {
+    "message": "لم تتم المزامنة بعد."
+  },
+  "screenTimeError": {
+    "message": "أدخل بين 5 و1440 دقيقة لتفعيل الحد."
+  },
+  "dailyLimitError": {
+    "message": "أدخل موقع الهدف وعدد دقائق صحيحاً (> 0) لتفعيل الحد."
+  },
+  "whitelistCapacityError": {
+    "message": "تجاوزت سعة القائمة البيضاء (الحد الأقصى 1000 عنصر)."
+  },
+  "sessionExpiredError": {
+    "message": "انتهت الجلسة. يرجى تسجيل الدخول مجدداً."
+  },
+  "incognitoWarning": {
+    "message": "تحذير: الإضافة معطّلة في وضع التصفح الخاص. فعّلها من إعدادات الإضافة لمنع التحايل."
+  },
+  "limitRemoved": {
+    "message": "أُزيل الحد عن $1"
+  },
+  "limitsTableTitle": {
+    "message": "المواقع ذات الحدود الزمنية"
+  },
+  "limitColTotal": {
+    "message": "الإجمالي"
+  },
+  "limitColConsumed": {
+    "message": "المستهلك"
+  },
+  "limitColRemaining": {
+    "message": "المتبقي"
+  },
+  "limitColStatus": {
+    "message": "الحالة"
+  },
+  "limitColAction": {
+    "message": "الإجراء"
+  },
+  "searchListPlaceholder": {
+    "message": "ابحث في القائمة…"
+  },
+  "listCount": {
+    "message": "عرض $1 من $2"
+  },
+  "noMatches": {
+    "message": "لا توجد نتائج."
+  },
+  "exportReportButton": {
+    "message": "تصدير CSV"
+  },
+  "reportExported": {
+    "message": "تم تصدير التقرير بصيغة CSV."
+  },
+  "pinHeader": {
+    "message": "فتح سريع برمز PIN"
+  },
+  "pinDesc": {
+    "message": "رمز قصير يتيح لك فتح البوب‑اب دون كتابة كلمة المرور الكاملة أمام طفلك. ما تزال كلمة المرور مطلوبة لتغيير أي قاعدة."
+  },
+  "pinNewLabel": {
+    "message": "رمز PIN جديد (4-8 أرقام)"
+  },
+  "pinConfirmLabel": {
+    "message": "أعد إدخال الرمز"
+  },
+  "pinSave": {
+    "message": "حفظ الرمز"
+  },
+  "pinRemove": {
+    "message": "حذف الرمز"
+  },
+  "pinSet": {
+    "message": "تم ضبط رمز PIN."
+  },
+  "pinNotSet": {
+    "message": "لم يُضبط رمز PIN بعد."
+  },
+  "pinSaved": {
+    "message": "تم حفظ رمز PIN."
+  },
+  "pinRemoved": {
+    "message": "تم حذف رمز PIN."
+  },
+  "pinMismatch": {
+    "message": "الرمزان غير متطابقين."
+  },
+  "pinInvalid": {
+    "message": "استخدم من 4 إلى 8 أرقام فقط."
+  },
+  "setupRequired": {
+    "message": "يرجى ضبط كلمة مرور الوالد في صفحة الإعدادات أولاً."
+  },
+  "pinEnterLabel": {
+    "message": "أدخل رمز PIN"
+  },
+  "pinUnlockButton": {
+    "message": "فتح برمز PIN"
+  },
+  "usePasswordInstead": {
+    "message": "استخدم كلمة المرور بدلاً منه"
+  },
+  "usePinInstead": {
+    "message": "استخدم رمز PIN بدلاً منه"
+  },
+  "onboardingTitle": {
+    "message": "أنت الآن محمي — ثلاث اختيارات سريعة"
+  },
+  "onboardingDesc": {
+    "message": "اختر ما تريد حظره وكم من وقت الشاشة مسموح به. يمكنك تغيير كل شيء لاحقاً من اللوحة."
+  },
+  "onboardingPacksTitle": {
+    "message": "حزم الحظر"
+  },
+  "onboardingMinutesPlaceholder": {
+    "message": "الدقائق في اليوم (5–1440)"
+  },
+  "onboardingMinutesHint": {
+    "message": "اتركه فارغاً ليبقى وقت الشاشة غير محدود حالياً."
+  },
+  "onboardingFinish": {
+    "message": "تطبيق وفتح اللوحة"
+  },
+  "onboardingSkip": {
+    "message": "تخطي الآن"
+  },
+  "onboardingSaved": {
+    "message": "اكتمل الإعداد. اللوحة جاهزة."
+  },
+  "newtabSitesTitle": {
+    "message": "المواقع المسموح بها"
+  },
+  "newtabNoSites": {
+    "message": "لا توجد مواقع مسموح بها بعد. يمكن للوالد إضافتها من اللوحة."
+  },
+  "newtabTimeLeft": {
+    "message": "بقي $1 من وقت الشاشة اليوم"
+  },
+  "newtabExhausted": {
+    "message": "انتهى وقت الشاشة لهذا اليوم."
+  },
+  "newtabStatusActive": {
+    "message": "الحماية مفعّلة."
   }
 }

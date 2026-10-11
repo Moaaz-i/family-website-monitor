@@ -18,7 +18,7 @@
     <!-- Setup -->
     <div id="setupSection" style="display: none">
       <div class="card">
-        <h2 data-i18n="setupTitle">Set Parent Password 🛡️</h2>
+        <h2 data-i18n="setupTitle">Set Parent Password</h2>
         <input
           type="password"
           id="newPassword"
@@ -40,7 +40,7 @@
     <!-- Login -->
     <div id="loginSection" style="display: none">
       <div class="card">
-        <h2 data-i18n="loginTitle">Parent Login 🔑</h2>
+        <h2 data-i18n="loginTitle">Parent Login</h2>
         <input
           type="password"
           id="loginPassword"
@@ -54,37 +54,127 @@
       </div>
     </div>
 
+    <!-- First-run wizard: shown once, right after the password is created,
+         so a new install leaves the panel already blocking something. -->
+    <div id="onboardingSection" style="display: none">
+      <div class="card">
+        <h2 data-i18n="onboardingTitle">You're protected — three quick choices</h2>
+        <p class="tab-hint" data-i18n="onboardingDesc">
+          Choose what to block and how much screen time is allowed. You can
+          change everything later from the panel.
+        </p>
+
+        <h3 data-i18n="onboardingPacksTitle">Block packs</h3>
+        <div
+          id="onboardingPackContainer"
+          class="onboarding-packs"
+          role="group"
+        ></div>
+
+        <h3 data-i18n="screenTimeHeader">Total daily screen time</h3>
+        <div class="form-group">
+          <input
+            type="number"
+            id="onboardingMinutes"
+            min="5"
+            max="1440"
+            step="5"
+            data-i18n-placeholder="onboardingMinutesPlaceholder"
+          />
+        </div>
+        <p class="tab-hint" data-i18n="onboardingMinutesHint">
+          Leave empty to keep screen time unlimited for now.
+        </p>
+
+        <div class="report-actions">
+          <button
+            id="onboardingFinishBtn"
+            class="btn btn-success"
+            data-i18n="onboardingFinish"
+          ></button>
+          <button
+            id="onboardingSkipBtn"
+            class="btn btn-secondary"
+            data-i18n="onboardingSkip"
+          ></button>
+        </div>
+      </div>
+    </div>
+
     <!-- Dashboard -->
     <div id="dashboardSection" class="dashboard-container" style="display: none">
       <!-- Sidebar -->
       <aside class="sidebar">
         <div class="sidebar-header">
-          <span class="sidebar-logo">🛡️</span>
+          <span class="sidebar-logo" aria-hidden="true">
+            <svg viewBox="0 0 48 48" focusable="false">
+              <path d="M24 4 8 10v12c0 10.5 6.9 18.9 16 22 9.1-3.1 16-11.5 16-22V10L24 4Z" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round" />
+              <path d="M17 24h14M24 17v14" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" />
+            </svg>
+          </span>
           <h2 data-i18n="appName" style="font-size: 1.15rem; margin: 0; background: none; -webkit-text-fill-color: initial; text-shadow: none;">Family Monitor</h2>
         </div>
-        <nav class="sidebar-nav">
+        <nav class="sidebar-nav" role="tablist" aria-orientation="vertical">
           <span
             class="tab-link active"
+            role="tab"
+            tabindex="0"
+            aria-selected="true"
+            aria-controls="tab-whitelist"
             data-tab="tab-whitelist"
             data-i18n="tabWhitelist"
           >Whitelist</span>
           <span
             class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-blocklist"
+            data-tab="tab-blocklist"
+            data-i18n="tabBlocklist"
+          >Blocklist</span>
+          <span
+            class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-schedule"
             data-tab="tab-schedule"
             data-i18n="tabSchedule"
           >Schedule</span>
           <span
             class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-limits"
             data-tab="tab-limits"
             data-i18n="tabLimits"
           >Limits</span>
           <span
             class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-report"
+            data-tab="tab-report"
+            data-i18n="tabReport"
+          >Report</span>
+          <span
+            class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-activity"
             data-tab="tab-activity"
             data-i18n="tabLog"
           >Activity Log</span>
           <span
             class="tab-link"
+            role="tab"
+            tabindex="-1"
+            aria-selected="false"
+            aria-controls="tab-settings"
             data-tab="tab-settings"
             data-i18n="tabSettings"
           >Settings</span>
@@ -98,8 +188,8 @@
         </header>
 
         <!-- Whitelist -->
-        <div id="tab-whitelist" class="tab-content active">
-          <h3 data-i18n="allowedWebsites">Allowed Websites 🌐</h3>
+        <div id="tab-whitelist" role="tabpanel" class="tab-content active">
+          <h3 data-i18n="allowedWebsites">Allowed Websites</h3>
           <div class="inline-form">
             <input
               type="text"
@@ -129,11 +219,77 @@
             />
             <span data-i18n="allowWholeDomain">Allow the whole domain (all sub-links)</span>
           </label>
+
+          <!-- Filtering: a whitelist can hold 1000 entries and scrolling is
+               the wrong tool for finding one of them. -->
+          <div class="form-group" style="margin-bottom: 0.6rem">
+            <input
+              type="search"
+              id="whitelistSearch"
+              data-i18n-placeholder="searchListPlaceholder"
+            />
+          </div>
+          <p
+            id="whitelistCount"
+            class="tab-hint"
+            role="status"
+            style="margin-bottom: 0.6rem"
+          ></p>
           <ul id="whitelistContainer"></ul>
+
+          <hr />
+
+          <h3 data-i18n="safePacksTitle">Quick Safe Packs</h3>
+          <p class="tab-hint" data-i18n="safePacksDesc">
+            Pre-reviewed sites that are safe for children.
+          </p>
+          <div id="safePresetContainer" class="preset-grid"></div>
+        </div>
+
+        <!-- Blocklist -->
+        <div id="tab-blocklist" role="tabpanel" class="tab-content">
+          <h3 data-i18n="blocklistTitle">Blocked Websites</h3>
+          <p class="tab-hint" data-i18n="blocklistDesc">
+            Blocked sites cannot be opened, even if they are on the whitelist.
+          </p>
+          <div class="inline-form">
+            <input
+              type="text"
+              id="newKeywordInput"
+              data-i18n-placeholder="addKeywordPlaceholder"
+            />
+            <button
+              id="addKeywordBtn"
+              class="btn btn-danger"
+              data-i18n="addButton"
+            ></button>
+          </div>
+          <div class="form-group" style="margin-bottom: 0.6rem">
+            <input
+              type="search"
+              id="blocklistSearch"
+              data-i18n-placeholder="searchListPlaceholder"
+            />
+          </div>
+          <p
+            id="blocklistCount"
+            class="tab-hint"
+            role="status"
+            style="margin-bottom: 0.6rem"
+          ></p>
+          <ul id="blocklistContainer"></ul>
+
+          <hr />
+
+          <h3 data-i18n="presetsTitle">Quick Block Packs</h3>
+          <p class="tab-hint" data-i18n="presetsDesc">
+            Add a whole category of sites to the blocklist in one click.
+          </p>
+          <div id="presetContainer" class="preset-grid"></div>
         </div>
 
         <!-- Schedule -->
-        <div id="tab-schedule" class="tab-content">
+        <div id="tab-schedule" role="tabpanel" class="tab-content">
           <h3 data-i18n="browsingSchedule">Browsing Schedule</h3>
 
           <div
@@ -207,7 +363,7 @@
         </div>
 
         <!-- Limits -->
-        <div id="tab-limits" class="tab-content">
+        <div id="tab-limits" role="tabpanel" class="tab-content">
           <h3 data-i18n="dailyLimit">Daily Limit</h3>
 
           <div
@@ -263,17 +419,17 @@
 
           <hr />
 
-          <h3>Websites With Time Limits ⏳</h3>
+          <h3 data-i18n="limitsTableTitle">Websites With Time Limits</h3>
           <div class="table-container">
             <table class="log-table">
               <thead>
                 <tr>
-                  <th>Website</th>
-                  <th>Total Time</th>
-                  <th>Consumed Time</th>
-                  <th>Remaining Time</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th data-i18n="tableHeaderWebsite"></th>
+                  <th data-i18n="limitColTotal"></th>
+                  <th data-i18n="limitColConsumed"></th>
+                  <th data-i18n="limitColRemaining"></th>
+                  <th data-i18n="limitColStatus"></th>
+                  <th data-i18n="limitColAction"></th>
                 </tr>
               </thead>
               <tbody id="limitsTableBody"></tbody>
@@ -282,7 +438,67 @@
 
           <hr />
 
-          <h3 data-i18n="emergencyLock">Emergency Lock 🔒</h3>
+          <!-- Whole-day screen-time budget -->
+          <h3 data-i18n="screenTimeHeader">Total daily screen time</h3>
+          <p class="tab-hint" data-i18n="screenTimeDesc">
+            One allowance for the whole day across every site. Sites you allow
+            always stay open.
+          </p>
+
+          <div
+            class="form-group"
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              margin-bottom: 1.5rem;
+            "
+          >
+            <input
+              type="checkbox"
+              id="screenTimeEnabledCheckbox"
+              style="width: auto; margin: 0"
+            />
+            <label
+              for="screenTimeEnabledCheckbox"
+              data-i18n="screenTimeEnabledLabel"
+              style="cursor: pointer; margin: 0"
+              >Enforce a daily screen-time budget</label
+            >
+          </div>
+
+          <div class="limit-input-grid">
+            <div class="form-group">
+              <label data-i18n="screenTimeMinutesLabel">Minutes per day</label>
+              <input
+                type="number"
+                id="screenTimeMinutesInput"
+                min="5"
+                max="1440"
+                step="5"
+                data-i18n-placeholder="minutesPlaceholder"
+              />
+            </div>
+            <div class="form-group">
+              <label data-i18n="screenTimeUsedLabel">Used today</label>
+              <input type="text" id="screenTimeUsedText" readonly />
+            </div>
+            <div class="form-group">
+              <label data-i18n="screenTimeRemainingLabel">Left today</label>
+              <input type="text" id="screenTimeRemainingText" readonly />
+            </div>
+          </div>
+
+          <button
+            id="saveScreenTimeBtn"
+            class="btn btn-primary"
+            data-i18n="screenTimeSave"
+            style="width: auto; margin-top: 0.5rem"
+          ></button>
+
+          <hr />
+
+          <h3 data-i18n="emergencyLock">Emergency Lock</h3>
           <button
             id="enableEmergencyBtn"
             class="btn btn-danger"
@@ -295,8 +511,54 @@
           ></button>
         </div>
 
+        <!-- Report -->
+        <div id="tab-report" role="tabpanel" class="tab-content">
+          <h3 data-i18n="reportTitle">Usage Report</h3>
+          <p class="tab-hint" data-i18n="reportDesc">
+            Time spent, visits and blocked attempts for each site.
+          </p>
+
+          <div class="form-group">
+            <label for="reportDaySelect" data-i18n="reportDayLabel">Day</label>
+            <select id="reportDaySelect"></select>
+          </div>
+
+          <div class="table-container">
+            <table class="log-table">
+              <thead>
+                <tr>
+                  <th data-i18n="reportColSite">Website</th>
+                  <th data-i18n="reportColTime">Time</th>
+                  <th data-i18n="reportColVisits">Visits</th>
+                  <th data-i18n="reportColBlocked">Blocked</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody"></tbody>
+            </table>
+          </div>
+
+          <!-- Purely decorative: the table above carries the same numbers,
+               so screen readers are pointed at it instead. -->
+          <div id="reportChart" class="report-chart" aria-hidden="true"></div>
+
+          <div id="reportTotals" class="report-totals" aria-live="polite"></div>
+
+          <div class="report-actions">
+            <button
+              id="exportReportBtn"
+              class="btn btn-secondary"
+              data-i18n="exportReportButton"
+            ></button>
+            <button
+              id="clearReportBtn"
+              class="btn btn-secondary"
+              data-i18n="clearReportButton"
+            ></button>
+          </div>
+        </div>
+
         <!-- Activity -->
-        <div id="tab-activity" class="tab-content">
+        <div id="tab-activity" role="tabpanel" class="tab-content">
           <h3 data-i18n="failedAttempts">Failed Attempts</h3>
           <div class="table-container">
             <table>
@@ -318,7 +580,7 @@
         </div>
 
         <!-- Settings -->
-        <div id="tab-settings" class="tab-content">
+        <div id="tab-settings" role="tabpanel" class="tab-content">
           <!-- General Settings -->
           <div class="settings-section-card">
             <h4 data-i18n="settingsGeneral">General Settings</h4>
@@ -340,6 +602,94 @@
                 ></button>
               </div>
             </div>
+            <p
+              id="syncStatusLine"
+              class="tab-hint"
+              role="status"
+              data-i18n="syncStatusOff"
+              style="margin-bottom: 0"
+            >
+              Not synced yet.
+            </p>
+          </div>
+
+          <!-- PIN quick unlock -->
+          <div class="settings-section-card">
+            <h4 data-i18n="pinHeader">PIN quick unlock</h4>
+            <p
+              data-i18n="pinDesc"
+              style="
+                font-size: 13px;
+                margin-bottom: 15px;
+                opacity: 0.8;
+                font-weight: 500;
+              "
+            >
+              A short code so you can unlock the popup without typing the full
+              password in front of your child. The password is still required
+              to change any rule.
+            </p>
+            <div class="limit-input-grid">
+              <div class="form-group">
+                <label data-i18n="pinNewLabel">New PIN (4-8 digits)</label>
+                <input
+                  type="password"
+                  id="pinInput"
+                  inputmode="numeric"
+                  autocomplete="new-password"
+                  maxlength="8"
+                />
+              </div>
+              <div class="form-group">
+                <label data-i18n="pinConfirmLabel">Repeat PIN</label>
+                <input
+                  type="password"
+                  id="pinConfirmInput"
+                  inputmode="numeric"
+                  autocomplete="new-password"
+                  maxlength="8"
+                />
+              </div>
+            </div>
+            <div class="report-actions">
+              <button
+                id="savePinBtn"
+                class="btn btn-primary"
+                data-i18n="pinSave"
+              ></button>
+              <button
+                id="removePinBtn"
+                class="btn btn-secondary"
+                data-i18n="pinRemove"
+              ></button>
+            </div>
+            <p
+              id="pinStatus"
+              class="tab-hint"
+              role="status"
+              style="margin-bottom: 0"
+            ></p>
+          </div>
+
+          <!-- Notifications -->
+          <div class="settings-section-card">
+            <h4 data-i18n="notificationsHeader">Time Warnings</h4>
+            <p
+              data-i18n="notificationsDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              Get a desktop warning 5 minutes and 1 minute before a site's daily
+              time runs out.
+            </p>
+            <label class="switch-row" for="notificationsEnabledCheckbox">
+              <input
+                type="checkbox"
+                id="notificationsEnabledCheckbox"
+                style="width: auto; margin: 0"
+              />
+              <span data-i18n="notificationsToggle">Enable time warnings</span>
+            </label>
+            <div id="notificationsStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
           </div>
 
           <!-- Extensions Access Control -->
@@ -357,6 +707,29 @@
               Allow Access (20 Minutes)
             </button>
             <div id="extensionsTimerDisplay" style="margin-top: 14px; font-weight: bold; color: var(--text); opacity: 0.9; display: none;"></div>
+          </div>
+
+          <!-- Incognito Bypass Protection -->
+          <div class="settings-section-card">
+            <h4 data-i18n="incognitoHeader">Incognito Protection</h4>
+            <p
+              data-i18n="incognitoDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              Chrome does not run extensions in Incognito windows until you
+              allow it — leaving it off is the easiest way around every rule.
+            </p>
+            <div
+              id="incognitoStatus"
+              role="status"
+              style="font-size: 13px; font-weight: 700; margin-bottom: 12px;"
+            ></div>
+            <button
+              id="enableIncognitoBtn"
+              class="btn btn-primary"
+              data-i18n="incognitoButton"
+              style="width: auto"
+            ></button>
           </div>
 
           <!-- Change Password -->

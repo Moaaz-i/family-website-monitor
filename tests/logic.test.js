@@ -163,3 +163,55 @@ test("determineUrlStatus: exceeded daily limit blocked with reason limit", () =>
   assert.equal(res.status, "blocked");
   assert.equal(res.reason, "limit");
 });
+
+// Regression: the limit used to match the *full* URL, so "youtube.com" never
+// matched "youtube.com/watch?v=…" — the core feature did nothing on real pages.
+test("determineUrlStatus: daily limit applies to any URL of the site", () => {
+  const today = new Date().toDateString();
+  const dailyLimit = {
+    enabled: true,
+    sites: {
+      "youtube.com": { minutes: 1, usedTodaySeconds: 60, lastReset: today },
+    },
+  };
+  for (const url of [
+    "https://www.youtube.com/watch?v=abc",
+    "https://m.youtube.com/feed",
+    "https://youtube.com/",
+    "youtube.com",
+  ]) {
+    const res = determineUrlStatus(url, { whitelist: [], schedule: { enabled: false }, dailyLimit });
+    assert.equal(res.reason, "limit", `${url} should hit its limit`);
+  }
+  // …and never another site's limit.
+  const other = determineUrlStatus("https://example.com/x", {
+    whitelist: [],
+    schedule: { enabled: false },
+    dailyLimit,
+  });
+  assert.equal(other.reason, "default");
+});
+
+test("determineUrlStatus: a fresh daily limit leaves the site open", () => {
+  const res = determineUrlStatus("https://www.youtube.com/watch?v=abc", {
+    whitelist: [],
+    schedule: { enabled: false },
+    dailyLimit: {
+      enabled: true,
+      sites: {
+        "youtube.com": { minutes: 60, usedTodaySeconds: 0, lastReset: new Date().toDateString() },
+      },
+    },
+  });
+  assert.equal(res.status, "allowed");
+});
+
+// Regression: a temporary allowance used to require the exact same path, so
+// "allow 15 minutes" only unblocked the single URL that was open.
+test("determineUrlStatus: temporary allowance covers the whole site", () => {
+  const until = Date.now() + 60000;
+  const base = { whitelist: [], schedule: { enabled: false }, tempAllowed: { "https://youtube.com/": until } };
+  assert.equal(determineUrlStatus("https://www.youtube.com/watch?v=other", base).status, "allowed");
+  assert.equal(determineUrlStatus("https://m.youtube.com/feed", base).status, "allowed");
+  assert.equal(determineUrlStatus("https://evil.com/", base).status, "blocked");
+});

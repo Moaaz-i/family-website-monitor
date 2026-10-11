@@ -1,6 +1,6 @@
 {
   "name": "family-website-monitor",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Parental control Chrome extension (MV3) with whitelists, schedules, daily limits and emergency lock.",
   "private": true,
   "type": "module",
@@ -8,9 +8,17 @@
     "build": "node build.mjs",
     "prod": "node build.mjs --minify",
     "watch": "node build.mjs --watch",
-    "test": "node --test tests/*.test.js"
+    "test": "node --test tests/*.test.js",
+    "icons": "node tools/generate-icons.mjs src/icons",
+    "check": "node tools/check.mjs",
+    "lint": "eslint .",
+    "preview": "npm run build && node tools/preview.mjs",
+    "package": "npm run prod && cd dist && zip -qr ../family-website-monitor.zip .",
+    "verify": "npm run check && npm run lint && npm test && npm run prod"
   },
   "devDependencies": {
-    "esbuild": "^0.21.5"
+    "@eslint/js": "^10.0.1",
+    "esbuild": "^0.21.5",
+    "eslint": "^10.12.0"
   }
 }

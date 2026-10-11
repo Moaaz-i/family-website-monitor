@@ -1,20 +1,13 @@
-import { isMatchingSite, isEntryAllowed } from "./lib/url.js";
-import {
-  verifyPasswordInput,
-  generateSecureId,
-} from "./lib/security.js";
+import { isSameSite, isEntryAllowed, isValidRedirectTarget } from "./lib/url.js";
+import { migrateDailyLimit } from "./lib/rules.js";
+import { generateSecureId } from "./lib/security.js";
 import {
   showToast,
   startLockoutTimer,
   handleLockout,
   applyThemeClass,
 } from "./lib/ui.js";
-import {
-  WHITELIST_MAX,
-  SESSION_DURATION_MS,
-  BRUTE_FORCE_THRESHOLD,
-  BRUTE_FORCE_LOCKOUT_MS,
-} from "./lib/constants.js";
+import { WHITELIST_MAX } from "./lib/constants.js";
 import { t, onTranslationReady, initTranslations } from "./lib/translator.js";
 
 // Security Feature #11: Anti-Clickjacking Frame Busting
@@ -83,18 +76,18 @@ onTranslationReady(() => {
   });
 
   checkForUpdatesBtn && checkForUpdatesBtn.addEventListener("click", () => {
-    checkForUpdatesBtn.innerHTML = '<span class="checking-spinner">⟳</span> Checking...';
+    checkForUpdatesBtn.textContent = 'Checking...';
     checkForUpdatesBtn.disabled = true;
     chrome.runtime.sendMessage({ type: "checkForUpdatesNow" }, (data) => {
       checkForUpdatesBtn.disabled = false;
       if (data && data.updateAvailable) {
-        checkForUpdatesBtn.textContent = "🔔 Update available!";
+        checkForUpdatesBtn.textContent = "Update available!";
         showUpdateBanner(data.latestVersion, data.currentVersion);
         showUpdateModal(data.latestVersion, data.currentVersion, data.releaseNotes);
       } else {
-        checkForUpdatesBtn.textContent = "✅ Up to date";
+        checkForUpdatesBtn.textContent = "Up to date";
         setTimeout(() => {
-          checkForUpdatesBtn.textContent = "🔄 Check for Updates";
+          checkForUpdatesBtn.textContent = "Check for Updates";
         }, 3000);
       }
     });
@@ -105,16 +98,19 @@ onTranslationReady(() => {
 
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs && tabs.length > 0) {
-      let urlString = tabs[0].url || tabs[0].pendingUrl || "";
+      const urlString = tabs[0].url || tabs[0].pendingUrl || "";
       try {
         const url = new URL(urlString);
-        if (url.searchParams.has("target")) {
-          activeTabUrl = decodeURIComponent(url.searchParams.get("target"));
-        } else {
-          activeTabUrl = urlString;
-        }
-      } catch (e) {
-        activeTabUrl = urlString;
+        // searchParams.get() already percent-decoded — decoding again corrupts
+        // URLs that legitimately contain "%".
+        const fromQuery = url.searchParams.has("target")
+          ? url.searchParams.get("target")
+          : urlString;
+        // Only http(s) targets may ever be whitelisted or displayed as the
+        // current site.
+        activeTabUrl = isValidRedirectTarget(fromQuery) ? fromQuery : "";
+      } catch {
+        activeTabUrl = isValidRedirectTarget(urlString) ? urlString : "";
       }
       try {
         document.getElementById("currentDomain").textContent =
@@ -128,11 +124,18 @@ onTranslationReady(() => {
 
   const unlockBtn = document.getElementById("unlockBtn");
   const popupPasswordInput = document.getElementById("popupPassword");
+  const pinGroup = document.getElementById("pinGroup");
+  const passwordGroup = document.getElementById("passwordGroup");
+  const popupPinInput = document.getElementById("popupPin");
+  const pinUnlockBtn = document.getElementById("pinUnlockBtn");
+  const usePasswordBtn = document.getElementById("usePasswordBtn");
+  const usePinBtn = document.getElementById("usePinBtn");
   const lockScreen = document.getElementById("lockScreen");
   const managementDashboard = document.getElementById("managementDashboard");
 
   // Initial brute force check
   handleLockout(popupPasswordInput, unlockBtn);
+  if (pinUnlockBtn && popupPinInput) handleLockout(popupPinInput, pinUnlockBtn);
 
   // Load language selector state
   chrome.storage.local.get("language", (data) => {
@@ -158,51 +161,97 @@ onTranslationReady(() => {
     }
   });
 
-  unlockBtn.addEventListener("click", async () => {
+  // ── Unlock: password and optional PIN share one code path ────────────────
+  let hasPin = false;
+  let authMode = "password";
+
+  function setAuthMode(mode) {
+    authMode = mode === "pin" && hasPin ? "pin" : "password";
+    pinGroup.classList.toggle("hidden", authMode !== "pin");
+    passwordGroup.classList.toggle("hidden", authMode === "pin");
+    usePinBtn.classList.toggle("hidden", !hasPin || authMode === "pin");
+  }
+
+  function showDashboard() {
+    lockScreen.classList.add("hidden");
+    managementDashboard.classList.remove("hidden");
+    loadDashboardData();
+  }
+
+  function handleAuthResult(res) {
+    if (!res) return;
+    const field = authMode === "pin" ? popupPinInput : popupPasswordInput;
+    const button = authMode === "pin" ? pinUnlockBtn : unlockBtn;
+
+    if (res.ok) {
+      showDashboard();
+      popupPasswordInput.value = "";
+      popupPinInput.value = "";
+      return;
+    }
+
+    if (res.reason === "not-configured") {
+      showToast(t("setupRequired"), "warning");
+      setTimeout(() => chrome.runtime.openOptionsPage(), 1500);
+      return;
+    }
+
+    if (res.reason === "no-pin") {
+      hasPin = false;
+      setAuthMode("password");
+      showToast(t("pinNotSet"), "warning");
+      return;
+    }
+
+    if (res.lockoutExpiry && res.lockoutExpiry > Date.now()) {
+      startLockoutTimer(field, button, res.lockoutExpiry);
+    }
+    showToast(t("passwordIncorrect"), "error");
+    field.value = "";
+    field.focus();
+  }
+
+  chrome.storage.local.get(["pinHash"], (data) => {
+    hasPin = Boolean(data.pinHash);
+    setAuthMode(hasPin ? "pin" : "password");
+    const firstField = hasPin ? popupPinInput : popupPasswordInput;
+    if (firstField) firstField.focus();
+  });
+
+  usePasswordBtn.addEventListener("click", () => {
+    setAuthMode("password");
+    popupPasswordInput.focus();
+  });
+
+  usePinBtn.addEventListener("click", () => {
+    setAuthMode("pin");
+    popupPinInput.focus();
+  });
+
+  pinUnlockBtn.addEventListener("click", () => {
+    const pin = popupPinInput.value;
+    if (!pin) return;
+    // The service worker owns verification, lockout and the attempt log.
+    chrome.runtime.sendMessage(
+      { type: "verifyParentPin", pin, site: "popup" },
+      handleAuthResult,
+    );
+  });
+
+  popupPinInput.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") pinUnlockBtn.click();
+  });
+
+  unlockBtn.addEventListener("click", () => {
     const enteredPassword = popupPasswordInput.value;
-    chrome.storage.local.get(["password", "failedAttemptsCount"], async (data) => {
-      if (!data.password) {
-        showToast(
-          "Please set up a parent password in options page first.",
-          "warning",
-        );
-        setTimeout(() => {
-          chrome.runtime.openOptionsPage();
-        }, 1500);
-        return;
-      }
+    if (!enteredPassword) return;
 
-      const correct = await verifyPasswordInput(enteredPassword, data.password);
-
-      if (correct) {
-        // Reset lockout tracking
-        chrome.storage.local.set({ failedAttemptsCount: 0, lockoutExpiry: 0 });
-
-        // Generate temporary session token (expires in 5 minutes)
-        const sessionToken = Date.now().toString(36) + Math.random().toString(36);
-        const sessionExpiry = Date.now() + SESSION_DURATION_MS;
-        chrome.storage.local.set({ sessionToken, sessionExpiry });
-
-        lockScreen.classList.add("hidden");
-        managementDashboard.classList.remove("hidden");
-        loadDashboardData();
-      } else {
-        const attemptsCount = (data.failedAttemptsCount || 0) + 1;
-        const updates = { failedAttemptsCount: attemptsCount };
-
-        if (attemptsCount >= BRUTE_FORCE_THRESHOLD) {
-          const lockoutExpiryTime = Date.now() + BRUTE_FORCE_LOCKOUT_MS;
-          updates.lockoutExpiry = lockoutExpiryTime;
-          startLockoutTimer(popupPasswordInput, unlockBtn, lockoutExpiryTime);
-        }
-
-        chrome.storage.local.set(updates, () => {
-          showToast(t("passwordIncorrect"), "error");
-          popupPasswordInput.value = "";
-          popupPasswordInput.focus();
-        });
-      }
-    });
+    // Verification happens in the service worker: the popup never reads the
+    // stored password hash, and lockout/logging logic lives in one place.
+    chrome.runtime.sendMessage(
+      { type: "verifyParentPassword", password: enteredPassword, site: "popup" },
+      handleAuthResult,
+    );
   });
 
   popupPasswordInput.addEventListener("keydown", (e) => {
@@ -223,25 +272,51 @@ onTranslationReady(() => {
           domainToggle.checked = isWhitelisted && matchedEntry.mode === "domain";
         }
 
-        const dl = data.dailyLimit || {
-          enabled: false,
-          minutes: 0,
-          targetSites: [],
-        };
-        const hasLimit =
-          dl.enabled &&
-          dl.targetSites &&
-          dl.targetSites.some((site) => isMatchingSite(site, activeTabUrl));
+        // The stored layout is { enabled, sites: { [site]: { minutes, ... } } }.
+        // migrateDailyLimit() also converts the pre-3.0 { targetSites } shape,
+        // which is what the popup previously read and got wrong.
+        const dl = migrateDailyLimit(data.dailyLimit);
         const limitInput = document.getElementById("popupLimitMinutes");
+        const siteKey = activeTabUrl
+          ? Object.keys(dl.sites).find((site) => isSameSite(activeTabUrl, site))
+          : null;
+        const siteData = siteKey ? dl.sites[siteKey] : null;
+        const hasLimit = Boolean(dl.enabled && siteData);
 
-        if (hasLimit) limitInput.value = dl.minutes;
-        else limitInput.value = "";
+        limitInput.value = hasLimit ? String(siteData.minutes) : "";
 
         updateStatusTag(isWhitelisted, hasLimit);
         document.getElementById("popupEmergencyLock").checked =
           !!data.emergencyLock;
       },
     );
+
+    // Whole-day budget, independent of the site currently open.
+    chrome.runtime.sendMessage({ type: "checkTimeStatus" }, (res) => {
+      const box = document.getElementById("screenTimeBox");
+      const value = document.getElementById("screenTimeValue");
+      if (!box || !value) return;
+      const screen = res && res.screen;
+      if (!screen || !screen.enabled) {
+        box.classList.add("hidden");
+        return;
+      }
+      box.classList.remove("hidden");
+      value.textContent = screen.exhausted
+        ? t("blockedReasonBudget")
+        : formatClock(screen.remainingSeconds);
+    });
+  }
+
+  // Compact "2h 5m" / "45s" label for the popup status box.
+  function formatClock(totalSeconds) {
+    const total = Math.max(0, Math.round(Number(totalSeconds) || 0));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = total % 60;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    if (minutes > 0) return `${minutes}m ${seconds}s`;
+    return `${seconds}s`;
   }
 
   function updateWhitelistButtonState(isWhitelisted) {
@@ -278,12 +353,12 @@ onTranslationReady(() => {
       // Verification of active session prior to whitelisting
       chrome.storage.local.get(["sessionExpiry", "whitelist"], (data) => {
         if (!data.sessionExpiry || data.sessionExpiry < Date.now()) {
-          showToast("Session expired. Please log in again.", "error");
+          showToast(t("sessionExpiredError"), "error");
           location.reload();
           return;
         }
 
-        let whitelist = data.whitelist || [];
+        const whitelist = data.whitelist || [];
         const index = whitelist.findIndex((e) =>
           isEntryAllowed(activeTabUrl, e),
         );
@@ -293,7 +368,7 @@ onTranslationReady(() => {
         } else {
           // Whitelist size cap (Security Feature #18)
           if (whitelist.length >= WHITELIST_MAX) {
-            showToast("Whitelist storage capacity exceeded (max 1000 items)", "error");
+            showToast(t("whitelistCapacityError"), "error");
             return;
           }
 
@@ -328,38 +403,38 @@ onTranslationReady(() => {
       // Verification of active session prior to saving settings
       chrome.storage.local.get(["sessionExpiry", "dailyLimit"], (data) => {
         if (!data.sessionExpiry || data.sessionExpiry < Date.now()) {
-          showToast("Session expired. Please log in again.", "error");
+          showToast(t("sessionExpiredError"), "error");
           location.reload();
           return;
         }
 
-        const minutesVal = document.getElementById("popupLimitMinutes").value;
-        const minutes = parseInt(minutesVal || "0");
+        const minutesVal = document.getElementById("popupLimitMinutes").value.trim();
+        const parsed = parseInt(minutesVal, 10);
+        const minutes = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 0), 1440) : 0;
         const emergencyLock =
           document.getElementById("popupEmergencyLock").checked;
 
-        const existingDl = data.dailyLimit || {};
-        let newDl = { ...existingDl };
+        // Write straight into the { enabled, sites } layout that the service
+        // worker and the control panel read. Mixing in the legacy
+        // { minutes, targetSites } keys silently discarded the limit.
+        const dl = migrateDailyLimit(data.dailyLimit);
+        const today = new Date().toDateString();
+
         if (minutes > 0) {
-          newDl.enabled = true;
-          newDl.minutes = minutes;
-          if (!newDl.targetSites) newDl.targetSites = [];
-          if (
-            !newDl.targetSites.some((site) =>
-              isMatchingSite(site, activeTabUrl),
-            )
-          ) {
-            newDl.targetSites = [activeTabUrl];
-            if (newDl.usedToday === undefined) newDl.usedToday = 0;
-            if (newDl.usedTodaySeconds === undefined)
-              newDl.usedTodaySeconds = 0;
-            if (!newDl.lastReset) newDl.lastReset = new Date().toDateString();
-          }
-        } else if (minutesVal === "0" || minutesVal === "") {
-          newDl.enabled = false;
+          const current = dl.sites[activeTabUrl];
+          dl.enabled = true;
+          dl.sites[activeTabUrl] = {
+            minutes,
+            usedTodaySeconds: current ? current.usedTodaySeconds || 0 : 0,
+            lastReset: (current && current.lastReset) || today,
+          };
+        } else {
+          delete dl.sites[activeTabUrl];
+          if (Object.keys(dl.sites).length === 0) dl.enabled = false;
         }
+
         chrome.storage.local.set(
-          { dailyLimit: newDl, emergencyLock: emergencyLock },
+          { dailyLimit: dl, emergencyLock: emergencyLock },
           () => {
             showToast(t("settingsSaved"), "success");
             loadDashboardData();

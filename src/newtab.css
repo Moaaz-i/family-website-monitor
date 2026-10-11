@@ -1,0 +1,108 @@
+/* New tab page: a calm family dashboard, not a control panel.
+   It shows the clock, what is left of today, and the allowed sites — the
+   rule lists and the parent panel are never reachable from here. */
+
+.newtab-body {
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+
+.newtab-shell {
+  width: min(760px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.newtab-header {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.newtab-mark {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  color: #6366f1;
+}
+.newtab-mark svg {
+  width: 100%;
+  height: 100%;
+}
+.newtab-header h1 {
+  font-size: 1.05rem;
+}
+.newtab-date {
+  margin: 2px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-muted, #64748b);
+}
+
+.newtab-clock {
+  font-size: clamp(3rem, 12vw, 5.5rem);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.newtab-status {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-muted, #64748b);
+}
+
+.newtab-sites {
+  align-self: stretch;
+  margin-top: 0.8rem;
+}
+.newtab-sites h2 {
+  margin: 0 0 10px;
+  font-size: 0.95rem;
+  color: var(--text-muted, #64748b);
+}
+
+.newtab-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 10px;
+}
+
+.newtab-tile {
+  display: block;
+  padding: 14px 16px;
+  border: 1px solid var(--border, rgba(99, 102, 241, 0.12));
+  border-radius: var(--radius-sm, 14px);
+  background: var(--bg, rgba(255, 255, 255, 0.85));
+  color: inherit;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  direction: ltr;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease;
+}
+.newtab-tile:hover,
+.newtab-tile:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px var(--shadow-light, rgba(99, 102, 241, 0.14));
+}
+
+.newtab-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted, #64748b);
+}

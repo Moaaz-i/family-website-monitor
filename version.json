@@ -1,4 +1,4 @@
 {
-  "version": "2.2.0",
-  "releaseNotes": "New: modular src/dist architecture with automated build, whole-domain allow mode (toggle per site in whitelist, popup and blocked page), unit tests for the rules engine, and stronger code separation."
+  "version": "3.0.0",
+  "releaseNotes": "3.0.0: whitelist + blocklist with packs, schedules, per-site daily limits, a whole-day screen-time budget, \"ask a parent for more time\", usage report with chart and CSV export, cross-device sync, PIN quick unlock, a family new-tab dashboard, frame-aware enforcement, PBKDF2 password storage kept out of cloud sync, and a full Arabic RTL interface."
 }

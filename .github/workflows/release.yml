@@ -1,0 +1,69 @@
+name: Release
+
+# Tag-driven: pushing `v3.1.0` builds, verifies that the tag matches the
+# manifest version, packages the extension and publishes a GitHub release
+# with the zip attached (the same zip you would upload to the Web Store).
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Static checks
+        run: npm run check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Production build
+        run: npm run prod
+
+      - name: Tag must match manifest version
+        if: github.ref_type == 'tag'
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          MANIFEST="$(node -p "JSON.parse(require('fs').readFileSync('dist/manifest.json','utf8')).version")"
+          if [ "$TAG" != "$MANIFEST" ]; then
+            echo "Tag v$TAG does not match manifest/package version $MANIFEST" >&2
+            exit 1
+          fi
+
+      - name: Package zip
+        run: |
+          NAME="family-website-monitor-${GITHUB_REF_NAME:-dev}"
+          NAME="${NAME//\//_}"
+          (cd dist && zip -qr "../${NAME}.zip" .)
+          echo "ZIP=${NAME}.zip" >> "$GITHUB_ENV"
+
+      - name: Upload artifact (any run)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ZIP }}
+          path: ${{ env.ZIP }}
+          retention-days: 30
+
+      - name: Create GitHub release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP }}
+          generate_release_notes: true

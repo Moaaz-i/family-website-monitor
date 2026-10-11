@@ -2,6 +2,7 @@ import esbuild from "esbuild";
 import { cpSync, mkdirSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { generateIcons } from "./tools/generate-icons.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const SRC = join(ROOT, "src");
@@ -10,19 +11,26 @@ const DIST = join(ROOT, "dist");
 const ENTRIES = [
   "background.js",
   "content.js",
+  "content-search.js",
+  "content-whatsapp.js",
   "options.js",
   "popup.js",
   "blocked.js",
   "blocked-extensions.js",
+  "newtab.js",
 ];
 
 const STATIC_FILES = [
   "manifest.json",
   "options.html",
   "popup.html",
+  "popup.css",
   "blocked.html",
   "blocked-extensions.html",
   "uninstall.html",
+  "uninstall.css",
+  "newtab.html",
+  "newtab.css",
   "style.css",
 ];
 
@@ -34,6 +42,10 @@ const watch = process.argv.includes("--watch");
 async function build() {
   rmSync(DIST, { recursive: true, force: true });
   mkdirSync(DIST, { recursive: true });
+
+  // Icons are generated (not committed) so the mark can be tweaked in code.
+  const icons = generateIcons(join(DIST, "icons"));
+  console.log(`✔ Generated ${icons.length} icons`);
 
   const options = {
     entryPoints: ENTRIES.map((f) => join(SRC, f)),
