@@ -28,6 +28,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   count, so a 1000-entry whitelist stays usable.
 - **Report exports** — CSV (Excel-friendly, BOM so Arabic survives) and a
   CSS bar chart of the day's busiest sites next to the table.
+- **Search bar on the new tab page** — Enter searches the web; typing
+  offers the matching *allowed* sites first (mouse or ↑/↓ + Enter), so the
+  safe destination is always the fastest one to reach. The grid below
+  filters live while you type.
 - **First-run wizard** — right after the password is created, one screen
   offers the block packs and the screen-time budget, so a fresh install
   leaves the panel already enforcing something.

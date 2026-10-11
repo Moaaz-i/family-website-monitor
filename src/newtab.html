@@ -42,12 +42,69 @@
 
       <p class="newtab-status" id="newtabStatus" role="status"></p>
 
+      <!-- Search: Enter searches the web; typing offers the allowed sites
+           first, so the safe answer is always the fastest one to reach. -->
+      <div class="newtab-search-wrap">
+        <form class="newtab-search" id="newtabSearch" role="search">
+          <svg
+            class="newtab-search-icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <circle
+              cx="11"
+              cy="11"
+              r="6.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+            />
+            <path
+              d="m16 16 4.5 4.5"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+            />
+          </svg>
+          <input
+            id="newtabSearchInput"
+            type="search"
+            dir="auto"
+            autocomplete="off"
+            spellcheck="false"
+            aria-controls="newtabSuggestions"
+            data-i18n-placeholder="newtabSearchPlaceholder"
+            placeholder="Search the web, or jump to an allowed site"
+          />
+          <kbd class="newtab-search-key" aria-hidden="true">↵</kbd>
+          <button type="submit" class="newtab-search-go" data-i18n="newtabSearchGo">
+            Search
+          </button>
+        </form>
+        <ul
+          id="newtabSuggestions"
+          class="newtab-suggestions"
+          role="listbox"
+          aria-label="Allowed sites"
+          hidden
+        ></ul>
+      </div>
+
       <section class="newtab-sites">
         <h2 data-i18n="newtabSitesTitle">Allowed sites</h2>
         <!-- Plain <a> elements: middle-click and Ctrl/Cmd-click work as usual -->
         <div id="newtabTiles" class="newtab-tiles"></div>
         <p id="newtabEmpty" class="newtab-empty" hidden data-i18n="newtabNoSites">
           No allowed sites yet. A parent can add them in the panel.
+        </p>
+        <p
+          id="newtabNoMatch"
+          class="newtab-empty"
+          hidden
+          data-i18n="newtabSearchNoMatch"
+        >
+          No allowed site matches your search.
         </p>
       </section>
     </main>

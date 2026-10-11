@@ -807,5 +807,17 @@
   },
   "newtabStatusActive": {
     "message": "Protection is on."
+  },
+  "newtabSearchPlaceholder": {
+    "message": "Search the web, or jump to an allowed site"
+  },
+  "newtabSearchGo": {
+    "message": "Search"
+  },
+  "newtabSearchOpenHint": {
+    "message": "Open"
+  },
+  "newtabSearchNoMatch": {
+    "message": "No allowed site matches your search."
   }
 }

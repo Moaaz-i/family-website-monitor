@@ -19,6 +19,7 @@ English · [العربية](#العربية)
 | **Usage report** | Time, visits and blocked attempts per site, per day, kept for 14 days — with a bar chart and a CSV export. |
 | **Screen-time budget** | One allowance per day across every site. Whitelisted sites and an active temporary allowance stay open. |
 | **Ask for more time** | The blocked page offers a button; you get a desktop notification with *Allow 15 min / Not now*. |
+| **New tab** | A family dashboard (clock, time left, allowed-site tiles) with a search bar that offers the allowed sites before the open web. |
 | **Devices** | The lists, schedule, limits and screen-time configuration sync between your devices. The password, PIN and usage counters do not. |
 | **Emergency lock** | One click closes everything until you unlock it again. |
 | **PIN unlock** | Optional 4–8 digit PIN for the popup, verified with the same PBKDF2 work and the same lockout as the password. |

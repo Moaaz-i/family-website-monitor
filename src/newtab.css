@@ -106,3 +106,152 @@
   font-size: 14px;
   color: var(--text-muted, #64748b);
 }
+
+/* ── Search bar ───────────────────────────────────────────────────────────── */
+/* A pill with a gradient rim and a soft glow, so it reads as the one thing
+   to do on this page. The rim brightens while typing focus is inside. */
+.newtab-search-wrap {
+  align-self: stretch;
+  position: relative;
+  margin-top: 0.4rem;
+}
+
+.newtab-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 7px 7px 18px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(var(--bg, #fff), var(--bg, #fff)) padding-box,
+    linear-gradient(120deg, #6366f1, #ec4899 45%, #06b6d4) border-box;
+  box-shadow: 0 12px 34px rgba(99, 102, 241, 0.16);
+  transition:
+    box-shadow 0.18s ease,
+    transform 0.18s ease;
+}
+.newtab-search:focus-within {
+  transform: translateY(-1px);
+  box-shadow:
+    0 16px 44px rgba(99, 102, 241, 0.32),
+    0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+
+.newtab-search-icon {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  color: #6366f1;
+}
+
+.newtab-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.newtab-search input::placeholder {
+  color: var(--text-muted, #64748b);
+  font-weight: 500;
+}
+.newtab-search input::-webkit-search-cancel-button {
+  cursor: pointer;
+}
+
+.newtab-search-key {
+  flex: none;
+  padding: 3px 9px;
+  border: 1px solid var(--border, rgba(99, 102, 241, 0.18));
+  border-radius: 8px;
+  background: var(--bg, #fff);
+  color: var(--text-muted, #64748b);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.newtab-search-go {
+  flex: none;
+  padding: 10px 20px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(120deg, #6366f1, #7c3aed);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    filter 0.15s ease,
+    transform 0.15s ease;
+}
+.newtab-search-go:hover {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+/* Suggestions: allowed sites first, offered before the open web. */
+.newtab-suggestions {
+  position: absolute;
+  z-index: 20;
+  inset-inline: 0;
+  top: calc(100% + 8px);
+  margin: 0;
+  padding: 6px;
+  list-style: none;
+  border: 1px solid var(--border, rgba(99, 102, 241, 0.14));
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bg, #fff) 92%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.18);
+  overflow: hidden;
+}
+
+.newtab-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.newtab-suggestion.is-active {
+  background: linear-gradient(120deg, rgba(99, 102, 241, 0.16), rgba(236, 72, 153, 0.14));
+}
+.newtab-suggestion-glyph {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: linear-gradient(120deg, #6366f1, #ec4899);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+.newtab-suggestion-host {
+  direction: ltr;
+  text-align: start;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.newtab-suggestion-hint {
+  margin-inline-start: auto;
+  color: var(--text-muted, #64748b);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+.newtab-suggestion.is-active .newtab-suggestion-hint {
+  color: #4f46e5;
+}

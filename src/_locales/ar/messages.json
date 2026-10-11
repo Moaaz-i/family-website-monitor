@@ -807,5 +807,17 @@
   },
   "newtabStatusActive": {
     "message": "الحماية مفعّلة."
+  },
+  "newtabSearchPlaceholder": {
+    "message": "ابحث في الويب، أو انتقل إلى موقع مسموح"
+  },
+  "newtabSearchGo": {
+    "message": "بحث"
+  },
+  "newtabSearchOpenHint": {
+    "message": "فتح"
+  },
+  "newtabSearchNoMatch": {
+    "message": "لا يوجد موقع مسموح مطابق لبحثك."
   }
 }
