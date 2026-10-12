@@ -51,7 +51,7 @@ collects nothing, no child's information is stored, processed or shared.
 | --- | --- |
 | `storage` | Stores the rules, counters and settings on the device. |
 | `tabs` | Reads the current tab's URL to enforce rules and to show the current site in the popup. |
-| `webNavigation` | Applies the rules when a page (or an iframe inside it) starts loading, including cross-site redirects. |
+| `webNavigation` | Applies the rules when the current page (the address bar) starts loading or changes via a link — never to the assets a page imports. |
 | `alarms` | Periodic maintenance: expiring temporary allowances, rolling the daily counters over at midnight, checking for updates. |
 | `privacy` | An optional switch that reduces WebRTC IP leakage. It is off until the parent turns it on. |
 | `notifications` | Time warnings ("5 minutes left") and the "your child is asking for more time" alert. |

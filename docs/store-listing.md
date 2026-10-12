@@ -102,7 +102,7 @@ Parental control: allow, block, schedule and limit the websites a child can open
 | --- | --- |
 | `storage` | Saves the parent's rules (whitelist, blocklist, schedule, limits) and the local usage counters on the device. |
 | `tabs` | Reads the current tab's URL to apply the rules and to show the current site in the popup. |
-| `webNavigation` | Applies the rules the moment a page or an iframe starts navigating, which is the only reliable point to allow or block it. |
+| `webNavigation` | Applies the rules the moment the current page starts navigating, which is the only reliable point to allow or block it. Sub-frames and imported assets are not judged. |
 | `alarms` | Periodic maintenance: expiring temporary allowances, rolling the daily counters at midnight, and checking for a new version. |
 | `privacy` | An optional switch that reduces WebRTC IP leakage. It stays off until the parent enables it in Settings. |
 | `notifications` | Warns the parent when a site is about to run out of time and when a child asks for more time. |

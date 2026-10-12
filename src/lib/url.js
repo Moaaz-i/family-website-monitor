@@ -140,6 +140,22 @@ export function isEnforceableUrl(urlString) {
   return /^https?:\/\//i.test(value) || /^file:/i.test(value);
 }
 
+// The rules follow the *current path* — the URL in the address bar — and
+// nothing else.
+//
+// A page's imports are the page's own business: scripts, images, and
+// especially iframes such as
+// https://ep2.adtrafficquality.google/sodar/sodar2/255/runner.html that ad,
+// login and player widgets load on their own. Judging those files as sites
+// stopped them from loading and yanked an allowed page to the blocked page
+// for something the child never navigated to.
+//
+// So: main frame (frameId 0) only, and only a real destination there.
+export function shouldEnforceNavigation(urlString, frameId) {
+  if (Number(frameId || 0) !== 0) return false;
+  return isEnforceableUrl(urlString);
+}
+
 export function isValidRedirectTarget(urlString) {
   if (!urlString) return false;
   try {

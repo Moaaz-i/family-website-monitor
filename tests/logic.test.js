@@ -6,6 +6,7 @@ import {
   isMatchingSite,
   isEntryAllowed,
   isEnforceableUrl,
+  shouldEnforceNavigation,
   resolveRedirectUrl,
   isValidRedirectTarget,
   normalizeUrl,
@@ -69,6 +70,28 @@ test("resolveRedirectUrl unwraps Google redirect links", () => {
   const target = "https://example.com/safe";
   const url = `https://www.google.com/url?q=${encodeURIComponent(target)}`;
   assert.equal(resolveRedirectUrl(url), target);
+});
+
+test("shouldEnforceNavigation judges the current path only", () => {
+  // The address bar: a real destination is always judged.
+  assert.equal(shouldEnforceNavigation("https://blocked.example/watch", 0), true);
+  assert.equal(shouldEnforceNavigation("file:///Volumes/usb/game.swf", 0), true);
+  assert.equal(shouldEnforceNavigation("https://allowed.example/", undefined), true);
+
+  // A page's imports are the page's business: the ad/login/player iframes
+  // it loads by itself must not be judged, and must never bounce the tab.
+  assert.equal(
+    shouldEnforceNavigation("https://ep2.adtrafficquality.google/sodar/sodar2/255/runner.html", 3),
+    false,
+  );
+  assert.equal(shouldEnforceNavigation("https://youtube.com/embed/abc", 7), false);
+  // …even when that import would be blocked as a top-level address.
+  assert.equal(shouldEnforceNavigation("https://blocked.example/embed", 1), false);
+
+  // Not a destination at all, even in the main frame.
+  assert.equal(shouldEnforceNavigation("about:blank", 0), false);
+  assert.equal(shouldEnforceNavigation("chrome://settings/extensions", 0), false);
+  assert.equal(shouldEnforceNavigation("data:text/html,<h1>hi</h1>", 0), false);
 });
 
 test("isValidRedirectTarget only accepts http/https", () => {

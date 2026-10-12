@@ -35,9 +35,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **First-run wizard** — right after the password is created, one screen
   offers the block packs and the screen-time budget, so a fresh install
   leaves the panel already enforcing something.
-- **Frame-aware enforcement** — every iframe is evaluated with its own URL;
-  a blocked frame redirects the whole tab (an extension page cannot be
-  framed).
+- **Current-path enforcement** — only the URL in the address bar is judged.
+  A page's own imports (scripts, images, the iframes it loads by itself,
+  such as an ad or login widget) are never treated as destinations, so an
+  allowed site can no longer be stopped halfway by a helper file it needs.
 - **Local preview harness** (`npm run preview`) — serves `dist/` with a
   `chrome.*` stub *and* the real service worker, so every page and flow
   (auth, rules, notifications, ask-more-time) can be exercised in a normal
@@ -96,17 +97,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Fixed
 
-- **Allowed sites bounced to the blocked page on load** — every modern page
-  creates an `about:blank` (or `about:srcdoc` / `blob:` / `data:`) frame for
-  a lazy embed, and frame-aware enforcement judged that empty box like a
-  site, so an allowed page dragged the whole tab to
-  `blocked.html?target=about:blank&reason=default`. Only real destinations
-  (http/https/file) are judged now; a `data:` frame cannot smuggle a site
-  in either, because any http(s) navigation inside it is still checked.
+- **Allowed sites were stopped by their own imports** — evaluating every
+  iframe like a site meant that the moment an allowed page loaded its own
+  helper file, the whole tab was yanked to
+  `blocked.html?target=<that file>` (often
+  `about:blank`, or a third-party widget such as
+  `ep2.adtrafficquality.google/…/runner.html`). Enforcement now follows the
+  current path only: the main frame, and only when it is a real
+  destination (http/https/file). A `data:` page cannot smuggle a site in
+  either — it is not a destination, and the frame it opens is not judged.
 - Daily limits and temporary allowances matched the full URL path, so they
   never matched any real page (`youtube.com` vs `youtube.com/watch`).
 - A page blocked inside an iframe could bounce the user into the settings
-  page; the tab is now redirected to the blocked page instead.
+  page; iframe-level enforcement is gone — only the current path decides.
 - Hardcoded English strings (limits table headers/title, several toasts)
   and an emoji in the limits heading broke the Arabic build.
 - `src/lib/backup.js` imported `BACKUP_SALT`, which no longer existed —

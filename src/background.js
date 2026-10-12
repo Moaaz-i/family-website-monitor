@@ -1,4 +1,4 @@
-import { resolveRedirectUrl, isSameSite, isValidRedirectTarget, isEnforceableUrl } from "./lib/url.js";
+import { resolveRedirectUrl, isSameSite, isValidRedirectTarget, shouldEnforceNavigation } from "./lib/url.js";
 import { encodePolicy, decodePolicy, stableStringify, chunkKey, SYNC_META_KEY, SYNC_CHUNK_PREFIX } from "./lib/sync-codec.js";
 import { normalizeSyncedPayload, planApplySync } from "./lib/sync-policy.js";
 import {
@@ -429,17 +429,17 @@ async function enforceExtensionsGuard(tabId) {
   }
 }
 
-// Sub-frame navigations used to be ignored completely, which made every
-// <iframe src="blocked-site"> a free bypass: the frame is not our top frame,
-// so neither the content script nor the redirect ever touched it. The rules
-// are now evaluated for every frame; a blocked sub-frame drags the whole tab
-// to the blocked page (an extension page cannot be framed, so redirecting the
-// frame itself would just leave a blank box).
+// The rules follow the **current path**: only the main frame — the URL in
+// the address bar — is judged, and only when it is a real destination.
 //
-// Only *destinations* are judged (see isEnforceableUrl): a frame whose URL is
-// about:blank, about:srcdoc, data: or blob: is an empty or parent-owned box —
-// every site creates them for lazy embeds — and blocking those bounced whole
-// tabs to blocked.html?target=about:blank the moment an allowed page loaded.
+// A page's imports belong to the page the parent allowed: scripts, images
+// and especially the iframes it loads by itself (ad, login and player
+// widgets, e.g.
+// https://ep2.adtrafficquality.google/sodar/sodar2/255/runner.html).
+// Judging those as sites stopped them from loading and yanked an allowed
+// page to the blocked page for a file the child never navigated to.
+// Redirecting a sub-frame would be pointless anyway: an extension page
+// cannot be framed, so only the tab itself can be redirected.
 const recentBlockRedirects = new Map(); // `${tabId}` -> { url, at }
 const BLOCK_REDIRECT_COOLDOWN_MS = 4000;
 
@@ -453,18 +453,9 @@ function checkAndApplyRules(url, tabId, frameId = 0) {
     return;
   }
 
-  if (resolvedUrl.startsWith("chrome://") || resolvedUrl.startsWith("chrome-extension://")) {
-    return;
-  }
-
-  // `about:blank`, `about:srcdoc`, `data:` and `blob:` frames are not sites:
-  // they are empty or parent-owned boxes inside a page that was checked
-  // already. Every real http(s) destination — in any frame — is still
-  // judged below. (Skipping them here is what stops an allowed site from
-  // bouncing the whole tab the moment it creates a lazy embed.)
-  if (!isEnforceableUrl(resolvedUrl)) {
-    return;
-  }
+  // Sub-frames (imports, embeds) and non-web schemes (about:blank, data:,
+  // chrome://…) are not judged at all.
+  if (!shouldEnforceNavigation(resolvedUrl, frameId)) return;
 
   getPolicy((data) => {
     if (!data.password) {
@@ -1131,6 +1122,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "forceBlockRedirect") {
+    // Current path only: a sub-frame never decides where the address bar
+    // goes (frameId 0 = main frame; senders without a frame id are legacy).
+    if (Number(sender.frameId || 0) !== 0) return false;
+
     if (!allowRedirectBurst()) {
       console.warn("Redirect burst rate-limited");
       return false;
