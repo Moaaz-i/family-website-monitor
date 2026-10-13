@@ -1,5 +1,11 @@
 import { isEntryAllowed, normalizeUrl, isValidRedirectTarget } from "./lib/url.js";
-import { migrateDailyLimit, migrateScreenTime, screenTimeUsedSeconds, BLOCKLIST_MIN_KEYWORD } from "./lib/rules.js";
+import {
+  migrateDailyLimit,
+  migrateScreenTime,
+  screenTimeUsedSeconds,
+  isWithinSchedule,
+  BLOCKLIST_MIN_KEYWORD,
+} from "./lib/rules.js";
 import { SYNC_MAX_CHUNKS, SYNC_CHUNK_SIZE } from "./lib/sync-codec.js";
 import { BLOCK_PRESETS, SAFE_PRESETS, mergeIntoKeywords } from "./lib/presets.js";
 import { createPasswordSpec, generateSecureId, generateSessionToken } from "./lib/security.js";
@@ -374,6 +380,7 @@ onTranslationReady(() => {
     loadEmergencyLock();
     renderWhitelist();
     renderBlocklist();
+    renderStatusStrip();
     renderPresets();
     loadReport();
     loadNotifications();
@@ -468,6 +475,7 @@ onTranslationReady(() => {
     document.querySelectorAll(".tab-content").forEach((c) => c.classList.remove("active"));
     const panel = document.getElementById(tabId);
     if (panel) panel.classList.add("active");
+    renderStatusStrip();
   }
 
   document.addEventListener("click", (e) => {
@@ -563,71 +571,91 @@ onTranslationReady(() => {
       }
       visible.forEach((entry) => {
         const li = document.createElement("li");
-        li.style.display = "flex";
-        li.style.justifyContent = "space-between";
-        li.style.alignItems = "center";
-        li.style.gap = "1rem";
+        li.className = "list-row";
 
-        const span = document.createElement("span");
-        span.textContent = entry.fullUrl;
-        span.title = entry.fullUrl;
-        span.style.direction = "ltr";
-        span.style.whiteSpace = "nowrap";
-        span.style.overflow = "hidden";
-        span.style.textOverflow = "ellipsis";
-        span.style.flex = "1";
+        // The domain is the headline a parent scans; the path drops to a
+        // footnote, because nobody reads a full URL in a list.
+        const { host, path } = splitUrlForDisplay(entry.fullUrl);
+        const main = document.createElement("div");
+        main.className = "list-main";
 
-        const domainToggle = createDomainToggle(entry);
+        const label = document.createElement("span");
+        label.className = "list-label";
+        label.textContent = host;
+        label.title = entry.fullUrl;
+        main.appendChild(label);
+
+        if (path) {
+          const sub = document.createElement("span");
+          sub.className = "list-sub";
+          sub.textContent = path;
+          sub.title = entry.fullUrl;
+          main.appendChild(sub);
+        }
+
+        const badge = createModeBadge(entry);
 
         const button = document.createElement("button");
         button.textContent = t("deleteButton");
-        button.className = "btn btn-danger";
+        button.className = "btn-remove";
+        button.title = t("deleteButton");
         button.setAttribute("data-url", entry.fullUrl);
 
-        li.append(span, domainToggle, button);
+        li.append(main, badge, button);
         whitelistContainer.appendChild(li);
       });
     });
   }
 
-  // Whole-domain switch shown next to every whitelisted site
-  function createDomainToggle(entry) {
-    const label = document.createElement("label");
-    label.className = "whole-domain-toggle";
-    label.title = entry.fullUrl;
+  // Scope shown as a chip instead of a switch: one click flips it, and the
+  // colour answers "is the whole site open?" without reading a sentence.
+  function createModeBadge(entry) {
+    const badge = document.createElement("button");
+    badge.type = "button";
+    badge.className = "mode-badge";
+    badge.title = entry.fullUrl;
 
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = entry.mode === "domain";
-    checkbox.addEventListener("change", () => {
-      entry.mode = checkbox.checked ? "domain" : "exact";
+    const paint = () => {
+      const domain = entry.mode === "domain";
+      badge.dataset.mode = domain ? "domain" : "exact";
+      badge.textContent = domain ? t("wholeDomainLabel") : t("modeExact");
+      badge.setAttribute("aria-pressed", String(domain));
+    };
+    paint();
+
+    badge.addEventListener("click", () => {
+      const next = entry.mode === "domain" ? "exact" : "domain";
       chrome.storage.local.get({ whitelist: [] }, (data) => {
         const whitelist = migrateWhitelist(data.whitelist);
         const target = whitelist.find((e) => e.id === entry.id) || whitelist.find((e) => isEntryAllowed(entry.fullUrl, e));
         if (!target) return;
-        target.mode = checkbox.checked ? "domain" : "exact";
+        target.mode = next;
         chrome.storage.local.set({ whitelist }, () => {
+          entry.mode = next;
           renderWhitelist();
           showToast(
-            checkbox.checked ? t("wholeDomainEnabled") : t("wholeDomainDisabled"),
-            checkbox.checked ? "success" : "info",
+            next === "domain" ? t("wholeDomainEnabled") : t("wholeDomainDisabled"),
+            next === "domain" ? "success" : "info",
           );
         });
       });
     });
+    return badge;
+  }
 
-    const slider = document.createElement("span");
-    slider.className = "switch-slider";
-
-    const text = document.createElement("span");
-    text.textContent = t("wholeDomainLabel") || "Whole domain";
-
-    label.append(checkbox, slider, text);
-    return label;
+  function splitUrlForDisplay(fullUrl) {
+    try {
+      const u = new URL(fullUrl.includes("://") ? fullUrl : `https://${fullUrl}`);
+      const path = `${u.pathname}${u.search}${u.hash}`;
+      const host = u.host || u.pathname || fullUrl;
+      return { host, path: u.host && path !== "/" ? path : "" };
+    } catch {
+      return { host: fullUrl, path: "" };
+    }
   }
 
   document.addEventListener("click", (e) => {
-    if (!e.target.classList.contains("btn-danger")) return;
+    if (!e.target.classList.contains("btn-remove")) return;
     const url = e.target.getAttribute("data-url");
     if (url) {
       verifyActiveSession(() => {
@@ -672,12 +700,32 @@ onTranslationReady(() => {
     });
   });
 
+  // Removal is never silent and never final: the rows come back for eight
+  // seconds if a hand slipped.
+  function restoreWhitelistEntries(index, removed) {
+    chrome.storage.local.get({ whitelist: [] }, (data) => {
+      const list = migrateWhitelist(data.whitelist);
+      const missing = removed.filter((e) => !list.some((x) => x.id === e.id));
+      // Back to where it stood — a list that reorders itself on undo feels
+      // like it lost something else too.
+      list.splice(Math.min(Math.max(index, 0), list.length), 0, ...missing);
+      chrome.storage.local.set({ whitelist: list }, () => renderWhitelist());
+    });
+  }
+
   function removeSite(url) {
     chrome.storage.local.get({ whitelist: [] }, (data) => {
       const whitelist = migrateWhitelist(data.whitelist);
+      const at = whitelist.findIndex((e) => isEntryAllowed(url, e));
+      const removed = whitelist.filter((e) => isEntryAllowed(url, e));
       const remaining = whitelist.filter((e) => !isEntryAllowed(url, e));
       chrome.storage.local.set({ whitelist: remaining }, () => {
         renderWhitelist();
+        if (removed.length === 0) return;
+        showToast(t("removedFromWhitelist", removed.map((e) => e.fullUrl).join(", ")), "info", {
+          label: t("undoButton"),
+          onClick: () => restoreWhitelistEntries(at, removed),
+        });
       });
     });
   }
@@ -686,6 +734,72 @@ onTranslationReady(() => {
   // A parent block always outranks the whitelist, so this list is the first
   // place to reach when something must stay closed.
   const KEYWORD_MAX = 500;
+
+  // ── Status strip ─────────────────────────────────────────────────────────
+  // Is protection on, what is allowed, what is blocked, how much time is
+  // left — readable before any tab is opened.
+  function renderStatusStrip() {
+    const strip = document.getElementById("statusStrip");
+    if (!strip) return;
+    strip.textContent = "";
+
+    const addChip = (text, tone, dot) => {
+      const chip = document.createElement("span");
+      chip.className = "status-chip" + (tone ? ` status-chip-${tone}` : "");
+      if (dot) {
+        const d = document.createElement("i");
+        d.className = "status-dot";
+        chip.appendChild(d);
+      }
+      chip.appendChild(document.createTextNode(text));
+      strip.appendChild(chip);
+    };
+
+    chrome.storage.local.get(
+      {
+        whitelist: [],
+        blockedKeywords: [],
+        schedule: null,
+        dailyLimit: null,
+        emergencyLock: false,
+      },
+      (data) => {
+        const locked = Boolean(data.emergencyLock);
+        const schedule = data.schedule || { enabled: false, days: [], startTime: "", endTime: "" };
+        const outside = Boolean(schedule.enabled) && !isWithinSchedule(schedule);
+
+        if (locked) addChip(t("statusLocked"), "danger", true);
+        else if (outside) addChip(t("statusOutsideSchedule"), "warn", true);
+        else addChip(t("statusProtectionOn"), "ok", true);
+
+        addChip(t("statusAllowedCount", String(migrateWhitelist(data.whitelist).length)));
+        addChip(t("statusBlockedCount", String((data.blockedKeywords || []).length)));
+        if (schedule.enabled) addChip(t("statusScheduleOn"), outside ? "warn" : null);
+
+        const dl = migrateDailyLimit(data.dailyLimit);
+        const limited = Object.keys(dl.sites || {}).length;
+        if (limited > 0) addChip(t("statusLimitsCount", String(limited)));
+
+        // The budget itself lives in the worker, so ask it like the popup does.
+        chrome.runtime.sendMessage({ type: "checkTimeStatus" }, (res) => {
+          if (chrome.runtime.lastError || !strip.isConnected) return;
+          const screen = res && res.screen;
+          if (!screen || !screen.enabled) return;
+          if (screen.exhausted) {
+            addChip(t("blockedReasonBudget"), "danger", true);
+            return;
+          }
+          // Same thresholds as the budget bar: calm, then amber, then red.
+          const ratio = screen.minutes > 0 ? screen.remainingSeconds / (screen.minutes * 60) : 1;
+          addChip(
+            t("statusTimeLeft", formatDuration(screen.remainingSeconds)),
+            ratio <= 0.15 ? "danger" : ratio <= 0.4 ? "warn" : null,
+            true,
+          );
+        });
+      },
+    );
+  }
 
   function renderBlocklist() {
     const container = document.getElementById("blocklistContainer");
@@ -723,7 +837,7 @@ onTranslationReady(() => {
         const button = document.createElement("button");
         button.type = "button";
         button.textContent = t("deleteButton");
-        button.className = "btn btn-danger btn-sm";
+        button.className = "btn-remove";
         button.setAttribute("data-keyword", keyword);
         button.addEventListener("click", () => {
           verifyActiveSession(() => removeKeyword(keyword));
@@ -737,12 +851,23 @@ onTranslationReady(() => {
 
   function removeKeyword(keyword) {
     chrome.storage.local.get({ blockedKeywords: [] }, (data) => {
-      const list = (Array.isArray(data.blockedKeywords) ? data.blockedKeywords : []).filter(
-        (k) => String(k).toLowerCase() !== String(keyword).toLowerCase(),
-      );
+      const all = Array.isArray(data.blockedKeywords) ? data.blockedKeywords : [];
+      const at = all.findIndex((k) => String(k).toLowerCase() === String(keyword).toLowerCase());
+      const list = all.filter((k) => String(k).toLowerCase() !== String(keyword).toLowerCase());
       chrome.storage.local.set({ blockedKeywords: list }, () => {
         renderBlocklist();
-        showToast(t("keywordRemoved"), "info");
+        showToast(t("keywordRemoved"), "info", {
+          label: t("undoButton"),
+          onClick: () => {
+            chrome.storage.local.get({ blockedKeywords: [] }, (d2) => {
+              const restored = (Array.isArray(d2.blockedKeywords) ? d2.blockedKeywords : []).slice();
+              if (!restored.some((k) => String(k).toLowerCase() === String(keyword).toLowerCase())) {
+                restored.splice(Math.min(Math.max(at, 0), restored.length), 0, keyword);
+              }
+              chrome.storage.local.set({ blockedKeywords: restored }, () => renderBlocklist());
+            });
+          },
+        });
       });
     });
   }
@@ -958,19 +1083,36 @@ onTranslationReady(() => {
 
         const tdAction = document.createElement("td");
         const btnDelete = document.createElement("button");
-        btnDelete.className = "btn btn-danger btn-sm";
-        btnDelete.style.padding = "4px 8px";
-        btnDelete.style.fontSize = "12px";
+        btnDelete.className = "btn-remove";
         btnDelete.textContent = t("deleteButton") || "Delete";
         btnDelete.addEventListener("click", () => {
           verifyActiveSession(() => {
             chrome.storage.local.get(["dailyLimit"], (data) => {
               const currentDl = migrateDailyLimit(data.dailyLimit);
               if (currentDl.sites && currentDl.sites[site]) {
+                const saved = currentDl.sites[site];
+                const at = Object.keys(currentDl.sites).indexOf(site);
                 delete currentDl.sites[site];
                 chrome.storage.local.set({ dailyLimit: currentDl }, () => {
                   renderLimitsTable();
-                  showToast(t("limitRemoved", site), "success");
+                  showToast(t("limitRemoved", site), "info", {
+                    label: t("undoButton"),
+                    onClick: () => {
+                      chrome.storage.local.get({ dailyLimit: null }, (d2) => {
+                        const dl = migrateDailyLimit(d2.dailyLimit);
+                        const sites = dl.sites || {};
+                        // Key order is row order: put the site back in line.
+                        const keys = Object.keys(sites).filter((k) => k !== site);
+                        keys.splice(Math.min(Math.max(at, 0), keys.length), 0, site);
+                        const rebuilt = {};
+                        keys.forEach((k) => {
+                          rebuilt[k] = k === site ? saved : sites[k];
+                        });
+                        dl.sites = rebuilt;
+                        chrome.storage.local.set({ dailyLimit: dl }, () => renderLimitsTable());
+                      });
+                    },
+                  });
                 });
               }
             });
@@ -1040,8 +1182,22 @@ onTranslationReady(() => {
     const leftEl = document.getElementById("screenTimeRemainingText");
     if (!usedEl || !leftEl) return;
     const used = screenTimeUsedSeconds(st);
+    const total = st.minutes * 60;
     usedEl.value = formatDuration(used);
-    leftEl.value = st.minutes > 0 ? formatDuration(Math.max(0, st.minutes * 60 - used)) : "—";
+    leftEl.value = st.minutes > 0 ? formatDuration(Math.max(0, total - used)) : "—";
+
+    // One bar beats three fields: how much of today's budget is still there.
+    const bar = document.getElementById("screenTimeBar");
+    const fill = document.getElementById("screenTimeFill");
+    if (bar && fill) {
+      const active = st.enabled && st.minutes > 0;
+      bar.hidden = !active;
+      if (active) {
+        const ratio = Math.max(0, Math.min(1, (total - used) / total));
+        fill.style.width = `${Math.round(ratio * 100)}%`;
+        fill.className = "screen-time-fill" + (ratio <= 0.15 ? " danger" : ratio <= 0.4 ? " warn" : "");
+      }
+    }
   }
 
   document.getElementById("saveScreenTimeBtn").addEventListener("click", () => {
@@ -1093,6 +1249,15 @@ onTranslationReady(() => {
     if (area !== "local") return;
     if (changes.policySyncStatus) renderSyncStatus(changes.policySyncStatus.newValue || "");
     if (changes.screenTime) renderScreenTimeUsage(migrateScreenTime(changes.screenTime.newValue));
+    if (
+      changes.whitelist ||
+      changes.blockedKeywords ||
+      changes.schedule ||
+      changes.dailyLimit ||
+      changes.emergencyLock
+    ) {
+      renderStatusStrip();
+    }
   });
 
   // ── PIN quick unlock ─────────────────────────────────────────────────────

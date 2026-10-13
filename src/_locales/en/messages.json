@@ -162,7 +162,7 @@
     "description": "Tab title for the settings section."
   },
   "allowedWebsites": {
-    "message": "Allowed Websites",
+    "message": "Allowed websites",
     "description": "Header for the whitelist management section."
   },
   "addSitePlaceholder": {
@@ -174,7 +174,7 @@
     "description": "Button text to add a site to the whitelist."
   },
   "browsingSchedule": {
-    "message": "Browsing Schedule",
+    "message": "Browsing schedule",
     "description": "Header for the schedule section."
   },
   "allowedDays": {
@@ -215,7 +215,7 @@
     "description": "Button to save schedule settings."
   },
   "dailyLimit": {
-    "message": "Daily Limit",
+    "message": "Daily limit",
     "description": "Header for the daily limit section."
   },
   "minutesPlaceholder": {
@@ -231,7 +231,7 @@
     "description": "Label for the daily limit activation checkbox."
   },
   "emergencyLock": {
-    "message": "Emergency Lock",
+    "message": "Emergency lock",
     "description": "Header for the emergency lock section."
   },
   "enableLockButton": {
@@ -243,7 +243,7 @@
     "description": "Button to disable the emergency lock."
   },
   "failedAttempts": {
-    "message": "Failed Attempts",
+    "message": "Failed attempts",
     "description": "Header for the failed attempts log."
   },
   "tableHeaderWebsite": {
@@ -470,7 +470,7 @@
     "message": "Report"
   },
   "blocklistTitle": {
-    "message": "Blocked Websites"
+    "message": "Blocked websites"
   },
   "blocklistDesc": {
     "message": "Blocked sites can never be opened — a block also outranks the whitelist."
@@ -497,7 +497,7 @@
     "message": "Blocklist storage capacity exceeded (max 500 items)."
   },
   "presetsTitle": {
-    "message": "Quick Block Packs"
+    "message": "Quick block packs"
   },
   "presetsDesc": {
     "message": "Block a whole category of sites with one click. You can remove any entry afterwards."
@@ -524,7 +524,7 @@
     "message": "Movie streaming"
   },
   "safePacksTitle": {
-    "message": "Quick Safe Packs"
+    "message": "Quick safe packs"
   },
   "safePacksDesc": {
     "message": "Pre-reviewed sites that are safe for children."
@@ -536,7 +536,7 @@
     "message": "Kids sites"
   },
   "reportTitle": {
-    "message": "Usage Report"
+    "message": "Usage report"
   },
   "reportDesc": {
     "message": "Time spent, visits and blocked attempts per site. Kept for the last 14 days."
@@ -686,7 +686,7 @@
     "message": "Limit removed for $1"
   },
   "limitsTableTitle": {
-    "message": "Websites With Time Limits"
+    "message": "Websites with time limits"
   },
   "limitColTotal": {
     "message": "Total Time"
@@ -840,5 +840,98 @@
   },
   "embedBlockedHint": {
     "message": "A parent blocked it."
+  },
+  "whitelistHint": {
+    "message": "Only these sites open. Anything else a child tries to reach is blocked.",
+    "description": "One-line explainer under the whitelist heading."
+  },
+  "scheduleHint": {
+    "message": "Browsing is only allowed during these days and hours.",
+    "description": "Explainer under the schedule heading."
+  },
+  "dailyLimitHint": {
+    "message": "A time budget per site, per day. A countdown shows on the page and closes it when time runs out.",
+    "description": "Explainer under the daily limit heading."
+  },
+  "limitsTableHint": {
+    "message": "Sites currently on a daily time budget.",
+    "description": "Explainer under the time-limits table heading."
+  },
+  "emergencyLockHint": {
+    "message": "Blocks everything until you switch it off again. Reversible.",
+    "description": "Explainer under the emergency lock heading."
+  },
+  "activityHint": {
+    "message": "What was tried, from where, and at what time.",
+    "description": "Explainer under the failed attempts heading."
+  },
+  "statusProtectionOn": {
+    "message": "Protection on",
+    "description": "Status chip: rules are active right now."
+  },
+  "statusLocked": {
+    "message": "Emergency lock",
+    "description": "Status chip: the emergency lock is engaged."
+  },
+  "statusOutsideSchedule": {
+    "message": "Outside browsing hours",
+    "description": "Status chip: the schedule is on but the window is closed."
+  },
+  "statusAllowedCount": {
+    "message": "$1 allowed",
+    "description": "Status chip with the whitelist count. $1 = number of sites.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusBlockedCount": {
+    "message": "$1 blocked",
+    "description": "Status chip with the blocklist count. $1 = number of keywords.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusScheduleOn": {
+    "message": "Schedule on",
+    "description": "Status chip: a browsing schedule is enabled."
+  },
+  "statusLimitsCount": {
+    "message": "$1 with time limits",
+    "description": "Status chip with the number of sites on a daily budget. $1 = count.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusTimeLeft": {
+    "message": "$1 left today",
+    "description": "Status chip with the remaining screen time. $1 = duration.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "modeExact": {
+    "message": "This page only",
+    "description": "Chip on a whitelist row when only the exact URL is allowed."
+  },
+  "undoButton": {
+    "message": "Undo",
+    "description": "Button inside a toast that reverses the last action."
+  },
+  "removedFromWhitelist": {
+    "message": "Removed: $1",
+    "description": "Toast after deleting whitelist rows. $1 = the removed URLs.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
   }
 }

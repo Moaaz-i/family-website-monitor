@@ -137,20 +137,17 @@ h2 {
 }
 
 h3 {
-  font-size: 1.35rem;
-  margin-top: 2rem;
-  margin-bottom: 1.5rem;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.75rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  margin: 1.6rem 0 0.3rem;
   text-align: var(--direction-start, left);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.9;
+  letter-spacing: -0.01em;
+  opacity: 0.95;
 }
 
 p {
   margin-top: 0;
-  margin-bottom: 2rem;
+  margin-bottom: 1.1rem;
   color: var(--text);
   opacity: 0.75;
   font-size: 1rem;
@@ -408,8 +405,11 @@ td {
 }
 
 td:first-child {
-  white-space: normal;
+  white-space: nowrap;
   min-width: 120px;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Custom Toast Notification System */
@@ -509,13 +509,19 @@ html[dir="rtl"] .dashboard-container {
 .sidebar-header {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding-bottom: 1.8rem;
+  gap: 10px;
+  padding-bottom: 1.1rem;
   border-bottom: 1px solid var(--border);
 }
 
 .sidebar-logo {
-  font-size: 2.2rem;
+  font-size: 1.6rem;
+}
+
+/* The wordmark wraps on purpose, not by accident: balanced two lines. */
+.sidebar-header h2 {
+  text-wrap: balance;
+  font-weight: 700;
 }
 
 .sidebar-nav {
@@ -550,6 +556,16 @@ html[dir="rtl"] .dashboard-container {
   box-shadow: 0 4px 14px var(--primary-glow);
 }
 
+.sidebar .tab-link svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  opacity: 0.85;
+}
+.sidebar .tab-link.active svg {
+  opacity: 1;
+}
+
 .main-content {
   flex: 1;
   background: var(--bg);
@@ -558,17 +574,16 @@ html[dir="rtl"] .dashboard-container {
   border-radius: var(--radius);
   border: 1px solid var(--border);
   box-shadow: 0 10px 30px var(--shadow-color);
-  padding: 3rem 3.5rem;
+  padding: 2.2rem 2.6rem;
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.25rem;
   min-width: 0;
 }
 
 .content-header {
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding-bottom: 0;
+  margin-bottom: -0.5rem;
 }
 
 .tab-content {
@@ -649,29 +664,13 @@ body.has-dashboard {
 #whitelistContainer {
   list-style: none;
   padding: 0;
-  margin: 1.5rem 0 0 0;
+  margin: 1rem 0 0 0;
   display: grid;
   grid-template-columns: repeat(auto-fill);
-  gap: 14px;
+  gap: 10px;
 }
 
-#whitelistContainer li {
-  background: rgba(99, 102, 241, 0.03);
-  border: 1px solid var(--border);
-  padding: 14px 20px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  transition: all 0.25s ease;
-}
-
-#whitelistContainer li:hover {
-  background: rgba(99, 102, 241, 0.06);
-  border-color: #3b82f6;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.04);
-}
+/* Row visuals live in .list-row (below) so both lists look the same. */
 
 /* ─── Touch-friendly Day Checkbox Pills ─── */
 .day-selector {
@@ -1159,4 +1158,212 @@ select:focus-visible,
   margin-inline-start: auto;
   color: var(--text-muted);
   font-weight: 500;
+}
+
+/* ─── Parent-friendly list rows ───────────────────────────────────────────── */
+/* The domain is the headline; the path is a footnote; the mode is a chip the
+   parent can flip; removal is quiet until it is hovered (red is reserved for
+   things that really hurt). */
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: rgba(99, 102, 241, 0.03);
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease;
+}
+.list-row:hover {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.28);
+}
+
+.list-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+.list-main .list-label {
+  flex: none;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.list-sub {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: start;
+  font-size: 12px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mode-badge {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(128, 128, 128, 0.05);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+.mode-badge:hover {
+  border-color: rgba(99, 102, 241, 0.4);
+  color: var(--text);
+}
+.mode-badge[data-mode="domain"] {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #15803d;
+}
+html.dark .mode-badge[data-mode="domain"] {
+  color: #4ade80;
+}
+
+.btn-remove {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-remove:hover {
+  background: var(--danger);
+  border-color: var(--danger);
+  color: #fff;
+}
+.btn-remove:focus-visible {
+  border-color: var(--danger);
+}
+
+/* ─── Status strip ───────────────────────────────────────────────────────── */
+/* The first thing a parent reads: is protection on, what is allowed or
+   blocked, and how much time is left today. */
+.status-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -0.2rem 0 0.2rem;
+}
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(128, 128, 128, 0.05);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.status-chip svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+}
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex: none;
+}
+.status-chip-ok {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #15803d;
+}
+.status-chip-ok .status-dot {
+  background: #22c55e;
+}
+.status-chip-warn {
+  background: rgba(245, 158, 11, 0.14);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: #b45309;
+}
+.status-chip-warn .status-dot {
+  background: #f59e0b;
+}
+.status-chip-danger {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #b91c1c;
+}
+.status-chip-danger .status-dot {
+  background: #ef4444;
+}
+html.dark .status-chip-ok {
+  color: #4ade80;
+}
+html.dark .status-chip-warn {
+  color: #fbbf24;
+}
+html.dark .status-chip-danger {
+  color: #f87171;
+}
+
+/* ─── Screen-time budget bar ─────────────────────────────────────────────── */
+.screen-time-bar {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.12);
+  overflow: hidden;
+  margin: 0.2rem 0 1.4rem;
+}
+.screen-time-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #22c55e, #16a34a);
+  transition: width 0.35s ease;
+}
+.screen-time-fill.warn {
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+.screen-time-fill.danger {
+  background: linear-gradient(90deg, #ef4444, #dc2626);
+}
+
+/* ─── Toast action (Undo) ─────────────────────────────────────────────────── */
+/* Deletion asks instead of telling: the toast carries its own reversal. */
+.toast-action {
+  flex: none;
+  margin-inline-start: auto;
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(99, 102, 241, 0.45);
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+  font-family: var(--font-family);
+  font-size: 14px !important;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.toast-action:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+.toast-action:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

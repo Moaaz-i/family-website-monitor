@@ -840,5 +840,98 @@
   },
   "embedBlockedHint": {
     "message": "قام الوالد بحظره."
+  },
+  "whitelistHint": {
+    "message": "لا تُفتح إلا هذه المواقع؛ كل ما يحاول الطفل الوصول إليه يُحجب.",
+    "description": "شرح سطري تحت عنوان قائمة السماح."
+  },
+  "scheduleHint": {
+    "message": "يُسمح بالتصفح في هذه الأيام والأوقات فقط.",
+    "description": "شرح تحت عنوان الجدول."
+  },
+  "dailyLimitHint": {
+    "message": "ميزانية وقت يومية لكل موقع؛ يظهر عدّاد تنازلي على الصفحة ويُغلقها عند انتهاء الوقت.",
+    "description": "شرح تحت عنوان الحد اليومي."
+  },
+  "limitsTableHint": {
+    "message": "المواقع التي تُطبق عليها ميزانية وقت يومية حالياً.",
+    "description": "شرح تحت عنوان جدول الحدود الزمنية."
+  },
+  "emergencyLockHint": {
+    "message": "يحجب كل شيء حتى تطفئه من جديد، ويمكن التراجع عنه.",
+    "description": "شرح تحت عنوان قفل الطوارئ."
+  },
+  "activityHint": {
+    "message": "ما الذي حاول الوصول، ومن أي مكان، ومتى.",
+    "description": "شرح تحت عنوان المحاولات الفاشلة."
+  },
+  "statusProtectionOn": {
+    "message": "الحماية مفعّلة",
+    "description": "شارة حالة: القواعد تعمل الآن."
+  },
+  "statusLocked": {
+    "message": "قفل الطوارئ",
+    "description": "شارة حالة: قفل الطوارئ مُفعّل."
+  },
+  "statusOutsideSchedule": {
+    "message": "خارج أوقات التصفح",
+    "description": "شارة حالة: الجدول مفعّل لكن النافذة مغلقة."
+  },
+  "statusAllowedCount": {
+    "message": "$1 مسموحة",
+    "description": "شارة بعدد مواقع القائمة البيضاء. $1 = العدد.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusBlockedCount": {
+    "message": "$1 محجوبة",
+    "description": "شارة بعدد كلمات القائمة السوداء. $1 = العدد.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusScheduleOn": {
+    "message": "الجدول مفعّل",
+    "description": "شارة حالة: يوجد جدول تصفح مفعّل."
+  },
+  "statusLimitsCount": {
+    "message": "$1 بحدود زمنية",
+    "description": "شارة بعدد المواقع ذات الميزانية اليومية. $1 = العدد.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusTimeLeft": {
+    "message": "بقي $1 اليوم",
+    "description": "شارة بالوقت المتبقي لوقت الشاشة. $1 = المدة.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
+  },
+  "modeExact": {
+    "message": "هذه الصفحة فقط",
+    "description": "شارة في صف القائمة البيضاء عندما يُسمح بالرابط المحدد فقط."
+  },
+  "undoButton": {
+    "message": "تراجع",
+    "description": "زر داخل التنبيه يُلغي آخر إجراء."
+  },
+  "removedFromWhitelist": {
+    "message": "أُزيل: $1",
+    "description": "تنبيه بعد حذف صفوف من القائمة البيضاء. $1 = الروابط المزالة.",
+    "placeholders": {
+      "1": {
+        "content": "$1"
+      }
+    }
   }
 }

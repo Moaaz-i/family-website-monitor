@@ -1,6 +1,10 @@
 import { t } from "./translator.js";
 
-export function showToast(message, type = "success") {
+// `action` ({ label, onClick }) turns the toast into a question with an
+// answer — the pattern deletion depends on: remove now, undo for a few
+// seconds. A plain message gets 3s; one with a button gets 8s, because
+// three seconds is enough to read but not to find and press a button.
+export function showToast(message, type = "success", action = null) {
   let container = document.getElementById("toastContainer");
   if (!container) {
     container = document.createElement("div");
@@ -12,18 +16,34 @@ export function showToast(message, type = "success") {
   toast.className = `toast ${type}`;
   toast.textContent = message;
 
+  const dismiss = () => {
+    toast.classList.remove("show");
+    setTimeout(() => {
+      toast.remove();
+    }, 300);
+  };
+
+  const hasAction = Boolean(action && action.label && typeof action.onClick === "function");
+  const hideTimer = setTimeout(dismiss, hasAction ? 8000 : 3000);
+
+  if (hasAction) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "toast-action";
+    btn.textContent = action.label;
+    btn.addEventListener("click", () => {
+      clearTimeout(hideTimer);
+      dismiss();
+      action.onClick();
+    });
+    toast.appendChild(btn);
+  }
+
   container.appendChild(toast);
 
   setTimeout(() => {
     toast.classList.add("show");
   }, 10);
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-    setTimeout(() => {
-      toast.remove();
-    }, 300);
-  }, 3000);
 }
 
 export function startLockoutTimer(inputEl, buttonEl, expiryTime, placeholderKey = "enterParentPassword") {
