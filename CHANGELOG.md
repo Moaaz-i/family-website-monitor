@@ -35,6 +35,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **First-run wizard** — right after the password is created, one screen
   offers the block packs and the screen-time budget, so a fresh install
   leaves the panel already enforcing something.
+- **Embed guard** — an allowed site may still *embed* a blocked one, but the
+  extension empties that frame in place: the page keeps loading, the embed
+  becomes a small "blocked" marker (no redirect, no broken tab). A content
+  script runs in every frame at `document_start`, asks the worker once, and
+  only acts on a blocked answer. Togglable in Settings (synced, default on);
+  with it off, a page's iframes are left exactly as the page wrote them —
+  the current path only.
 - **Current-path enforcement** — only the URL in the address bar is judged.
   A page's own imports (scripts, images, the iframes it loads by itself,
   such as an ad or login widget) are never treated as destinations, so an

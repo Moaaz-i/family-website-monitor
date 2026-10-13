@@ -44,6 +44,9 @@ const MIME = {
 };
 
 const INJECT = [
+  // The messages must be ready before anything asks for them, so they are
+  // served as a classic script that runs before the stub.
+  '<script src="/i18n-messages.js"></script>',
   '<script src="/chrome-stub.js"></script>',
   '<script type="module">import "/background.js";</script>',
 ].join("");
@@ -65,6 +68,15 @@ const server = createServer(async (req, res) => {
       const body = await readFile(join(here, "chrome-stub.js"));
       res.writeHead(200, { "content-type": MIME[".js"] });
       res.end(body);
+      return;
+    }
+
+    // The stub needs the message catalogue synchronously (chrome.i18n).
+    // Read on every request so a rebuild is picked up without a restart.
+    if (pathname === "/i18n-messages.js") {
+      const json = JSON.parse(await readFile(join(distDir, "_locales/en/messages.json"), "utf-8"));
+      res.writeHead(200, { "content-type": MIME[".js"] });
+      res.end(`window.__FWM_I18N_MESSAGES__ = ${JSON.stringify(json)};`);
       return;
     }
 

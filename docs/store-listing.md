@@ -50,6 +50,7 @@ WHAT IT DOES
 • Daily limits — minutes per site per day, with a live countdown pill on the page and a hard stop when the time runs out.
 • Screen-time budget — one allowance per day across every site. Whitelisted sites always stay open.
 • Ask for more time — the blocked page has a button; you get a desktop notification with "Allow 15 min" or "Not now".
+• Embeds — if an allowed site embeds a blocked one (a video, a login box), that frame is emptied in place; the page keeps working.
 • Usage report — time, visits and blocked attempts per site for the last 14 days, with a bar chart and CSV export.
 • Emergency lock — one click closes everything until you unlock it again.
 • Optional PIN — unlock the panel with a short PIN instead of typing your password in front of your children.
@@ -76,6 +77,7 @@ Free, open source, and deliberately small: no remote code, no background service
 • الحد اليومي — دقائق لكل موقع يومياً مع عدّاد تنازلي على الصفحة وإيقاف فوري عند انتهاء الوقت.
 • ميزانية وقت الشاشة — مبلغ واحد ليوم كامل لكل المواقع، والمواقع المسموح بها تبقى مفتوحة دائماً.
 • طلب وقت إضافي — في صفحة الحظر زر للطفل، وتصلك إشعار على سطح المكتب بزرّي «اسمح بـ 15 دقيقة» و«ليس الآن».
+• العناصر المضمَّنة — إذا ضمَّن موقع مسموح موقعاً محجوباً (فيديو، تسجيل دخول) فُفرَّغ ذلك الإطار في مكانه وتبقى الصفحة تعمل.
 • تقرير الاستخدام — الوقت والزيارات والمحاولات المحجوبة لكل موقع خلال 14 يوماً، مع رسم بياني وتصدير CSV.
 • قفل الطوارئ — ضغطة واحدة تغلق كل شيء حتى تفتحها أنت.
 • رمز PIN اختياري — افتح اللوحة برمز قصير بدلاً من كتابة كلمة المرور أمام طفلك.
@@ -106,7 +108,7 @@ Parental control: allow, block, schedule and limit the websites a child can open
 | `alarms` | Periodic maintenance: expiring temporary allowances, rolling the daily counters at midnight, and checking for a new version. |
 | `privacy` | An optional switch that reduces WebRTC IP leakage. It stays off until the parent enables it in Settings. |
 | `notifications` | Warns the parent when a site is about to run out of time and when a child asks for more time. |
-| `<all_urls>` host access | The content scripts show the countdown pill on limited sites and enforce the schedule and blocklist on the page itself. |
+| `<all_urls>` host access | The content scripts show the countdown pill on limited sites and, in every frame, empty an embed that points at a blocked site (the page itself is never redirected). |
 | New tab override (`chrome_url_overrides.newtab`) | Replaces the new tab with a family dashboard (clock, time left, allowed sites). No data leaves the device. |
 
 ## 8. Privacy policy URL

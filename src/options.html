@@ -692,6 +692,28 @@
             <div id="notificationsStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
           </div>
 
+          <!-- Embed guard -->
+          <div class="settings-section-card">
+            <h4 data-i18n="embedGuardHeader">Embeds inside allowed sites</h4>
+            <p
+              data-i18n="embedGuardDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              When an allowed site embeds a blocked one (a video, a login box,
+              an ad script), empty that frame in place. The page itself keeps
+              loading — only the embed becomes a "blocked" marker.
+            </p>
+            <label class="switch-row" for="embedGuardCheckbox">
+              <input
+                type="checkbox"
+                id="embedGuardCheckbox"
+                style="width: auto; margin: 0"
+              />
+              <span data-i18n="embedGuardToggle">Empty blocked embeds</span>
+            </label>
+            <div id="embedGuardStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
+          </div>
+
           <!-- Extensions Access Control -->
           <div class="settings-section-card">
             <h4 data-i18n="extensionsAccessHeader">Extension Settings Access</h4>

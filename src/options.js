@@ -377,6 +377,7 @@ onTranslationReady(() => {
     renderPresets();
     loadReport();
     loadNotifications();
+    loadEmbedGuard();
     renderWrongAttempts();
     renderLimitsTable();
     updateExtensionsTimer();
@@ -1459,6 +1460,34 @@ onTranslationReady(() => {
         chrome.storage.local.set({ notificationsEnabled: enabled }, () => {
           showToast(enabled ? t("notificationsOn") : t("notificationsOff"), "info");
           loadNotifications();
+        });
+      });
+    });
+
+  // ── Embed guard ──────────────────────────────────────────────────────────
+  // Off means "the current path only": a page's iframes are left exactly as
+  // the page wrote them, and nothing is emptied.
+  function loadEmbedGuard() {
+    const checkbox = document.getElementById("embedGuardCheckbox");
+    const status = document.getElementById("embedGuardStatus");
+    if (!checkbox || !status) return;
+
+    chrome.storage.local.get({ embedGuardEnabled: true }, (data) => {
+      const enabled = data.embedGuardEnabled !== false;
+      checkbox.checked = enabled;
+      status.textContent = enabled ? t("embedGuardOn") : t("embedGuardOff");
+      status.style.color = enabled ? "var(--success-solid)" : "var(--text-muted)";
+    });
+  }
+
+  document
+    .getElementById("embedGuardCheckbox")
+    .addEventListener("change", (e) => {
+      const enabled = e.target.checked;
+      verifyActiveSession(() => {
+        chrome.storage.local.set({ embedGuardEnabled: enabled }, () => {
+          showToast(enabled ? t("embedGuardOn") : t("embedGuardOff"), "info");
+          loadEmbedGuard();
         });
       });
     });

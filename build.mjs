@@ -10,6 +10,7 @@ const DIST = join(ROOT, "dist");
 
 const ENTRIES = [
   "background.js",
+  "content-embed.js",
   "content.js",
   "content-search.js",
   "content-whatsapp.js",

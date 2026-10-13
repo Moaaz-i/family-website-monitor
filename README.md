@@ -13,6 +13,7 @@ English · [العربية](#العربية)
 | Area | Behaviour |
 | --- | --- |
 | **Whitelist** | Only sites you allow open. Each entry can cover one exact URL or a whole domain (all sub-links). |
+| **Embeds** | A page may embed a blocked site, but that frame is emptied in place and shows a "blocked" marker — the page itself never breaks. Off switch in Settings ("current path only"). |
 | **Blocklist** | Domains and keywords a parent blocks. A block always outranks the whitelist. |
 | **Schedule** | Allowed days and a daily time window (overnight windows such as `22:00 → 06:00` are supported). |
 | **Daily limits** | Per-site minutes per day, with a live countdown pill on the page and a hard stop when time runs out. |

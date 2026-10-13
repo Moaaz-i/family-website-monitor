@@ -441,6 +441,10 @@
           const sender = {
             id: chrome.runtime.id,
             url: location.href,
+            // The preview has no frames of its own; messages look like they
+            // come from the main frame, which is what a top-frame content
+            // script sends in the real extension.
+            frameId: 0,
             tab: currentTab(),
           };
           messageListeners.forEach((fn) => {
@@ -465,6 +469,25 @@
         addListener(fn) {
           changedListeners.push(fn);
         },
+      },
+    },
+
+    // Served by the preview server from _locales/en/messages.json (the real
+    // extension reads it through chrome.i18n instead).
+    i18n: {
+      getMessage(key, substitutions) {
+        const entry = (globalThis.__FWM_I18N_MESSAGES__ || {})[key];
+        if (!entry || typeof entry.message !== "string") return "";
+        let text = entry.message;
+        const list =
+          Array.isArray(substitutions) ? substitutions : substitutions == null ? [] : [substitutions];
+        list.forEach((value, index) => {
+          text = text.split(`$${index + 1}`).join(String(value));
+        });
+        return text;
+      },
+      getUILanguage() {
+        return navigator.language || "en";
       },
     },
 

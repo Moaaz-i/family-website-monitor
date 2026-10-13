@@ -819,5 +819,26 @@
   },
   "newtabSearchNoMatch": {
     "message": "No allowed site matches your search."
+  },
+  "embedGuardHeader": {
+    "message": "Embeds inside allowed sites"
+  },
+  "embedGuardDesc": {
+    "message": "When an allowed site embeds a blocked one (a video, a login box, an ad script), empty that frame in place. The page itself keeps loading — only the embed becomes a \"blocked\" marker."
+  },
+  "embedGuardToggle": {
+    "message": "Empty blocked embeds"
+  },
+  "embedGuardOn": {
+    "message": "Blocked embeds are emptied in place."
+  },
+  "embedGuardOff": {
+    "message": "Embeds are not touched — only the page you open is judged."
+  },
+  "embedBlockedTitle": {
+    "message": "This embed is blocked"
+  },
+  "embedBlockedHint": {
+    "message": "A parent blocked it."
   }
 }

@@ -79,6 +79,7 @@ const POLICY_KEYS = [
   "language",
   "screenTime",
   "notificationsEnabled",
+  "embedGuardEnabled",
 ];
 
 let policyCache = null;
@@ -127,6 +128,7 @@ const SYNCED_KEYS = [
   "schedule",
   "dailyLimit",
   "notificationsEnabled",
+  "embedGuardEnabled",
   "screenTime",
 ];
 const SYNC_PUSH_DEBOUNCE_MS = 3000;
@@ -1114,6 +1116,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const url = resolveRedirectUrl(message.url);
       if (!data.password) {
         sendResponse({ status: "blocked", reason: "setup" });
+        return;
+      }
+      // An embed (an iframe the page loaded by itself) is only judged when
+      // the parent asked for embed guarding; otherwise the frame is left
+      // exactly as the page wrote it.
+      if (message.embed && data.embedGuardEnabled === false) {
+        sendResponse({ status: "allowed" });
         return;
       }
       sendResponse(determineUrlStatus(url, data));
