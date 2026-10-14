@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { matchesBlocklist, determineUrlStatus } from "../src/lib/rules.js";
+import { matchesBlocklist, determineUrlStatus, shouldShowSearchResult } from "../src/lib/rules.js";
 import { mergeIntoKeywords, BLOCK_PRESETS, SAFE_PRESETS } from "../src/lib/presets.js";
 
 // ─── matchesBlocklist ────────────────────────────────────────────────────────
@@ -156,4 +156,45 @@ test("mergeIntoKeywords adds only new entries", () => {
   const third = mergeIntoKeywords(second.list, ["a.com"]);
   assert.equal(third.changed, false);
   assert.equal(third.list, second.list);
+});
+
+// ─── shouldShowSearchResult ─────────────────────────────────────────────────
+// The search filter is presentation only, but it must fail the same way the
+// enforcement does: a block wins, and "only allowed" hides when unsure.
+
+const SEARCH_POLICY = {
+  whitelist: [{ fullUrl: "https://khanacademy.org/", mode: "domain" }],
+  blockedKeywords: [],
+  whitelistOnly: true,
+};
+
+test("shouldShowSearchResult: without whitelist-only every result shows", () => {
+  assert.equal(shouldShowSearchResult("https://anything.example/page", { whitelistOnly: false }), true);
+  assert.equal(shouldShowSearchResult("https://anything.example/page", {}), true);
+});
+
+test("shouldShowSearchResult: unfiltered results still lose blocked links", () => {
+  const policy = { whitelistOnly: false, blockedKeywords: ["youtube"] };
+  assert.equal(shouldShowSearchResult("https://youtube.com/watch?v=1", policy), false);
+  assert.equal(shouldShowSearchResult("https://example.com/", policy), true);
+});
+
+test("shouldShowSearchResult: whitelist-only hides what is not allowed", () => {
+  assert.equal(shouldShowSearchResult("https://www.khanacademy.org/math", SEARCH_POLICY), true);
+  assert.equal(shouldShowSearchResult("https://random.example/", SEARCH_POLICY), false);
+});
+
+test("shouldShowSearchResult: a block beats the whitelist", () => {
+  const policy = { ...SEARCH_POLICY, blockedKeywords: ["khan"] };
+  assert.equal(shouldShowSearchResult("https://www.khanacademy.org/math", policy), false);
+});
+
+test("shouldShowSearchResult: an empty whitelist hides everything", () => {
+  assert.equal(shouldShowSearchResult("https://anything.example/", { whitelistOnly: true, whitelist: [] }), false);
+});
+
+test("shouldShowSearchResult: malformed input hides without throwing", () => {
+  assert.equal(shouldShowSearchResult("", SEARCH_POLICY), false);
+  assert.equal(shouldShowSearchResult(null, SEARCH_POLICY), false);
+  assert.equal(shouldShowSearchResult("https://x.example/", { whitelistOnly: true, whitelist: null }), false);
 });

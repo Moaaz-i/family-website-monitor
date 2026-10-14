@@ -776,6 +776,36 @@
             <div id="embedGuardStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
           </div>
 
+          <!-- Whitelist-only search results -->
+          <div class="settings-section-card">
+            <h4 data-i18n="searchFilterHeader">Search results</h4>
+            <p
+              data-i18n="searchFilterDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              When on, a search page shows only the sites on your allowed
+              list. The query goes straight to the search engine and this
+              extension stores nothing.
+            </p>
+            <label class="switch-row" for="searchFilterCheckbox">
+              <input
+                type="checkbox"
+                id="searchFilterCheckbox"
+                style="width: auto; margin: 0"
+              />
+              <span data-i18n="searchFilterToggle">Only allowed sites in results</span>
+            </label>
+            <div id="searchFilterStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
+            <p
+              data-i18n="searchFilterNote"
+              class="tab-hint"
+              style="margin-top: 10px; margin-bottom: 0"
+            >
+              Add the search engine itself (for example google.com) to Allowed
+              Websites, or the results page cannot open.
+            </p>
+          </div>
+
           <!-- Extensions Access Control -->
           <div class="settings-section-card">
             <h4 data-i18n="extensionsAccessHeader">Extension Settings Access</h4>

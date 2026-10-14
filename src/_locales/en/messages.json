@@ -933,5 +933,29 @@
         "content": "$1"
       }
     }
+  },
+  "searchFilterHeader": {
+    "message": "Search results",
+    "description": "Header of the whitelist-only search filter card in Settings."
+  },
+  "searchFilterDesc": {
+    "message": "When on, a search page shows only the sites on your allowed list. The query goes straight to the search engine and this extension stores nothing.",
+    "description": "Explainer for the search filter: live search, zero storage."
+  },
+  "searchFilterToggle": {
+    "message": "Only allowed sites in results",
+    "description": "Label of the search filter switch."
+  },
+  "searchFilterOn": {
+    "message": "Showing only allowed sites.",
+    "description": "Status while the search filter is on."
+  },
+  "searchFilterOff": {
+    "message": "Results are not filtered.",
+    "description": "Status while the search filter is off."
+  },
+  "searchFilterNote": {
+    "message": "Add the search engine itself (for example google.com) to Allowed Websites, or the results page cannot open.",
+    "description": "Setup note under the search filter switch."
   }
 }

@@ -385,6 +385,7 @@ onTranslationReady(() => {
     loadReport();
     loadNotifications();
     loadEmbedGuard();
+    loadSearchFilter();
     renderWrongAttempts();
     renderLimitsTable();
     updateExtensionsTimer();
@@ -1653,6 +1654,34 @@ onTranslationReady(() => {
         chrome.storage.local.set({ embedGuardEnabled: enabled }, () => {
           showToast(enabled ? t("embedGuardOn") : t("embedGuardOff"), "info");
           loadEmbedGuard();
+        });
+      });
+    });
+
+  // ── Whitelist-only search results ────────────────────────────────────────
+  // Off (the default) means today's behaviour: the engine's results appear
+  // as the engine rendered them, with only blocked matches hidden.
+  function loadSearchFilter() {
+    const checkbox = document.getElementById("searchFilterCheckbox");
+    const status = document.getElementById("searchFilterStatus");
+    if (!checkbox || !status) return;
+
+    chrome.storage.local.get({ whitelistResultsOnly: false }, (data) => {
+      const enabled = data.whitelistResultsOnly === true;
+      checkbox.checked = enabled;
+      status.textContent = enabled ? t("searchFilterOn") : t("searchFilterOff");
+      status.style.color = enabled ? "var(--success-solid)" : "var(--text-muted)";
+    });
+  }
+
+  document
+    .getElementById("searchFilterCheckbox")
+    .addEventListener("change", (e) => {
+      const enabled = e.target.checked;
+      verifyActiveSession(() => {
+        chrome.storage.local.set({ whitelistResultsOnly: enabled }, () => {
+          showToast(enabled ? t("searchFilterOn") : t("searchFilterOff"), "info");
+          loadSearchFilter();
         });
       });
     });

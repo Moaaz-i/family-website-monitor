@@ -19,6 +19,11 @@ tracking, no advertising, no account and no server of ours involved.
   schedule, limits, screen-time budget) is mirrored through
   `chrome.storage.sync`, i.e. to Google under the user's own account. The
   password, the PIN, sessions and every usage counter are never synced.
+- Search queries are never stored. The new-tab search opens the search
+  engine's own results page directly, and the optional parent-enabled
+  filter ("only allowed sites") only hides non-allowed results on that
+  page — the query travels from the browser to the search engine and
+  nowhere else.
 - Uninstalling the extension clears its local settings and purges the
   synced mirror.
 - The usage report keeps at most 14 days and can be cleared from the panel.

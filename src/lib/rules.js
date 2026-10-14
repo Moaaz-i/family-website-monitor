@@ -252,3 +252,18 @@ export function isUrlAllowed(urlString, data) {
   const resolved = resolveRedirectUrl(urlString);
   return data.whitelist.some((e) => isEntryAllowed(resolved, e));
 }
+
+// A search result obeys the same ladder as navigation: a block always wins,
+// and when the parent chose "only allowed sites" nothing outside the
+// whitelist is ever shown. A failing check hides — it never reveals.
+export function shouldShowSearchResult(urlString, data) {
+  if (!urlString) return false;
+  const policy = data || {};
+  const keywords = Array.isArray(policy.blockedKeywords) ? policy.blockedKeywords : [];
+  if (matchesBlocklist(urlString, keywords)) return false;
+  if (policy.whitelistOnly) {
+    if (!Array.isArray(policy.whitelist) || policy.whitelist.length === 0) return false;
+    return isUrlAllowed(urlString, policy);
+  }
+  return true;
+}

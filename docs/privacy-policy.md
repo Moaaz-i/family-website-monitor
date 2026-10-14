@@ -34,6 +34,10 @@ are explicitly excluded from sync and never leave the device.
 - It does not collect, transmit or sell personal information of any kind.
 - It has no telemetry, crash reporting, analytics SDKs or advertising.
 - It downloads no remote code. Everything it runs is inside the package.
+- It does not store search queries. The new-tab search opens the search
+  engine's own results page directly, and the optional parent-enabled
+  filter ("only allowed sites") hides non-allowed results on that page;
+  the query never reaches the extension's storage.
 - It does not keep a browsing history anywhere except the local usage report
   on this device, which the parent can clear from the panel and which is
   pruned to the last 14 days automatically.

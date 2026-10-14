@@ -80,6 +80,7 @@ const POLICY_KEYS = [
   "screenTime",
   "notificationsEnabled",
   "embedGuardEnabled",
+  "whitelistResultsOnly",
 ];
 
 let policyCache = null;
@@ -129,6 +130,7 @@ const SYNCED_KEYS = [
   "dailyLimit",
   "notificationsEnabled",
   "embedGuardEnabled",
+  "whitelistResultsOnly",
   "screenTime",
 ];
 const SYNC_PUSH_DEBOUNCE_MS = 3000;
