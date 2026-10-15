@@ -15,6 +15,17 @@ export const BLOCKLIST_MIN_KEYWORD = 3;
  * The blocklist deliberately outranks the whitelist: if a parent blocks
  * something, no "always allow" entry may resurrect it.
  */
+function blockToken(raw) {
+  return String(raw || "")
+    .trim()
+    .toLowerCase()
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .replace(/\/.*$/, "")
+    .replace(/[^a-z0-9\u0600-\u06ff.\- ]/g, "")
+    .trim();
+}
+
 export function matchesBlocklist(urlString, list) {
   if (!Array.isArray(list) || list.length === 0) return false;
   if (!urlString) return false;
@@ -24,14 +35,7 @@ export function matchesBlocklist(urlString, list) {
   const host = (getHostname(resolved) || "").toLowerCase().replace(/^www\./, "");
 
   for (const raw of list) {
-    const token = String(raw || "")
-      .trim()
-      .toLowerCase()
-      .replace(/^https?:\/\//, "")
-      .replace(/^www\./, "")
-      .replace(/\/.*$/, "")
-      .replace(/[^a-z0-9\u0600-\u06ff.\- ]/g, "")
-      .trim();
+    const token = blockToken(raw);
     if (!token) continue;
 
     // Domain-shaped entries ("youtube.com") match the host only, by exact
@@ -45,6 +49,25 @@ export function matchesBlocklist(urlString, list) {
 
     // Bare keywords ("minecraft") also match anywhere in the URL, so a path
     // or a query parameter cannot smuggle the blocked topic past us.
+    if (token.length >= BLOCKLIST_MIN_KEYWORD && lower.includes(token)) return true;
+  }
+  return false;
+}
+
+/**
+ * The keyword half of the blocklist, applied to free text such as a video
+ * title: a domain-shaped token ("example.com") names a host, never a topic,
+ * so it must not swallow ordinary sentences. The same length floor as URLs
+ * applies, so a two-letter token can never blank out a page.
+ */
+export function matchesKeywordInText(text, list) {
+  if (!Array.isArray(list) || list.length === 0) return false;
+  const lower = String(text || "").toLowerCase();
+  if (!lower) return false;
+
+  for (const raw of list) {
+    const token = blockToken(raw);
+    if (!token || token.includes(".")) continue;
     if (token.length >= BLOCKLIST_MIN_KEYWORD && lower.includes(token)) return true;
   }
   return false;
@@ -182,6 +205,13 @@ export function determineUrlStatus(resolvedUrl, data) {
 
   if (data.emergencyLock) {
     return { status: "blocked", reason: "emergency" };
+  }
+
+  // A timed pause is the emergency lock's gentler sibling: the parent picks
+  // the moment ("until 7 a.m.") and nobody has to remember to turn it back
+  // on. Until then it outranks everything, the whitelist included.
+  if (Number(data.pausedUntil) > Date.now()) {
+    return { status: "blocked", reason: "pause" };
   }
 
   // Blocklist outranks everything a child (or a stale setting) could allow:

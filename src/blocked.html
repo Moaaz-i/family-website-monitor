@@ -38,6 +38,10 @@
         Parental permission is required for access.
       </p>
 
+      <!-- The parent's own line, when they wrote one: rendered as plain
+           text with textContent, never as markup. -->
+      <p id="parentNote" class="parent-note" hidden></p>
+
       <!-- Child-facing escape hatch: it can only *ask*. The worker raises a
            notification and the parent's own tap grants the time. -->
       <button

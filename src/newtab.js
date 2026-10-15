@@ -258,10 +258,15 @@ onTranslationReady(() => {
       // Read the parent's choice now, not at page load: a tab opened before
       // the switch was flipped must still obey it. The filter hides what is
       // not allowed; strict SafeSearch trims what is left.
-      chrome.storage.local.get({ whitelistResultsOnly: false }, (data) => {
-        const safe = data.whitelistResultsOnly === true ? "&safe=active" : "";
-        navigate(`https://www.google.com/search?q=${encodeURIComponent(query)}${safe}`);
-      });
+      chrome.storage.local.get(
+        { whitelistResultsOnly: false, safeSearchEnforced: false },
+        (data) => {
+          const strict =
+            data.whitelistResultsOnly === true || data.safeSearchEnforced === true;
+          const safe = strict ? "&safe=active" : "";
+          navigate(`https://www.google.com/search?q=${encodeURIComponent(query)}${safe}`);
+        },
+      );
     });
 
     document.addEventListener("click", (event) => {

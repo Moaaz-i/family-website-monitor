@@ -395,6 +395,24 @@ onTranslationReady(() => {
     });
   });
 
+  // The emergency switch acts the moment it is flipped: in an emergency the
+  // parent should not have to hunt for a Save button too. The Save button
+  // below writes the site limit only — this checkbox is its single writer.
+  document.getElementById("popupEmergencyLock").addEventListener("change", (e) => {
+    const on = e.target.checked;
+    chrome.storage.local.get(["sessionExpiry"], (data) => {
+      if (!data.sessionExpiry || data.sessionExpiry < Date.now()) {
+        e.target.checked = !on; // the switch tells the truth again
+        showToast(t("sessionExpiredError"), "error");
+        location.reload();
+        return;
+      }
+      chrome.storage.local.set({ emergencyLock: on }, () => {
+        showToast(t(on ? "emergencyLockEnabled" : "emergencyLockDisabled"), on ? "error" : "success");
+      });
+    });
+  });
+
   document
     .getElementById("savePopupSettingsBtn")
     .addEventListener("click", () => {
@@ -411,9 +429,6 @@ onTranslationReady(() => {
         const minutesVal = document.getElementById("popupLimitMinutes").value.trim();
         const parsed = parseInt(minutesVal, 10);
         const minutes = Number.isFinite(parsed) ? Math.min(Math.max(parsed, 0), 1440) : 0;
-        const emergencyLock =
-          document.getElementById("popupEmergencyLock").checked;
-
         // Write straight into the { enabled, sites } layout that the service
         // worker and the control panel read. Mixing in the legacy
         // { minutes, targetSites } keys silently discarded the limit.
@@ -434,7 +449,7 @@ onTranslationReady(() => {
         }
 
         chrome.storage.local.set(
-          { dailyLimit: dl, emergencyLock: emergencyLock },
+          { dailyLimit: dl },
           () => {
             showToast(t("settingsSaved"), "success");
             loadDashboardData();

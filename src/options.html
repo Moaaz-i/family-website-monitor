@@ -293,6 +293,9 @@
           <p class="tab-hint" data-i18n="blocklistDesc">
             Blocked sites cannot be opened, even if they are on the whitelist.
           </p>
+          <p class="tab-hint" data-i18n="ytFilterHint" style="opacity: 0.75">
+            A word here also hides every YouTube video whose title contains it.
+          </p>
           <div class="inline-form">
             <input
               type="text"
@@ -568,6 +571,21 @@
             class="btn btn-secondary"
             data-i18n="disableLockButton"
           ></button>
+
+          <hr />
+
+          <h3 data-i18n="pauseHeader">Timed pause</h3>
+          <p class="tab-hint" data-i18n="pauseHint">
+            Stop all browsing until a time you pick — it resumes by itself,
+            nobody has to remember to unlock it.
+          </p>
+          <div class="pause-buttons">
+            <button id="pause1hBtn" class="btn btn-secondary" data-i18n="pause1h"></button>
+            <button id="pause3hBtn" class="btn btn-secondary" data-i18n="pause3h"></button>
+            <button id="pauseMorningBtn" class="btn btn-secondary" data-i18n="pauseMorning"></button>
+            <button id="resumeNowBtn" class="btn btn-secondary" data-i18n="resumeNow" hidden></button>
+          </div>
+          <div id="pauseStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
         </div>
 
         <!-- Report -->
@@ -752,6 +770,26 @@
               <span data-i18n="notificationsToggle">Enable time warnings</span>
             </label>
             <div id="notificationsStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
+            <label
+              class="switch-row"
+              for="digestCheckbox"
+              style="margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px"
+            >
+              <input
+                type="checkbox"
+                id="digestCheckbox"
+                style="width: auto; margin: 0"
+              />
+              <span data-i18n="digestToggle">Evening summary at 8 p.m.</span>
+            </label>
+            <p
+              data-i18n="digestHint"
+              style="font-size: 12px; opacity: 0.75; font-weight: 500; margin-top: 8px"
+            >
+              One local notification a day: time used, top site, blocked
+              attempts. Nothing is sent anywhere.
+            </p>
+            <div id="digestStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
           </div>
 
           <!-- Embed guard -->
@@ -804,6 +842,50 @@
               Add the search engine itself (for example google.com) to Allowed
               Websites, or the results page cannot open.
             </p>
+          </div>
+
+          <!-- Strict SafeSearch -->
+          <div class="settings-section-card">
+            <h4 data-i18n="safeSearchHeader">Strict SafeSearch</h4>
+            <p
+              data-i18n="safeSearchDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              Whatever opens a results page — the new tab, the address bar, a
+              link — it is reloaded once with strict safe search on Google,
+              Bing and DuckDuckGo.
+            </p>
+            <label class="switch-row" for="safeSearchCheckbox">
+              <input
+                type="checkbox"
+                id="safeSearchCheckbox"
+                style="width: auto; margin: 0"
+              />
+              <span data-i18n="safeSearchToggle">Enforce strict SafeSearch</span>
+            </label>
+            <div id="safeSearchStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
+          </div>
+
+          <!-- A note on the blocked page -->
+          <div class="settings-section-card">
+            <h4 data-i18n="blockedMsgHeader">A note on the blocked page</h4>
+            <p
+              data-i18n="blockedMsgDesc"
+              style="font-size: 13px; margin-bottom: 15px; opacity: 0.8; font-weight: 500;"
+            >
+              A short line in your own words, read by the child whenever a
+              page is blocked. It stays on your devices.
+            </p>
+            <div class="inline-form">
+              <input
+                type="text"
+                id="blockedMsgInput"
+                maxlength="140"
+                data-i18n-placeholder="blockedMsgPlaceholder"
+              />
+              <button id="saveBlockedMsgBtn" class="btn btn-primary" data-i18n="blockedMsgSave"></button>
+            </div>
+            <div id="blockedMsgStatus" role="status" style="font-size: 13px; font-weight: 700; margin-top: 10px;"></div>
           </div>
 
           <!-- Extensions Access Control -->

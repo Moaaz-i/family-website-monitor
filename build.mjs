@@ -14,6 +14,7 @@ const ENTRIES = [
   "content.js",
   "content-search.js",
   "content-whatsapp.js",
+  "content-youtube.js",
   "options.js",
   "popup.js",
   "blocked.js",

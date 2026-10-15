@@ -59,7 +59,8 @@ collects nothing, no child's information is stored, processed or shared.
 | `alarms` | Periodic maintenance: expiring temporary allowances, rolling the daily counters over at midnight, checking for updates. |
 | `privacy` | An optional switch that reduces WebRTC IP leakage. It is off until the parent turns it on. |
 | `notifications` | Time warnings ("5 minutes left") and the "your child is asking for more time" alert. |
-| `<all_urls>` (host access) | The content scripts: the countdown pill on a limited site (top frame), and — in every frame — the embed guard that empties an iframe pointing at a blocked site. |
+| `contextMenus` | Adds "Allow this site" / "Block this site" to the right-click menu. The item only opens the panel with the field pre-filled; nothing is saved until the parent confirms while logged in. |
+| `<all_urls>` (host access) | The content scripts: the countdown pill on a limited site (top frame), the search-result and YouTube-title filters, and — in every frame — the embed guard that empties an iframe pointing at a blocked site. |
 | New tab override | Shows the family dashboard (clock, time left, allowed sites) instead of the browser's new tab. |
 
 ## Data retention and deletion

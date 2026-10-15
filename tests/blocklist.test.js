@@ -1,7 +1,12 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { matchesBlocklist, determineUrlStatus, shouldShowSearchResult } from "../src/lib/rules.js";
+import {
+  matchesBlocklist,
+  determineUrlStatus,
+  shouldShowSearchResult,
+  matchesKeywordInText,
+} from "../src/lib/rules.js";
 import { mergeIntoKeywords, BLOCK_PRESETS, SAFE_PRESETS } from "../src/lib/presets.js";
 
 // ─── matchesBlocklist ────────────────────────────────────────────────────────
@@ -197,4 +202,63 @@ test("shouldShowSearchResult: malformed input hides without throwing", () => {
   assert.equal(shouldShowSearchResult("", SEARCH_POLICY), false);
   assert.equal(shouldShowSearchResult(null, SEARCH_POLICY), false);
   assert.equal(shouldShowSearchResult("https://x.example/", { whitelistOnly: true, whitelist: null }), false);
+});
+
+// ─── matchesKeywordInText ───────────────────────────────────────────────────
+// Page copy (video titles, headlines) is matched by keywords only: a domain
+// entry names a host, not a topic, and a short token never blanks a page.
+
+test("matchesKeywordInText: bare keywords match anywhere in the text", () => {
+  assert.equal(matchesKeywordInText("Learn Minecraft redstone", ["minecraft"]), true);
+  assert.equal(matchesKeywordInText("LEARN MINECRAFT", ["Minecraft"]), true);
+  assert.equal(matchesKeywordInText("Learn chess basics", ["minecraft"]), false);
+});
+
+test("matchesKeywordInText: domain-shaped tokens never match text", () => {
+  assert.equal(matchesKeywordInText("Visit example.com today", ["example.com"]), false);
+  assert.equal(matchesKeywordInText("example.com video", ["example"]), true);
+});
+
+test("matchesKeywordInText: short tokens and empty input never match", () => {
+  assert.equal(matchesKeywordInText("two letters", ["ab"]), false);
+  assert.equal(matchesKeywordInText("", ["minecraft"]), false);
+  assert.equal(matchesKeywordInText("anything", []), false);
+  assert.equal(matchesKeywordInText("anything", null), false);
+  assert.equal(matchesKeywordInText(null, ["minecraft"]), false);
+});
+
+test("matchesKeywordInText: Arabic keywords match Arabic text", () => {
+  assert.equal(matchesKeywordInText("درس الرياضيات للصف الثالث", ["الرياضيات"]), true);
+  assert.equal(matchesKeywordInText("درس اللغة العربية", ["الرياضيات"]), false);
+});
+
+// ─── Timed pause in the ladder ──────────────────────────────────────────────
+const PAUSE_DATA = {
+  whitelist: [{ fullUrl: "https://khanacademy.org/", mode: "domain" }],
+  blockedKeywords: [],
+};
+
+test("determineUrlStatus: a live pause blocks even the whitelist", () => {
+  const data = { ...PAUSE_DATA, pausedUntil: Date.now() + 60000 };
+  assert.deepEqual(determineUrlStatus("https://www.khanacademy.org/math", data), {
+    status: "blocked",
+    reason: "pause",
+  });
+});
+
+test("determineUrlStatus: an expired pause changes nothing", () => {
+  const data = { ...PAUSE_DATA, pausedUntil: Date.now() - 60000 };
+  assert.deepEqual(determineUrlStatus("https://www.khanacademy.org/math", data), {
+    status: "allowed",
+  });
+});
+
+test("determineUrlStatus: without a pause the ladder is untouched", () => {
+  assert.deepEqual(determineUrlStatus("https://www.khanacademy.org/math", { ...PAUSE_DATA }), {
+    status: "allowed",
+  });
+  assert.deepEqual(determineUrlStatus("https://random.example/", { ...PAUSE_DATA }), {
+    status: "blocked",
+    reason: "default",
+  });
 });

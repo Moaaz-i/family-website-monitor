@@ -39,6 +39,16 @@ export const NOTIFY_MESSAGES = {
     moreTimeGive: (minutes) => `Allow ${minutes} min`,
     moreTimeDeny: "Not now",
     moreTimeApplied: (host, minutes) => `${host} is allowed for ${minutes} minutes.`,
+    digestTitle: "Today\u2019s summary",
+    digestBody: (seconds, topHost, blocked) => {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const time = h > 0 ? `${h}h ${m}m` : `${m}m`;
+      const parts = [`Screen time: ${time}.`];
+      if (topHost) parts.push(`Top site: ${topHost}.`);
+      if (blocked > 0) parts.push(`${blocked} blocked attempt${blocked === 1 ? "" : "s"}.`);
+      return parts.join(" ");
+    },
   },
   ar: {
     title: "الوقت على وشك الانتهاء",
@@ -50,6 +60,16 @@ export const NOTIFY_MESSAGES = {
     moreTimeGive: (minutes) => `السماح ${minutes} د`,
     moreTimeDeny: "ليس الآن",
     moreTimeApplied: (host, minutes) => `تم السماح بـ${host} لمدة ${minutes} دقيقة.`,
+    digestTitle: "ملخّص اليوم",
+    digestBody: (seconds, topHost, blocked) => {
+      const h = Math.floor(seconds / 3600);
+      const m = Math.floor((seconds % 3600) / 60);
+      const time = h > 0 ? `${h} س ${m} د` : `${m} د`;
+      const parts = [`وقت الشاشة: ${time}.`];
+      if (topHost) parts.push(`الأعلى استخداماً: ${topHost}.`);
+      if (blocked > 0) parts.push(`${blocked} محاولة محجوبة.`);
+      return parts.join(" ");
+    },
   },
 };
 

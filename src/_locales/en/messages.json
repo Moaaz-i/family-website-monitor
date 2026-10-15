@@ -957,5 +957,125 @@
   "searchFilterNote": {
     "message": "Add the search engine itself (for example google.com) to Allowed Websites, or the results page cannot open.",
     "description": "Setup note under the search filter switch."
+  },
+  "ctxMenuAllow": {
+    "message": "Family Monitor: Allow this site",
+    "description": "Right-click menu item: opens the panel with this site pre-filled for the whitelist."
+  },
+  "ctxMenuBlock": {
+    "message": "Family Monitor: Block this site",
+    "description": "Right-click menu item: opens the panel with this site pre-filled for the blocklist."
+  },
+  "intentAllowHint": {
+    "message": "The site is filled in — press Add to allow it.",
+    "description": "Toast after a right-click 'allow this site'; nothing is saved until Add."
+  },
+  "intentBlockHint": {
+    "message": "The site is filled in — press Add to block it.",
+    "description": "Toast after a right-click 'block this site'; nothing is saved until Add."
+  },
+  "pauseHeader": {
+    "message": "Timed pause",
+    "description": "Limits tab heading for the expiring pause."
+  },
+  "pauseHint": {
+    "message": "Stop all browsing until a time you pick — it resumes by itself, nobody has to remember to unlock it.",
+    "description": "Explainer under the timed-pause heading."
+  },
+  "pause1h": {
+    "message": "1 hour",
+    "description": "Pause preset: one hour from now."
+  },
+  "pause3h": {
+    "message": "3 hours",
+    "description": "Pause preset: three hours from now."
+  },
+  "pauseMorning": {
+    "message": "Until 7 a.m.",
+    "description": "Pause preset: until the next 7 a.m."
+  },
+  "resumeNow": {
+    "message": "Resume now",
+    "description": "Button that lifts an active pause immediately."
+  },
+  "pauseActive": {
+    "message": "Paused — $1 left",
+    "description": "Pause countdown. $1 = duration remaining."
+  },
+  "pauseStarted": {
+    "message": "Browsing is paused.",
+    "description": "Toast when a pause starts."
+  },
+  "pauseResumed": {
+    "message": "Browsing resumed.",
+    "description": "Toast when a pause is lifted."
+  },
+  "blockedReasonPause": {
+    "message": "Browsing is paused by a parent. It resumes automatically.",
+    "description": "Blocked-page reason when a timed pause is active."
+  },
+  "safeSearchHeader": {
+    "message": "Strict SafeSearch",
+    "description": "Settings card heading for enforced SafeSearch."
+  },
+  "safeSearchDesc": {
+    "message": "Whatever opens a results page — the new tab, the address bar, a link — it is reloaded once with strict safe search on Google, Bing and DuckDuckGo.",
+    "description": "Explainer for the SafeSearch switch."
+  },
+  "safeSearchToggle": {
+    "message": "Enforce strict SafeSearch",
+    "description": "Label of the SafeSearch switch."
+  },
+  "safeSearchOn": {
+    "message": "Strict SafeSearch is enforced.",
+    "description": "Status while enforced SafeSearch is on."
+  },
+  "safeSearchOff": {
+    "message": "SafeSearch is left as the engine set it.",
+    "description": "Status while enforced SafeSearch is off."
+  },
+  "ytFilterHint": {
+    "message": "A word here also hides every YouTube video whose title contains it.",
+    "description": "Blocklist tab hint: keywords also filter YouTube titles."
+  },
+  "blockedMsgHeader": {
+    "message": "A note on the blocked page",
+    "description": "Settings card heading for the parent's own blocked-page line."
+  },
+  "blockedMsgDesc": {
+    "message": "A short line in your own words, read by the child whenever a page is blocked. It stays on your devices.",
+    "description": "Explainer for the blocked-page note."
+  },
+  "blockedMsgPlaceholder": {
+    "message": "Homework first, then we can talk.",
+    "description": "Placeholder in the blocked-page note field."
+  },
+  "blockedMsgSave": {
+    "message": "Save note",
+    "description": "Button that saves the blocked-page note."
+  },
+  "blockedMsgSaved": {
+    "message": "Note saved.",
+    "description": "Toast after saving the blocked-page note."
+  },
+  "digestToggle": {
+    "message": "Evening summary at 8 p.m.",
+    "description": "Switch label for the local daily digest notification."
+  },
+  "digestHint": {
+    "message": "One local notification a day: time used, top site, blocked attempts. Nothing is sent anywhere.",
+    "description": "Explainer under the digest switch."
+  },
+  "digestOn": {
+    "message": "The evening summary is on.",
+    "description": "Status while the digest is enabled."
+  },
+  "digestOff": {
+    "message": "The evening summary is off.",
+    "description": "Status while the digest is disabled."
+  },
+  "statusPaused": {
+    "message": "Paused — $1",
+    "description": "Status strip chip while a timed pause runs. $1 = duration remaining."
   }
 }

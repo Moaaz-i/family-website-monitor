@@ -48,6 +48,46 @@ const MAX_WALK_LEVELS = 3;
 
 const RECHECK_DELAY_MS = 400;
 
+// ─── Strict SafeSearch ──────────────────────────────────────────────────────
+// The parent's switch lives here, not in the address bar: whether the results
+// page was opened from the new tab, the omnibox or a link, it reloads once
+// with the engine's strict parameter and then stops touching the URL. The
+// sessionStorage counter keeps an engine that strips the parameter from
+// turning into a reload loop.
+const SAFE_SEARCH_RULES = [
+  { match: (h) => h === "google.com" || h.endsWith(".google.com") || h.includes("google."), param: "safe", value: "active" },
+  { match: (h) => h === "bing.com" || h.endsWith(".bing.com"), param: "adlt", value: "strict" },
+  { match: (h) => h === "duckduckgo.com" || h.endsWith(".duckduckgo.com"), param: "kp", value: "1" },
+];
+const SAFE_SEARCH_TRIES_KEY = "fwm-safe-search-tries";
+
+function applyStrictSafeSearch() {
+  try {
+    const host = location.hostname.toLowerCase();
+    const rule = SAFE_SEARCH_RULES.find((r) => r.match(host));
+    if (!rule) return;
+    const url = new URL(location.href);
+    if (url.searchParams.get(rule.param) === rule.value) return;
+
+    let tries = 0;
+    try {
+      tries = Number(sessionStorage.getItem(SAFE_SEARCH_TRIES_KEY)) || 0;
+    } catch {
+      tries = 0; // storage denied: fall through to the one-shot replace
+    }
+    if (tries >= 2) return;
+    try {
+      sessionStorage.setItem(SAFE_SEARCH_TRIES_KEY, String(tries + 1));
+    } catch {
+      /* one shot it is */
+    }
+    url.searchParams.set(rule.param, rule.value);
+    location.replace(url.toString());
+  } catch {
+    /* a URL we cannot rewrite is a page we leave alone */
+  }
+}
+
 function isSearchPage() {
   const host = location.hostname.toLowerCase();
   if (host === "google.com" || host.endsWith(".google.com")) {
@@ -64,12 +104,18 @@ function isSearchPage() {
 function loadPolicy() {
   return new Promise((resolve) => {
     chrome.storage.local.get(
-      { blockedKeywords: [], whitelist: [], whitelistResultsOnly: false },
+      {
+        blockedKeywords: [],
+        whitelist: [],
+        whitelistResultsOnly: false,
+        safeSearchEnforced: false,
+      },
       (data) =>
         resolve({
           blockedKeywords: Array.isArray(data.blockedKeywords) ? data.blockedKeywords : [],
           whitelist: Array.isArray(data.whitelist) ? data.whitelist : [],
           whitelistOnly: data.whitelistResultsOnly === true,
+          safeSearch: data.safeSearchEnforced === true,
         }),
     );
   });
@@ -204,6 +250,11 @@ async function init() {
   if (!isSearchPage()) return;
 
   policy = await loadPolicy();
+
+  // Enforce strict SafeSearch before anything else; a reload re-runs init
+  // with the parameter already in place.
+  if (policy.safeSearch) applyStrictSafeSearch();
+
   // Nothing to hide — do not observe or scan at all.
   if (!isActive()) return;
 
@@ -226,6 +277,14 @@ async function init() {
     }
     if (changes.whitelistResultsOnly) {
       policy.whitelistOnly = changes.whitelistResultsOnly.newValue === true;
+      touched = true;
+    }
+    if (changes.safeSearchEnforced) {
+      policy.safeSearch = changes.safeSearchEnforced.newValue === true;
+      if (policy.safeSearch) {
+        applyStrictSafeSearch(); // may reload; the fresh load re-scans
+        return;
+      }
       touched = true;
     }
     if (!touched) return;

@@ -41,6 +41,8 @@ onTranslationReady(() => {
 
   const urlParams = new URLSearchParams(window.location.search);
   const targetParam = urlParams.get("target");
+  const intentParam = urlParams.get("intent");
+  const intentUrlParam = urlParams.get("url");
 
   function migrateWhitelist(list) {
     return list
@@ -69,7 +71,11 @@ onTranslationReady(() => {
   }
 
   function redirectToTarget() {
-    if (!targetParam) return openDashboard();
+    if (!targetParam) {
+      openDashboard();
+      handleContextIntent();
+      return;
+    }
     // URLSearchParams.get() already decoded once. Validate the scheme: an
     // options.html?target=javascript:... link would otherwise run arbitrary
     // script in the extension origin.
@@ -93,6 +99,38 @@ onTranslationReady(() => {
         window.location.replace(cleanUrl);
       });
     });
+  }
+
+  // Right-click -> "Allow this site" / "Block this site": the panel opens on
+  // the right list with the field filled in. Nothing is written here — the
+  // parent still presses Add, and none of this runs before the login screen.
+  function handleContextIntent() {
+    if (intentParam !== "allow" && intentParam !== "block") return;
+    const raw = intentUrlParam || "";
+    const clean = isValidRedirectTarget(raw) ? normalizeUrl(raw) : null;
+    if (!clean) return;
+
+    const isAllow = intentParam === "allow";
+    const tabBtn = document.querySelector(
+      `.tab-link[data-tab="${isAllow ? "tab-whitelist" : "tab-blocklist"}"]`,
+    );
+    if (tabBtn) tabBtn.click();
+
+    const input = document.getElementById(isAllow ? "newSiteInput" : "newKeywordInput");
+    if (input) {
+      if (isAllow) {
+        input.value = clean;
+      } else {
+        // The blocklist speaks keywords; the host is the one it means.
+        try {
+          input.value = new URL(clean).hostname.replace(/^www\./, "") || clean;
+        } catch {
+          input.value = clean;
+        }
+      }
+      input.focus();
+    }
+    showToast(t(isAllow ? "intentAllowHint" : "intentBlockHint"), "info");
   }
 
   // Initial routing based on password existence and active session
@@ -386,6 +424,10 @@ onTranslationReady(() => {
     loadNotifications();
     loadEmbedGuard();
     loadSearchFilter();
+    loadSafeSearch();
+    loadBlockedMessage();
+    loadDigest();
+    updatePauseStatus();
     renderWrongAttempts();
     renderLimitsTable();
     updateExtensionsTimer();
@@ -763,14 +805,23 @@ onTranslationReady(() => {
         schedule: null,
         dailyLimit: null,
         emergencyLock: false,
+        pausedUntil: 0,
       },
       (data) => {
         const locked = Boolean(data.emergencyLock);
+        const pausedUntil = Number(data.pausedUntil) || 0;
+        const paused = !locked && pausedUntil > Date.now();
         const schedule = data.schedule || { enabled: false, days: [], startTime: "", endTime: "" };
         const outside = Boolean(schedule.enabled) && !isWithinSchedule(schedule);
 
         if (locked) addChip(t("statusLocked"), "danger", true);
-        else if (outside) addChip(t("statusOutsideSchedule"), "warn", true);
+        else if (paused) {
+          addChip(
+            t("statusPaused", formatDuration(Math.round((pausedUntil - Date.now()) / 1000))),
+            "warn",
+            true,
+          );
+        } else if (outside) addChip(t("statusOutsideSchedule"), "warn", true);
         else addChip(t("statusProtectionOn"), "ok", true);
 
         addChip(t("statusAllowedCount", String(migrateWhitelist(data.whitelist).length)));
@@ -1255,10 +1306,12 @@ onTranslationReady(() => {
       changes.blockedKeywords ||
       changes.schedule ||
       changes.dailyLimit ||
-      changes.emergencyLock
+      changes.emergencyLock ||
+      changes.pausedUntil
     ) {
       renderStatusStrip();
     }
+    if (changes.pausedUntil) updatePauseStatus();
   });
 
   // ── PIN quick unlock ─────────────────────────────────────────────────────
@@ -1685,6 +1738,151 @@ onTranslationReady(() => {
         });
       });
     });
+
+  // ── Strict SafeSearch ─────────────────────────────────────────────────────
+  // Off (the default) leaves every engine's own setting alone; on, every
+  // results page reloads once with the engine's strict parameter.
+  function loadSafeSearch() {
+    const checkbox = document.getElementById("safeSearchCheckbox");
+    const status = document.getElementById("safeSearchStatus");
+    if (!checkbox || !status) return;
+
+    chrome.storage.local.get({ safeSearchEnforced: false }, (data) => {
+      const enabled = data.safeSearchEnforced === true;
+      checkbox.checked = enabled;
+      status.textContent = enabled ? t("safeSearchOn") : t("safeSearchOff");
+      status.style.color = enabled ? "var(--success-solid)" : "var(--text-muted)";
+    });
+  }
+
+  document
+    .getElementById("safeSearchCheckbox")
+    .addEventListener("change", (e) => {
+      const enabled = e.target.checked;
+      verifyActiveSession(() => {
+        chrome.storage.local.set({ safeSearchEnforced: enabled }, () => {
+          showToast(enabled ? t("safeSearchOn") : t("safeSearchOff"), "info");
+          loadSafeSearch();
+        });
+      });
+    });
+
+  // ── A note on the blocked page ────────────────────────────────────────────
+  // Parent-authored, synced as configuration, and rendered as plain text on
+  // the blocked page — never as markup.
+  function loadBlockedMessage() {
+    const input = document.getElementById("blockedMsgInput");
+    if (!input) return;
+    chrome.storage.local.get({ blockedMessage: "" }, (data) => {
+      input.value = typeof data.blockedMessage === "string" ? data.blockedMessage : "";
+    });
+  }
+
+  document.getElementById("saveBlockedMsgBtn").addEventListener("click", () => {
+    verifyActiveSession(() => {
+      const input = document.getElementById("blockedMsgInput");
+      if (!input) return;
+      const message = (input.value || "").trim().slice(0, 140);
+      chrome.storage.local.set({ blockedMessage: message }, () => {
+        showToast(t("blockedMsgSaved"), "success");
+        loadBlockedMessage();
+      });
+    });
+  });
+
+  // ── Evening digest ────────────────────────────────────────────────────────
+  // The worker owns the 8 p.m. alarm; this only flips the switch.
+  function loadDigest() {
+    const checkbox = document.getElementById("digestCheckbox");
+    const status = document.getElementById("digestStatus");
+    if (!checkbox || !status) return;
+
+    chrome.storage.local.get({ dailyDigestEnabled: false }, (data) => {
+      const enabled = data.dailyDigestEnabled === true;
+      checkbox.checked = enabled;
+      status.textContent = enabled ? t("digestOn") : t("digestOff");
+      status.style.color = enabled ? "var(--success-solid)" : "var(--text-muted)";
+    });
+  }
+
+  document
+    .getElementById("digestCheckbox")
+    .addEventListener("change", (e) => {
+      const enabled = e.target.checked;
+      verifyActiveSession(() => {
+        chrome.storage.local.set({ dailyDigestEnabled: enabled }, () => {
+          showToast(enabled ? t("digestOn") : t("digestOff"), "info");
+          loadDigest();
+        });
+      });
+    });
+
+  // ── Timed pause ───────────────────────────────────────────────────────────
+  // The emergency lock's gentler sibling: the same stop, but it expires by
+  // itself — nobody has to remember to unlock at 7 a.m.
+  let pauseTimer = null;
+
+  function morningTarget() {
+    const at = new Date();
+    at.setHours(7, 0, 0, 0);
+    if (Date.now() >= at.getTime()) at.setDate(at.getDate() + 1);
+    return at.getTime();
+  }
+
+  function updatePauseStatus() {
+    const status = document.getElementById("pauseStatus");
+    const resumeBtn = document.getElementById("resumeNowBtn");
+    if (!status || !resumeBtn) return;
+
+    chrome.storage.local.get({ pausedUntil: 0 }, (data) => {
+      const until = Number(data.pausedUntil) || 0;
+      const remaining = until - Date.now();
+      const active = remaining > 0;
+      resumeBtn.hidden = !active;
+
+      if (!active) {
+        status.textContent = "";
+        if (pauseTimer) {
+          clearInterval(pauseTimer);
+          pauseTimer = null;
+        }
+        return;
+      }
+      status.textContent = t("pauseActive", formatDuration(Math.round(remaining / 1000)));
+      status.style.color = "var(--warning-solid)";
+      renderStatusStrip(); // the strip shows the same countdown chip
+      if (!pauseTimer) pauseTimer = setInterval(updatePauseStatus, 20000);
+    });
+  }
+
+  function startPause(untilMs) {
+    verifyActiveSession(() => {
+      chrome.storage.local.set({ pausedUntil: untilMs }, () => {
+        showToast(t("pauseStarted"), "info");
+        updatePauseStatus();
+        renderStatusStrip();
+      });
+    });
+  }
+
+  document
+    .getElementById("pause1hBtn")
+    .addEventListener("click", () => startPause(Date.now() + 60 * 60 * 1000));
+  document
+    .getElementById("pause3hBtn")
+    .addEventListener("click", () => startPause(Date.now() + 3 * 60 * 60 * 1000));
+  document
+    .getElementById("pauseMorningBtn")
+    .addEventListener("click", () => startPause(morningTarget()));
+  document.getElementById("resumeNowBtn").addEventListener("click", () => {
+    verifyActiveSession(() => {
+      chrome.storage.local.set({ pausedUntil: 0 }, () => {
+        showToast(t("pauseResumed"), "success");
+        updatePauseStatus();
+        renderStatusStrip();
+      });
+    });
+  });
 
   document.getElementById("changePassBtn").addEventListener("click", () => {
     verifyActiveSession(async () => {

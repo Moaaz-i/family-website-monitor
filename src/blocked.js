@@ -60,8 +60,20 @@ onTranslationReady(() => {
     else if (reason === "tampered") messageKey = "blockedReasonTampered";
     else if (reason === "blocklist") messageKey = "blockedReasonBlocklist";
     else if (reason === "budget") messageKey = "blockedReasonBudget";
+    else if (reason === "pause") messageKey = "blockedReasonPause";
     reasonMessage.textContent = t(messageKey);
   }
+
+  // The parent's own words, if they wrote any. textContent only: the string
+  // may have been typed on another device and is never treated as markup.
+  chrome.storage.local.get({ blockedMessage: "" }, (data) => {
+    const note = document.getElementById("parentNote");
+    if (!note) return;
+    const message = typeof data.blockedMessage === "string" ? data.blockedMessage.trim() : "";
+    if (!message) return;
+    note.textContent = message;
+    note.hidden = false;
+  });
 
   document.getElementById("blockedUrl").textContent = decodedTarget || "Unknown Site";
 

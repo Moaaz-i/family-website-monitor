@@ -108,7 +108,8 @@ Parental control: allow, block, schedule and limit the websites a child can open
 | `alarms` | Periodic maintenance: expiring temporary allowances, rolling the daily counters at midnight, and checking for a new version. |
 | `privacy` | An optional switch that reduces WebRTC IP leakage. It stays off until the parent enables it in Settings. |
 | `notifications` | Warns the parent when a site is about to run out of time and when a child asks for more time. |
-| `<all_urls>` host access | The content scripts show the countdown pill on limited sites and, in every frame, empty an embed that points at a blocked site (the page itself is never redirected). |
+| `contextMenus` | Adds two right-click items, "Allow this site" and "Block this site", so a parent can add a site without copying URLs. The item only opens the settings panel with the field filled in; nothing is written until the parent presses Add while logged in. |
+| `<all_urls>` host access | The content scripts show the countdown pill on limited sites, hide search results and YouTube titles that match the parent's blocked words, and — in every frame — empty an embed that points at a blocked site (the page itself is never redirected). |
 | New tab override (`chrome_url_overrides.newtab`) | Replaces the new tab with a family dashboard (clock, time left, allowed sites). No data leaves the device. |
 
 ## 8. Privacy policy URL

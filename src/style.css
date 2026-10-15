@@ -1022,6 +1022,14 @@ select:focus-visible,
   color: var(--text);
 }
 
+/* The parent's own line: same voice as the reason, one step softer. */
+.parent-note {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  opacity: 0.85;
+}
+
 .parent-area {
   margin-top: 2rem;
   padding-top: 1.25rem;
@@ -1322,6 +1330,13 @@ html.dark .status-chip-danger {
 }
 
 /* ─── Screen-time budget bar ─────────────────────────────────────────────── */
+.pause-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
 .screen-time-bar {
   height: 10px;
   border-radius: 999px;

@@ -74,6 +74,7 @@ const POLICY_KEYS = [
   "schedule",
   "dailyLimit",
   "emergencyLock",
+  "pausedUntil",
   "tempAllowed",
   "timeTampered",
   "language",
@@ -107,6 +108,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
       policyCacheAt = 0;
     }
     if (SYNCED_KEYS.some((key) => key in changes)) schedulePolicyPush();
+    if ("dailyDigestEnabled" in changes) syncDailyDigestAlarm();
     return;
   }
 
@@ -131,6 +133,9 @@ const SYNCED_KEYS = [
   "notificationsEnabled",
   "embedGuardEnabled",
   "whitelistResultsOnly",
+  "pausedUntil",
+  "blockedMessage",
+  "dailyDigestEnabled",
   "screenTime",
 ];
 const SYNC_PUSH_DEBOUNCE_MS = 3000;
@@ -144,7 +149,6 @@ function setSyncStatus(status) {
   storageSet({ policySyncStatus: status });
 }
 
-/** The policy document as it should travel — configuration, not counters. */
 /** The policy document as it should travel — configuration, not counters. */
 function readSyncedPolicy() {
   return storageGet(SYNCED_KEYS).then((data) => normalizeSyncedPayload(data, SYNCED_KEYS));
@@ -911,18 +915,125 @@ function purgePasswordFromSync() {
   });
 }
 
+// ─── Right-click: allow / block this site ───────────────────────────────────
+// The menu item itself changes nothing: it only opens the panel with the
+// right field pre-filled, and the parent is already past the login screen by
+// the time anything can be confirmed. A child who finds the menu reaches a
+// password prompt, not a rule change.
+function createContextMenus() {
+  if (!chrome.contextMenus || !chrome.contextMenus.create) return;
+  chrome.contextMenus.removeAll(() => {
+    void chrome.runtime.lastError;
+    chrome.contextMenus.create({
+      id: "fwm-allow-site",
+      title: chrome.i18n.getMessage("ctxMenuAllow") || "Family Monitor: Allow this site",
+      contexts: ["page", "link"],
+    });
+    chrome.contextMenus.create({
+      id: "fwm-block-site",
+      title: chrome.i18n.getMessage("ctxMenuBlock") || "Family Monitor: Block this site",
+      contexts: ["page", "link"],
+    });
+  });
+}
+
+// Guarded: without the permission this API is undefined, and a top-level
+// throw here would take the whole service worker down with it.
+if (chrome.contextMenus && chrome.contextMenus.onClicked) {
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (info.menuItemId !== "fwm-allow-site" && info.menuItemId !== "fwm-block-site") return;
+  const raw = info.linkUrl || info.pageUrl || (tab && tab.url) || "";
+  // Scheme check here, normalisation on the panel side: a javascript: link
+  // must not even reach the address bar of an extension page.
+  if (!isValidRedirectTarget(raw)) return;
+  const intent = info.menuItemId === "fwm-allow-site" ? "allow" : "block";
+  chrome.tabs.create({
+    url: `${chrome.runtime.getURL("options.html")}?intent=${intent}&url=${encodeURIComponent(raw)}`,
+  });
+  });
+}
+
+// ─── Evening digest ─────────────────────────────────────────────────────────
+// One local notification a day, assembled from counters that already live on
+// this device. Nothing is sent anywhere; a day with no time and no blocks
+// stays quiet instead of reporting zeroes.
+const DAILY_DIGEST_HOUR = 20;
+
+function nextDailyDigestAt() {
+  const at = new Date();
+  at.setHours(DAILY_DIGEST_HOUR, 0, 0, 0);
+  if (Date.now() >= at.getTime()) at.setDate(at.getDate() + 1);
+  return at.getTime();
+}
+
+async function syncDailyDigestAlarm() {
+  const data = await storageGet(["dailyDigestEnabled"]);
+  if (data.dailyDigestEnabled === true) {
+    chrome.alarms.create("dailyDigest", { when: nextDailyDigestAt() });
+  } else {
+    chrome.alarms.clear("dailyDigest");
+  }
+}
+
+async function sendDailyDigest() {
+  if (!chrome.notifications || !chrome.notifications.create) return;
+  const data = await storageGet([
+    "dailyDigestEnabled",
+    "notificationsEnabled",
+    "activity",
+    "language",
+  ]);
+  if (data.dailyDigestEnabled !== true) return;
+  if (data.notificationsEnabled === false) return;
+
+  const activity = data.activity && typeof data.activity === "object" ? data.activity : {};
+  const bucket = activity[dayKey()];
+  let total = 0;
+  let blocked = 0;
+  let topHost = "";
+  let topSeconds = 0;
+  for (const host of Object.keys(bucket || {})) {
+    const entry = bucket[host] || {};
+    total += entry.seconds || 0;
+    blocked += entry.blocked || 0;
+    if ((entry.seconds || 0) > topSeconds) {
+      topSeconds = entry.seconds || 0;
+      topHost = host;
+    }
+  }
+  if (total === 0 && blocked === 0) return;
+
+  const lang = data.language === "ar" ? "ar" : "en";
+  const strings = NOTIFY_MESSAGES[lang];
+  chrome.notifications.create(
+    `digest-${dayKey()}`,
+    {
+      type: "basic",
+      iconUrl: chrome.runtime.getURL("icons/icon128.png"),
+      title: strings.digestTitle,
+      message: strings.digestBody(total, topHost, blocked),
+      priority: 0,
+    },
+    () => void chrome.runtime.lastError,
+  );
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.runtime.setUninstallURL(
     "https://moaaz-i.github.io/family-website-monitor/uninstall.html",
   );
   applyWebRTCSecurity();
   purgePasswordFromSync();
+  createContextMenus();
+  syncDailyDigestAlarm();
 });
 
 chrome.runtime.onStartup.addListener(() => {
   applyWebRTCSecurity();
   checkTimeTampering();
   purgePasswordFromSync();
+  createContextMenus();
+  syncDailyDigestAlarm();
 });
 
 fetchAndCheckUpdates();
@@ -994,6 +1105,10 @@ async function expireTemporaries() {
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === "checkForUpdates") {
     fetchAndCheckUpdates();
+    return;
+  }
+  if (alarm.name === "dailyDigest") {
+    sendDailyDigest().catch((e) => console.error("daily digest failed:", e));
     return;
   }
   if (alarm.name !== "trackTime") return;

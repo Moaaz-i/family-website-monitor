@@ -10,7 +10,8 @@
     "webNavigation",
     "alarms",
     "privacy",
-    "notifications"
+    "notifications",
+    "contextMenus"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self';"
@@ -55,6 +56,11 @@
       "matches": ["https://web.whatsapp.com/*"],
       "js": ["content-whatsapp.js"],
       "run_at": "document_end"
+    },
+    {
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["content-youtube.js"],
+      "run_at": "document_idle"
     }
   ],
   "options_page": "options.html",
