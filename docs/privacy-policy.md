@@ -1,6 +1,6 @@
 # Privacy Policy — Family Website Monitor
 
-_Last updated: 2026-10-11_
+_Last updated: 2026-10-15_
 
 This policy covers the Chrome extension **Family Website Monitor** (the
 "extension"). It is written for the Chrome Web Store listing and for anyone
@@ -43,6 +43,13 @@ are explicitly excluded from sync and never leave the device.
   pruned to the last 14 days automatically.
 - It cannot read pages on `chrome://`, the Chrome Web Store, or PDFs, and
   makes no attempt to.
+
+**The one request it makes by itself.** Every six hours the extension
+fetches the published `version.json` of this project from this repository's
+public GitHub page, to light an "update available" badge on its toolbar
+icon. The request carries only a cache-busting timestamp — no identifiers,
+no settings, no usage data — and it is the extension's sole outbound
+request.
 
 ## Children's privacy
 

@@ -138,3 +138,54 @@ Do not include real browsing data in the screenshots.
 - Small promo tile: 440×280 PNG.
 - Large promo tile: 1400×560 PNG (optional).
 - 128×128 source icon (the build already generates 128/48/32/16).
+
+## 11. Data safety form (dashboard → "Privacy practices")
+
+| Question | Answer |
+| --- | --- |
+| Does this extension collect or transmit user data? | **No.** |
+| Personal info (name, email, address) | Not collected. |
+| Health, financial, payment info | Not collected. |
+| Web activity / browsing history | Not collected — usage counters and the 14-day report stay in `chrome.storage.local` on the device. |
+| Authentication info | Not collected — the parent password exists only as a local PBKDF2 hash. |
+| Device/usage diagnostics, crash reports | Not collected — no telemetry of any kind. |
+| Data sold or shared for advertising | Never. |
+| Remote code | None — everything runs from the package. |
+
+The only outbound request the extension makes is fetching its own published
+`version.json` (a cache-busting timestamp, nothing else) to show an
+"update available" badge. If the form asks about internet communication,
+disclose that one request. There are no third-party recipients, no data
+retention to declare, and no deletion request flow to provide.
+
+## 12. Content rating (IARC questionnaire, if the dashboard asks)
+
+- Violence / gore: none.
+- Sexual content / nudity: none.
+- Profanity / offensive language: none.
+- Drugs, alcohol, tobacco, gambling, fear themes: none.
+- User-to-user interaction (chat, sharing, user-generated content): none.
+- Unfiltered internet access: **Yes, honestly** — the extension manages
+  general browsing, so the child reaches open web content the parent allows.
+  The rating authority may therefore return "Everyone" or a mild teen
+  rating; either is fine for publication.
+
+## 13. "What's new" for 3.0.0 + submission order
+
+```
+Timed pause that lifts itself, right-click "allow/block this site",
+strict SafeSearch on Google/Bing/DuckDuckGo, YouTube title filtering,
+a parent's own blocked-page note, and an optional 8 p.m. summary.
+```
+
+Recommended order:
+
+1. Enable GitHub Pages (branch `main`, root) so `PRIVACY.html` is live over
+   HTTPS — the listing cannot be submitted without a working policy URL.
+2. `npm run package` → upload `family-website-monitor.zip`.
+3. Paste sections 1–5b (listing), 6–7 (purpose + justifications),
+   the policy URL (8), screenshots (9), graphics (10).
+4. Data safety (11) and content rating (12).
+5. First release: **Unlisted** — install it on the family machines from the
+   shared link, run the real-Chrome smoke test (right-click menu, pause,
+   digest), then flip the listing to **Public**.

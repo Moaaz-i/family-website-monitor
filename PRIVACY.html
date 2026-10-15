@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — Family Website Monitor</title>
+<style>
+  body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 52rem; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+  h1 { font-size: 1.7rem; margin-bottom: .25rem; }
+  h2 { font-size: 1.2rem; margin-top: 2.2rem; border-bottom: 1px solid #e5e5e5; padding-bottom: .3rem; }
+  .date { color: #666; font-size: .9rem; }
+  table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: .95rem; }
+  th, td { border: 1px solid #ddd; padding: .5rem .65rem; text-align: left; vertical-align: top; }
+  th { background: #f6f6f6; }
+  code { background: #f2f2f2; padding: .1em .35em; border-radius: 4px; font-size: .9em; }
+  strong { font-weight: 650; }
+  .short { background: #f0f7ff; border: 1px solid #cfe3ff; border-radius: 8px; padding: .9rem 1.1rem; }
+  a { color: #0b57d0; }
+  footer { margin-top: 3rem; font-size: .85rem; color: #666; border-top: 1px solid #e5e5e5; padding-top: .9rem; }
+</style>
+</head>
+<body>
+
+<h1>Privacy Policy — Family Website Monitor</h1>
+<p class="date">Last updated: 2026-10-15</p>
+
+<p>This policy covers the Chrome extension <strong>Family Website Monitor</strong> (the
+"extension"). It is written for the Chrome Web Store listing and for anyone
+installing it for their family.</p>
+
+<h2>Short version</h2>
+<div class="short">
+<p>The extension has <strong>no analytics, no tracking, no advertising, no accounts
+and no servers of its own</strong>. Every piece of data it uses is stored on the
+device it runs on. Nothing is uploaded anywhere by us.</p>
+</div>
+
+<h2>What it stores, and where</h2>
+<table>
+  <tr><th>Data</th><th>Where it lives</th><th>Leaves the device?</th></tr>
+  <tr><td>Parent password (PBKDF2-SHA256 hash, salted)</td><td><code>chrome.storage.local</code></td><td>No</td></tr>
+  <tr><td>Optional PIN (same hashing)</td><td><code>chrome.storage.local</code></td><td>No</td></tr>
+  <tr><td>Whitelist, blocklist, schedule, daily limits, screen-time configuration</td><td><code>chrome.storage.local</code></td><td>Only if the parent enables Chrome sync (see below)</td></tr>
+  <tr><td>Time, visit and blocked-attempt counters; 14-day usage report</td><td><code>chrome.storage.local</code></td><td>No</td></tr>
+  <tr><td>Failed-login log, lockout and session token</td><td><code>chrome.storage.local</code></td><td>No</td></tr>
+</table>
+
+<p><strong>About Chrome sync.</strong> The extension mirrors the <em>rule configuration</em>
+(whitelists, blocklists, schedule, limits, screen-time settings) through
+<code>chrome.storage.sync</code> so a family with two computers configures the lists
+once. That data goes to Google under the user's own Chrome sync account, on
+Google's terms — not to us. Passwords, PINs, sessions and all usage counters
+are explicitly excluded from sync and never leave the device.</p>
+
+<h2>What the extension does <strong>not</strong> do</h2>
+<ul>
+  <li>It does not collect, transmit or sell personal information of any kind.</li>
+  <li>It has no telemetry, crash reporting, analytics SDKs or advertising.</li>
+  <li>It downloads no remote code. Everything it runs is inside the package.</li>
+  <li>It does not store search queries. The new-tab search opens the search
+      engine's own results page directly, and the optional parent-enabled
+      filter ("only allowed sites") hides non-allowed results on that page;
+      the query never reaches the extension's storage.</li>
+  <li>It does not keep a browsing history anywhere except the local usage report
+      on this device, which the parent can clear from the panel and which is
+      pruned to the last 14 days automatically.</li>
+  <li>It cannot read pages on <code>chrome://</code>, the Chrome Web Store, or PDFs, and
+      makes no attempt to.</li>
+</ul>
+<p><strong>The one request it makes by itself.</strong> Every six hours the extension
+fetches the published <code>version.json</code> of this project from this repository's
+public GitHub page, to light an "update available" badge on its toolbar
+icon. The request carries only a cache-busting timestamp — no identifiers,
+no settings, no usage data — and it is the extension's sole outbound
+request.</p>
+
+<h2>Children's privacy</h2>
+<p>No data is collected from anyone, including children. Because the extension
+collects nothing, no child's information is stored, processed or shared.</p>
+
+<h2>Permissions and why they are needed</h2>
+<table>
+  <tr><th>Permission</th><th>Why</th></tr>
+  <tr><td><code>storage</code></td><td>Stores the rules, counters and settings on the device.</td></tr>
+  <tr><td><code>tabs</code></td><td>Reads the current tab's URL to enforce rules and to show the current site in the popup.</td></tr>
+  <tr><td><code>webNavigation</code></td><td>Applies the rules when the current page (the address bar) starts loading or changes via a link — never to the assets a page imports.</td></tr>
+  <tr><td><code>alarms</code></td><td>Periodic maintenance: expiring temporary allowances, rolling the daily counters over at midnight, checking for updates.</td></tr>
+  <tr><td><code>privacy</code></td><td>An optional switch that reduces WebRTC IP leakage. It is off until the parent turns it on.</td></tr>
+  <tr><td><code>notifications</code></td><td>Time warnings ("5 minutes left") and the "your child is asking for more time" alert.</td></tr>
+  <tr><td><code>contextMenus</code></td><td>Adds "Allow this site" / "Block this site" to the right-click menu. The item only opens the panel with the field pre-filled; nothing is saved until the parent confirms while logged in.</td></tr>
+  <tr><td><code>&lt;all_urls&gt;</code> (host access)</td><td>The content scripts: the countdown pill on a limited site (top frame), the search-result and YouTube-title filters, and — in every frame — the embed guard that empties an iframe pointing at a blocked site.</td></tr>
+  <tr><td>New tab override</td><td>Shows the family dashboard (clock, time left, allowed sites) instead of the browser's new tab.</td></tr>
+</table>
+
+<h2>Data retention and deletion</h2>
+<ul>
+  <li>The usage report keeps at most 14 days and is cleared by the parent from
+      the panel at any time.</li>
+  <li>Uninstalling the extension removes everything: the background worker
+      clears its local settings and purges the synced mirror on uninstall.</li>
+  <li>"Clear all data" from Chrome's extension page removes the rest.</li>
+</ul>
+
+<h2>Security</h2>
+<ul>
+  <li>The parent password and PIN are stored only as PBKDF2-SHA256 hashes
+      (310,000 iterations, random per-password salt, constant-time comparison).
+      They are never readable in plaintext, never synced and never logged.</li>
+  <li>Five wrong attempts lock the panel for a cooldown period.</li>
+  <li>The panel locks itself automatically when its tab is hidden.</li>
+</ul>
+
+<h2>Changes</h2>
+<p>Any change to this policy is published in this repository and dated above.
+The extension's own history is in CHANGELOG.md.</p>
+
+<h2>Contact</h2>
+<p>Questions or reports: <a href="https://github.com/Moaaz-i/family-website-monitor/issues">https://github.com/Moaaz-i/family-website-monitor/issues</a></p>
+
+<footer>This extension is distributed by an individual developer, not by Google.</footer>
+
+</body>
+</html>

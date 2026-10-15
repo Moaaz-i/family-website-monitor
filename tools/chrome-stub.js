@@ -338,9 +338,7 @@
     message.textContent = options && options.message ? options.message : "";
     note.appendChild(message);
 
-    const actions = Array.isArray((options && options.buttons) || [])
-      ? options.buttons
-      : [];
+    const actions = Array.isArray(options && options.buttons) ? options.buttons : [];
     if (actions.length) {
       const row = document.createElement("div");
       row.className = "preview-note-actions";
@@ -549,8 +547,16 @@
           alarmListeners.push(fn);
         },
       },
-      create(name) {
+      create(name, options) {
         lastAlarmNames.add(name);
+        firedOnce.delete(name);
+        // Fire the alarm shortly after it is created (once), mirroring the
+        // real `when` behaviour closely enough for the preview without
+        // waiting until 8 p.m. Re-creating the alarm re-arms it.
+        const delay = options && typeof options.when === "number"
+          ? Math.max(1000, Math.min(options.when - Date.now(), 4000))
+          : 1000;
+        setTimeout(() => fireAlarm(name), delay);
       },
       clear(name, callback) {
         lastAlarmNames.delete(name);
@@ -613,6 +619,19 @@
   };
 
   const lastAlarmNames = new Set();
+  const firedOnce = new Set();
+
+  function fireAlarm(name) {
+    if (firedOnce.has(name)) return;
+    firedOnce.add(name);
+    alarmListeners.forEach((fn) => {
+      try {
+        fn({ name, scheduledTime: Date.now() });
+      } catch (e) {
+        console.error("[preview] alarm listener threw:", e);
+      }
+    });
+  }
 
   window.chrome = chrome;
 
